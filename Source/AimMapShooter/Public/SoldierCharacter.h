@@ -8,6 +8,7 @@
 
 class UCameraComponent;
 class AAutomaticRifle;
+class USkeletalMeshComponent;
 
 UCLASS()
 class AIMMAPSHOOTER_API ASoldierCharacter : public ACharacter
@@ -24,6 +25,9 @@ protected:
 
 	AAutomaticRifle* AutomaticRifle;
 
+	UPROPERTY(VisibleAnywhere, Category = "Components")
+	USkeletalMeshComponent* SkelMesh;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Player")
 	TSubclassOf<AAutomaticRifle> StarterWeaponClass;
 
@@ -39,7 +43,7 @@ protected:
 
 public:	
 
-	UPROPERTY(VisibleAnywhere, Category = "Camera")
+	UPROPERTY(EditAnywhere, Category = "Camera")
 	UCameraComponent* CameraComp;
 
 	FName HeadSocket;

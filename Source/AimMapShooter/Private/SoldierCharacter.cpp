@@ -2,6 +2,7 @@
 
 #include "Camera/CameraComponent.h"
 #include "AutomaticRifle.h"
+#include "Components/SkeletalMeshComponent.h"
 #include "SoldierCharacter.h"
 
 // Sets default values
@@ -13,8 +14,9 @@ ASoldierCharacter::ASoldierCharacter()
 	HeadSocket = "HeadSocket";
 	WeaponSocket = "WeaponSocket";
 
+	SkelMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Mesh"));
+
 	CameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComp"));
-	CameraComp->SetupAttachment(RootComponent);
 	CameraComp->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, HeadSocket);
 
 }
