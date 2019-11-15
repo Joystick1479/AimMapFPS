@@ -43,7 +43,7 @@ protected:
 
 public:	
 
-	UPROPERTY(EditAnywhere, Category = "Camera")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera")
 	UCameraComponent* CameraComp;
 
 	FName HeadSocket;
