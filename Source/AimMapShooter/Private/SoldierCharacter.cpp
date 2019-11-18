@@ -3,6 +3,7 @@
 #include "Camera/CameraComponent.h"
 #include "AutomaticRifle.h"
 #include "Components/SkeletalMeshComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "SoldierCharacter.h"
 
 // Sets default values
@@ -64,6 +65,8 @@ void ASoldierCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	PlayerInputComponent->BindAction("ZoomIn", IE_Pressed, this, &ASoldierCharacter::ZoomIn);
 	PlayerInputComponent->BindAction("ZoomIn", IE_Released, this, &ASoldierCharacter::ZoomOut);
 
+	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &ASoldierCharacter::Fire);
+
 }
 
 void ASoldierCharacter::MoveForward(float Value)
@@ -84,13 +87,33 @@ void ASoldierCharacter::EndCrouch()
 }
 void ASoldierCharacter::ZoomIn()
 {
-	//Attaching camera to ADS//
-	//CameraComp->DetachFromComponent(FDetachmentTransformRules::KeepRelativeTransform);
-	//CameraComp->AttachToComponent(this->GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, CameraSocket);
+	IsZooming = true;
+
+	APlayerController* PC = Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
+	if (PC)
+	{
+		if (AutomaticRifle)
+		{
+			PC->SetViewTargetWithBlend(AutomaticRifle, 2.0f, EViewTargetBlendFunction::VTBlend_Cubic);
+		}
+	}
 }
 
 void ASoldierCharacter::ZoomOut()
 {
-	//CameraComp->DetachFromComponent(FDetachmentTransformRules::KeepRelativeTransform);
-	//CameraComp->AttachToComponent(this->GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, HeadSocket);
+	IsZooming = false;
+
+	APlayerController* PC = Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
+	if (PC)
+	{
+			PC->SetViewTargetWithBlend(this, 2.0f, EViewTargetBlendFunction::VTBlend_Cubic);
+	}
+}
+
+void ASoldierCharacter::Fire()
+{
+	if (AutomaticRifle)
+	{
+		AutomaticRifle->Fire();
+	}
 }

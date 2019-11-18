@@ -23,11 +23,14 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+
+	
 	AAutomaticRifle* AutomaticRifle;
 
 
 	UPROPERTY(EditDefaultsOnly, Category = "Player")
 	TSubclassOf<AAutomaticRifle> StarterWeaponClass;
+
 
 	//Character Movement//
 	void MoveForward(float Value);
@@ -35,7 +38,7 @@ protected:
 	void BeginCrouch();
 	void EndCrouch();
 
-
+	void Fire();
 	void ZoomIn();
 	void ZoomOut();
 
@@ -46,6 +49,9 @@ public:
 
 	FName HeadSocket;
 	FName WeaponSocket;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Zoom")
+	bool IsZooming;
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
