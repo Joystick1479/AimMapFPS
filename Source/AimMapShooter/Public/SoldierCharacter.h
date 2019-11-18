@@ -25,8 +25,6 @@ protected:
 
 	AAutomaticRifle* AutomaticRifle;
 
-	UPROPERTY(VisibleAnywhere, Category = "Components")
-	USkeletalMeshComponent* SkelMesh;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Player")
 	TSubclassOf<AAutomaticRifle> StarterWeaponClass;

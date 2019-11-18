@@ -14,7 +14,6 @@ ASoldierCharacter::ASoldierCharacter()
 	HeadSocket = "HeadSocket";
 	WeaponSocket = "WeaponSocket";
 
-	SkelMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Mesh"));
 
 	CameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComp"));
 	CameraComp->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, HeadSocket);
