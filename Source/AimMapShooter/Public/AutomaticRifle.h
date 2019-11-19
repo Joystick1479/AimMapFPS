@@ -25,6 +25,9 @@ protected:
 	FName MuzzleSocket;
 	FName CameraSocket;
 
+	//Start location of holographic sight//
+	FName LineSocket;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon", meta = (ClampMin = 0.0f))
 	float BulletSpread;
 
