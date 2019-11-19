@@ -65,7 +65,10 @@ void ASoldierCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	PlayerInputComponent->BindAction("ZoomIn", IE_Pressed, this, &ASoldierCharacter::ZoomIn);
 	PlayerInputComponent->BindAction("ZoomIn", IE_Released, this, &ASoldierCharacter::ZoomOut);
 
-	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &ASoldierCharacter::Fire);
+	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &ASoldierCharacter::StartFire);
+	PlayerInputComponent->BindAction("Fire", IE_Released, this, &ASoldierCharacter::StopFire);
+
+	PlayerInputComponent->BindAction("Reload", IE_Pressed, this, &ASoldierCharacter::Reload);
 
 }
 
@@ -110,10 +113,26 @@ void ASoldierCharacter::ZoomOut()
 	}
 }
 
-void ASoldierCharacter::Fire()
+void ASoldierCharacter::StartFire()
 {
 	if (AutomaticRifle)
 	{
-		AutomaticRifle->Fire();
+		AutomaticRifle->StartFire();
+	}
+}
+
+void ASoldierCharacter::StopFire()
+{
+	if (AutomaticRifle)
+	{
+		AutomaticRifle->StopFire();
+	}
+}
+
+void ASoldierCharacter::Reload()
+{
+	if (AutomaticRifle)
+	{
+		AutomaticRifle->ReloadWeapon();
 	}
 }

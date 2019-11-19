@@ -38,7 +38,11 @@ protected:
 	void BeginCrouch();
 	void EndCrouch();
 
-	void Fire();
+	void StartFire();
+	void StopFire();
+
+	void Reload();
+
 	void ZoomIn();
 	void ZoomOut();
 

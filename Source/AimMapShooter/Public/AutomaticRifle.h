@@ -9,6 +9,44 @@
 class USkeletalMeshComponent;
 class UCameraComponent;
 
+namespace EWeaponState
+{
+	enum Type
+	{
+		Idle,
+		Firing,
+		Reloading,
+		Equipping,
+	};
+}
+
+USTRUCT()
+struct FWeaponData
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY(EditDefaultsOnly, Category = "Ammo")
+	int32 MaxAmmo;
+
+
+	UPROPERTY(EditDefaultsOnly, Category = "Ammo")
+	int32 AmmoPerClip;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Ammo")
+	int32 InitialClips;
+
+	UPROPERTY(EditDefaultsOnly, Category = WeaponStat)
+	float TimeBetweenShots;
+
+	FWeaponData()
+	{
+		MaxAmmo = 100;
+		AmmoPerClip = 20;
+		InitialClips = 4;
+		TimeBetweenShots = 0.2f;
+	}
+};
+
 UCLASS()
 class AIMMAPSHOOTER_API AAutomaticRifle : public AActor
 {
@@ -17,6 +55,16 @@ class AIMMAPSHOOTER_API AAutomaticRifle : public AActor
 public:	
 	// Sets default values for this actor's properties
 	AAutomaticRifle();
+	
+	enum class EAmmoType
+	{
+		EStandardAmmo,
+		EBpAmmo,
+		EBtAmmo,
+	};
+
+	void UseAmmo();
+	void ReloadWeapon();
 
 protected:
 	// Called when the game starts or when spawned
@@ -31,6 +79,28 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon", meta = (ClampMin = 0.0f))
 	float BulletSpread;
 
+	EWeaponState::Type CurrentState;
+
+	/** weapon data */
+	UPROPERTY(EditDefaultsOnly, Category = Config)
+	FWeaponData WeaponConfig;
+
+	UPROPERTY(Transient)
+	int32 CurrentAmmo;
+
+	UPROPERTY(Transient)
+	int32 CurrentAmmoInClip;
+
+	void Fire();
+
+	FTimerHandle TimerHandle_TimeBetweenShots;
+
+	float LastFireTime;
+
+	//* Bullets per minute fired*//
+	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
+	float RateOfFire;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -41,5 +111,8 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
 	UCameraComponent* Camera;
 
-	void Fire();
+
+	void StartFire();
+
+	void StopFire();
 };
