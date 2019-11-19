@@ -19,6 +19,10 @@ ASoldierCharacter::ASoldierCharacter()
 	CameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComp"));
 	CameraComp->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, HeadSocket);
 
+	ZoomingTime = 0.2f;
+
+	IsSingleFire = false;
+
 }
 
 // Called when the game starts or when spawned
@@ -70,6 +74,9 @@ void ASoldierCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
 	PlayerInputComponent->BindAction("Reload", IE_Pressed, this, &ASoldierCharacter::Reload);
 
+	PlayerInputComponent->BindAction("FireMode", IE_Pressed, this, &ASoldierCharacter::FireMode);
+
+
 }
 
 void ASoldierCharacter::MoveForward(float Value)
@@ -97,7 +104,7 @@ void ASoldierCharacter::ZoomIn()
 	{
 		if (AutomaticRifle)
 		{
-			PC->SetViewTargetWithBlend(AutomaticRifle, 2.0f, EViewTargetBlendFunction::VTBlend_Cubic);
+			PC->SetViewTargetWithBlend(AutomaticRifle, ZoomingTime, EViewTargetBlendFunction::VTBlend_Linear);
 		}
 	}
 }
@@ -109,16 +116,27 @@ void ASoldierCharacter::ZoomOut()
 	APlayerController* PC = Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
 	if (PC)
 	{
-			PC->SetViewTargetWithBlend(this, 2.0f, EViewTargetBlendFunction::VTBlend_Cubic);
+			PC->SetViewTargetWithBlend(this, ZoomingTime, EViewTargetBlendFunction::VTBlend_Linear);
 	}
 }
 
 void ASoldierCharacter::StartFire()
 {
-	if (AutomaticRifle)
+	if (IsSingleFire == false)
 	{
-		AutomaticRifle->StartFire();
+		if (AutomaticRifle)
+		{
+			AutomaticRifle->StartFire();
+		}
 	}
+	else
+	{
+		if (AutomaticRifle)
+		{
+			AutomaticRifle->Fire();
+		}
+	}
+	
 }
 
 void ASoldierCharacter::StopFire()
@@ -135,4 +153,9 @@ void ASoldierCharacter::Reload()
 	{
 		AutomaticRifle->StartReload();
 	}
+}
+
+void ASoldierCharacter::FireMode()
+{
+	IsSingleFire = true;
 }

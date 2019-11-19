@@ -5,6 +5,10 @@
 #include "DrawDebugHelpers.h"
 #include "SoldierCharacter.h"
 #include "TimerManager.h"
+#include "Particles/ParticleSystem.h"
+#include "Particles/ParticleSystemComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "Sound/SoundCue.h"
 #include "AutomaticRifle.h"
 
 // Sets default values
@@ -65,10 +69,9 @@ void AAutomaticRifle::Tick(float DeltaTime)
 
 void AAutomaticRifle::StartFire()
 {
+
 	float FirstDelay = FMath::Max(LastFireTime + WeaponConfig.TimeBetweenShots - GetWorld()->TimeSeconds, 0.0f);
-
-	GetWorldTimerManager().SetTimer(TimerHandle_TimeBetweenShots,this, &AAutomaticRifle::Fire, WeaponConfig.TimeBetweenShots, true, FirstDelay);
-
+	GetWorldTimerManager().SetTimer(TimerHandle_TimeBetweenShots, this, &AAutomaticRifle::Fire, WeaponConfig.TimeBetweenShots, true, FirstDelay);
 	Fire();
 }
 
@@ -101,10 +104,16 @@ void AAutomaticRifle::Fire()
 
 				if (GetWorld()->LineTraceSingleByChannel(Hit, StartLocation, EndLocation, ECollisionChannel::ECC_Pawn, QueryParams))
 				{
-					DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::Red, false, 1.0f, 0, 1.0f);
-				}
 
+					DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::Red, false, 1.0f, 0, 1.0f);
+
+					if (ImpactEffect)
+					{
+						UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactEffect, Hit.ImpactPoint, Hit.ImpactNormal.Rotation());
+					}
+				}
 				UseAmmo();
+				PlayFireEffects(EndLocation);
 			}
 		}
 		else
@@ -124,8 +133,14 @@ void AAutomaticRifle::Fire()
 				if (GetWorld()->LineTraceSingleByChannel(Hit, StartLocation, EndLocation, ECollisionChannel::ECC_Pawn, QueryParams))
 				{
 					DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::White, false, 1.0f, 0, 1.0f);
+
+					if (ImpactEffect)
+					{
+						UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactEffect, Hit.ImpactPoint, Hit.ImpactNormal.Rotation());
+					}
 				}
 				UseAmmo();
+				PlayFireEffects(EndLocation);
 			}
 		}
 
@@ -133,11 +148,36 @@ void AAutomaticRifle::Fire()
 	}
 	
 }
+
+void AAutomaticRifle::PlayFireEffects(FVector EndLocation)
+{
+	FVector MuzzleLocation = SkelMeshComp->GetSocketLocation(MuzzleSocket);
+
+	if (TracerEffect)
+	{
+		UParticleSystemComponent* TracerComp = UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), TracerEffect, MuzzleLocation);
+		if (TracerComp)
+		{
+			TracerComp->SetVectorParameter("Target", EndLocation);
+		}
+	}
+
+	if (MuzzleEffect)
+	{
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), MuzzleEffect, MuzzleLocation);
+	}
+	if (ShootSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(GetWorld(), ShootSound, GetActorLocation());
+	}
+}
 void AAutomaticRifle::StartReload()
 {
 	CurrentState = EWeaponState::Reloading;
 
-	GetWorldTimerManager().SetTimer(TimerHandle_ReloadWeapon, this, &AAutomaticRifle::ReloadWeapon, 3.0f, false);
+	UGameplayStatics::PlaySoundAtLocation(GetWorld(), ReloadSound, GetActorLocation());
+
+	GetWorldTimerManager().SetTimer(TimerHandle_ReloadWeapon, this, &AAutomaticRifle::ReloadWeapon, 2.5f, false);
 
 }
 

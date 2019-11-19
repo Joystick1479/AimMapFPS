@@ -31,6 +31,8 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Player")
 	TSubclassOf<AAutomaticRifle> StarterWeaponClass;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
+	float ZoomingTime;
 
 	//Character Movement//
 	void MoveForward(float Value);
@@ -40,6 +42,8 @@ protected:
 
 	void StartFire();
 	void StopFire();
+
+	void FireMode();
 
 	void Reload();
 
@@ -56,6 +60,9 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Zoom")
 	bool IsZooming;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Zoom")
+	bool IsSingleFire;
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

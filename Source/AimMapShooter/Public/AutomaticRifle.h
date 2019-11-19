@@ -8,6 +8,9 @@
 
 class USkeletalMeshComponent;
 class UCameraComponent;
+class UParticleSystem;
+class USoundCue;
+class ASoldierCharacter;
 
 namespace EWeaponState
 {
@@ -67,8 +70,13 @@ public:
 		EBtAmmo,
 	};
 
+
+	ASoldierCharacter* SoldierChar;
+
+
 	void UseAmmo();
 
+	void Fire();
 	void StartReload();
 	void StopReload();
 	void ReloadWeapon();
@@ -88,6 +96,7 @@ protected:
 
 	EWeaponState::Type CurrentState;
 
+
 	/** weapon data */
 	UPROPERTY(EditDefaultsOnly, Category = Config)
 	FWeaponData WeaponConfig;
@@ -98,7 +107,6 @@ protected:
 	UPROPERTY(Transient)
 	int32 CurrentAmmoInClip;
 
-	void Fire();
 
 	FTimerHandle TimerHandle_TimeBetweenShots;
 	FTimerHandle TimerHandle_StopReload;
@@ -110,6 +118,27 @@ protected:
 	//* Bullets per minute fired*//
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
 	float RateOfFire;
+
+
+	//*Particle effects*//
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Effects")
+	UParticleSystem* ImpactEffect;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Effects")
+	UParticleSystem* TracerEffect;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Effects")
+	UParticleSystem* MuzzleEffect;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Effects")
+	USoundCue* ShootSound;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Effects")
+	USoundCue* ReloadSound;
+
+	void PlayFireEffects(FVector EndLocation);
+
 
 public:	
 	// Called every frame
