@@ -38,12 +38,16 @@ struct FWeaponData
 	UPROPERTY(EditDefaultsOnly, Category = WeaponStat)
 	float TimeBetweenShots;
 
+	UPROPERTY(EditDefaultsOnly, Category = WeaponStat)
+	float TimeBetweenReload;
+
 	FWeaponData()
 	{
 		MaxAmmo = 100;
 		AmmoPerClip = 20;
 		InitialClips = 4;
 		TimeBetweenShots = 0.2f;
+		TimeBetweenReload = 2.0f;
 	}
 };
 
@@ -64,6 +68,9 @@ public:
 	};
 
 	void UseAmmo();
+
+	void StartReload();
+	void StopReload();
 	void ReloadWeapon();
 
 protected:
@@ -94,8 +101,11 @@ protected:
 	void Fire();
 
 	FTimerHandle TimerHandle_TimeBetweenShots;
+	FTimerHandle TimerHandle_StopReload;
+	FTimerHandle TimerHandle_ReloadWeapon;
 
 	float LastFireTime;
+	float LastReloadTime;
 
 	//* Bullets per minute fired*//
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon")

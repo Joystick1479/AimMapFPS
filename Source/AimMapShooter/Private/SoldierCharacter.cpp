@@ -133,6 +133,6 @@ void ASoldierCharacter::Reload()
 {
 	if (AutomaticRifle)
 	{
-		AutomaticRifle->ReloadWeapon();
+		AutomaticRifle->StartReload();
 	}
 }

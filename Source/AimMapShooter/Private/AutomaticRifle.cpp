@@ -79,7 +79,7 @@ void AAutomaticRifle::StopFire()
 
 void AAutomaticRifle::Fire()
 {
-	if (CurrentAmmoInClip > 0)
+	if (CurrentAmmoInClip > 0 && CurrentState!=EWeaponState::Reloading)
 	{
 		CurrentState = EWeaponState::Firing;
 
@@ -133,14 +133,31 @@ void AAutomaticRifle::Fire()
 	}
 	
 }
-void AAutomaticRifle::ReloadWeapon()
+void AAutomaticRifle::StartReload()
 {
 	CurrentState = EWeaponState::Reloading;
+
+	GetWorldTimerManager().SetTimer(TimerHandle_ReloadWeapon, this, &AAutomaticRifle::ReloadWeapon, 3.0f, false);
+
+}
+
+void AAutomaticRifle::StopReload()
+{
+	GetWorldTimerManager().ClearTimer(TimerHandle_ReloadWeapon);
+}
+
+void AAutomaticRifle::ReloadWeapon()
+{
 
 	int32 ClipDelta = FMath::Min(WeaponConfig.AmmoPerClip - CurrentAmmoInClip, CurrentAmmo - CurrentAmmoInClip);
 	if (ClipDelta > 0)
 	{
 		CurrentAmmoInClip += ClipDelta;
 	}
+
+	CurrentState = EWeaponState::Idle;
+
+	UE_LOG(LogTemp, Warning, TEXT("Reloaded"));
+	//LastReloadTime = GetWorld()->TimeSeconds;
 }
 
