@@ -3,4 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Kismet/GameplayStatics.h"
+#include "Engine.h"
 
+#define COLLISION_ITEMS ECC_GameTraceChannel2

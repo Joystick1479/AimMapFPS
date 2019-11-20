@@ -5,6 +5,7 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "HealthComponent.h"
+#include "AimMapShooter.h"
 #include "SoldierCharacter.h"
 
 
@@ -28,6 +29,9 @@ ASoldierCharacter::ASoldierCharacter()
 	IsSingleFire = false;
 
 	CharacterState = ECharacterState::Idle;
+	MaxUseDistance = 400;
+
+	bFocusItem = false;
 
 }
 
@@ -50,10 +54,44 @@ void ASoldierCharacter::BeginPlay()
 	
 }
 
+void ASoldierCharacter::LineTraceItem()
+{
+	//Line trace to pickup object//
+	//FVector camLoc;
+	//FRotator camRot;
+
+	//if (Controller == NULL)  return;
+
+	//Controller->GetPlayerViewPoint(camLoc, camRot);
+	const FVector start_trace = CameraComp->GetComponentLocation();
+	const FVector direction = CameraComp->GetComponentRotation().Vector();
+	const FVector end_trace = start_trace + (direction* MaxUseDistance);
+
+	FCollisionQueryParams TraceParams(FName(TEXT("")), true, this);
+	TraceParams.bReturnPhysicalMaterial = false;
+	TraceParams.bTraceComplex = true;
+	TraceParams.AddIgnoredActor(this);
+
+		FHitResult Hit;
+
+		if (GetWorld()->LineTraceSingleByChannel(Hit, start_trace, end_trace, COLLISION_ITEMS , TraceParams))
+		{
+			DrawDebugLine(GetWorld(), start_trace, end_trace, FColor::Red, false, 1.0f, 0, 1.0f);
+			bFocusItem = true;
+		}
+		else
+		{
+			bFocusItem = false;
+		}
+	
+}
+
 // Called every frame
 void ASoldierCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	LineTraceItem();
 
 }
 
@@ -171,6 +209,7 @@ void ASoldierCharacter::Reload()
 
 void ASoldierCharacter::FireMode()
 {
+	//* NO SWITCHING FIRE MODES WHEN FIRING *//
 	if (CharacterState != ECharacterState::Firing)
 	{
 		if (IsSingleFire == false)
@@ -182,7 +221,6 @@ void ASoldierCharacter::FireMode()
 			IsSingleFire = false;
 		}
 	}
-	
 		
 }
 

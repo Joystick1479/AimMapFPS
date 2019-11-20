@@ -37,6 +37,7 @@ protected:
 	
 	AAutomaticRifle* AutomaticRifle;
 
+	void LineTraceItem();
 
 	UPROPERTY(EditDefaultsOnly, Category = "Player")
 	TSubclassOf<AAutomaticRifle> StarterWeaponClass;
@@ -60,6 +61,11 @@ protected:
 	void ZoomIn();
 	void ZoomOut();
 
+	UPROPERTY(EditDefaultsOnly, Category = "LineTrace")
+	float MaxUseDistance;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Player")
+	bool bFocusItem;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Player")
 	bool bDied;
