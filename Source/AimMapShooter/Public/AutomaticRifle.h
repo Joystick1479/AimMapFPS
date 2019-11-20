@@ -137,6 +137,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Effects")
 	USoundCue* ReloadSound;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Effects")
+	USoundCue* NoAmmoSound;
+
 	void PlayFireEffects(FVector EndLocation);
 
 

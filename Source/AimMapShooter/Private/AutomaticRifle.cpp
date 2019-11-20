@@ -146,6 +146,13 @@ void AAutomaticRifle::Fire()
 
 		LastFireTime = GetWorld()->TimeSeconds;
 	}
+
+	//*Sound when no ammo in clip*//
+
+	if (CurrentAmmoInClip == 0 && CurrentState!=EWeaponState::Reloading)
+	{
+		UGameplayStatics::PlaySoundAtLocation(GetWorld(), NoAmmoSound, GetActorLocation());
+	}
 	
 }
 
