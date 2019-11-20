@@ -95,6 +95,9 @@ protected:
 	float BulletSpread;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon", meta = (ClampMin = 0.0f))
+	float BulletSpreadZooming;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Weapon", meta = (ClampMin = 0.0f))
 	float BaseDamage;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon")
@@ -124,6 +127,7 @@ protected:
 	//* Bullets per minute fired*//
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
 	float RateOfFire;
+
 
 
 	//*Particle effects*//

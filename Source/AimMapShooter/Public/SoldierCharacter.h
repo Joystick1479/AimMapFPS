@@ -11,6 +11,15 @@ class AAutomaticRifle;
 class USkeletalMeshComponent;
 class UHealthComponent;
 
+namespace ECharacterState
+{
+	enum Type
+	{
+		Idle,
+		Firing
+	};
+}
+
 UCLASS()
 class AIMMAPSHOOTER_API ASoldierCharacter : public ACharacter
 {
@@ -24,7 +33,7 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-
+	ECharacterState::Type CharacterState;
 	
 	AAutomaticRifle* AutomaticRifle;
 

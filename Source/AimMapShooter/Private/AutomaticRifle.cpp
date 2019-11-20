@@ -32,8 +32,11 @@ AAutomaticRifle::AAutomaticRifle()
 
 	CurrentAmmo = 0;
 	CurrentAmmoInClip = 0;
+
 	RateOfFire = 600;
 	BaseDamage = 20.0f;
+	BulletSpread = 2.0f;
+	BulletSpreadZooming = 0.5f;
 
 }
 
@@ -98,7 +101,10 @@ void AAutomaticRifle::Fire()
 				FVector StartLocation = SkelMeshComp->GetSocketLocation(LineSocket);
 				FRotator Rotation = SkelMeshComp->GetSocketRotation(LineSocket);
 				FVector ShotDirection = Rotation.Vector();
+				float HalfRad = FMath::DegreesToRadians(BulletSpreadZooming);
+				ShotDirection = FMath::VRandCone(ShotDirection, HalfRad, HalfRad);
 				FVector EndLocation = StartLocation + (ShotDirection * 10000);
+
 				FCollisionQueryParams QueryParams;
 				QueryParams.AddIgnoredActor(MyOwner);
 				QueryParams.AddIgnoredActor(this);
@@ -106,7 +112,7 @@ void AAutomaticRifle::Fire()
 				if (GetWorld()->LineTraceSingleByChannel(Hit, StartLocation, EndLocation, ECollisionChannel::ECC_Pawn, QueryParams))
 				{
 
-					DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::Red, false, 1.0f, 0, 1.0f);
+					//DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::Red, false, 1.0f, 0, 1.0f);
 
 					if (ImpactEffect)
 					{
@@ -130,6 +136,8 @@ void AAutomaticRifle::Fire()
 				FVector StartLocation = SkelMeshComp->GetSocketLocation(MuzzleSocket);
 				FRotator Rotation = SkelMeshComp->GetSocketRotation(MuzzleSocket);
 				FVector ShotDirection = Rotation.Vector();
+				float HalfRad = FMath::DegreesToRadians(BulletSpread);
+				ShotDirection = FMath::VRandCone(ShotDirection, HalfRad, HalfRad);
 				FVector EndLocation = StartLocation + (ShotDirection * 10000);
 				FCollisionQueryParams QueryParams;
 				QueryParams.AddIgnoredActor(MyOwner);
@@ -137,7 +145,7 @@ void AAutomaticRifle::Fire()
 
 				if (GetWorld()->LineTraceSingleByChannel(Hit, StartLocation, EndLocation, ECollisionChannel::ECC_Pawn, QueryParams))
 				{
-					DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::White, false, 1.0f, 0, 1.0f);
+					//DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::White, false, 1.0f, 0, 1.0f);
 
 					if (ImpactEffect)
 					{

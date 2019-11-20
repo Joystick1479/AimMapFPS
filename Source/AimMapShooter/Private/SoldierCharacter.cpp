@@ -27,6 +27,8 @@ ASoldierCharacter::ASoldierCharacter()
 
 	IsSingleFire = false;
 
+	CharacterState = ECharacterState::Idle;
+
 }
 
 // Called when the game starts or when spawned
@@ -130,6 +132,8 @@ void ASoldierCharacter::ZoomOut()
 
 void ASoldierCharacter::StartFire()
 {
+	CharacterState = ECharacterState::Firing;
+
 	if (IsSingleFire == false)
 	{
 		if (AutomaticRifle)
@@ -149,6 +153,8 @@ void ASoldierCharacter::StartFire()
 
 void ASoldierCharacter::StopFire()
 {
+	CharacterState = ECharacterState::Idle;
+
 	if (AutomaticRifle)
 	{
 		AutomaticRifle->StopFire();
@@ -165,7 +171,19 @@ void ASoldierCharacter::Reload()
 
 void ASoldierCharacter::FireMode()
 {
-	IsSingleFire = true;
+	if (CharacterState != ECharacterState::Firing)
+	{
+		if (IsSingleFire == false)
+		{
+			IsSingleFire = true;
+		}
+		else
+		{
+			IsSingleFire = false;
+		}
+	}
+	
+		
 }
 
 void ASoldierCharacter::OnHealthChanged(UHealthComponent * OwningHealthComp, float Health, float HealthDelta, const UDamageType * DamageType, AController * InstigatedBy, AActor * DamageCauser)
