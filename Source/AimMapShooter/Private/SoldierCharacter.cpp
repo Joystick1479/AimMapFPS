@@ -4,7 +4,9 @@
 #include "AutomaticRifle.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "HealthComponent.h"
 #include "SoldierCharacter.h"
+
 
 // Sets default values
 ASoldierCharacter::ASoldierCharacter()
@@ -18,6 +20,8 @@ ASoldierCharacter::ASoldierCharacter()
 
 	CameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComp"));
 	CameraComp->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, HeadSocket);
+
+	HealthComp = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComp"));
 
 	ZoomingTime = 0.2f;
 
@@ -39,6 +43,8 @@ void ASoldierCharacter::BeginPlay()
 		AutomaticRifle->SetOwner(this);
 		AutomaticRifle->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocket);
 	}
+
+	HealthComp->OnHealthChanged.AddDynamic(this, &ASoldierCharacter::OnHealthChanged);
 	
 }
 
@@ -120,6 +126,8 @@ void ASoldierCharacter::ZoomOut()
 	}
 }
 
+
+
 void ASoldierCharacter::StartFire()
 {
 	if (IsSingleFire == false)
@@ -158,4 +166,13 @@ void ASoldierCharacter::Reload()
 void ASoldierCharacter::FireMode()
 {
 	IsSingleFire = true;
+}
+
+void ASoldierCharacter::OnHealthChanged(UHealthComponent * OwningHealthComp, float Health, float HealthDelta, const UDamageType * DamageType, AController * InstigatedBy, AActor * DamageCauser)
+{
+	if (Health <= 0.0f && !bDied)
+	{
+		bDied = true;
+
+	}
 }

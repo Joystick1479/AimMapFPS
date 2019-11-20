@@ -9,6 +9,7 @@
 class UCameraComponent;
 class AAutomaticRifle;
 class USkeletalMeshComponent;
+class UHealthComponent;
 
 UCLASS()
 class AIMMAPSHOOTER_API ASoldierCharacter : public ACharacter
@@ -49,6 +50,16 @@ protected:
 
 	void ZoomIn();
 	void ZoomOut();
+
+
+	UPROPERTY(BlueprintReadOnly, Category = "Player")
+	bool bDied;
+
+	UFUNCTION()
+	void OnHealthChanged(UHealthComponent* OwningHealthComp, float Health, float HealthDelta, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components")
+	UHealthComponent* HealthComp;
 
 public:	
 
