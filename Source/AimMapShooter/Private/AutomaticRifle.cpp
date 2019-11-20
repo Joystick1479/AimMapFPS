@@ -33,6 +33,7 @@ AAutomaticRifle::AAutomaticRifle()
 	CurrentAmmo = 0;
 	CurrentAmmoInClip = 0;
 	RateOfFire = 600;
+	BaseDamage = 20.0f;
 
 }
 
@@ -111,6 +112,10 @@ void AAutomaticRifle::Fire()
 					{
 						UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactEffect, Hit.ImpactPoint, Hit.ImpactNormal.Rotation());
 					}
+					//*Applying damage*//
+					AActor* HitActor = Hit.GetActor();
+					float ActualDamage = BaseDamage;
+					UGameplayStatics::ApplyPointDamage(HitActor, ActualDamage, ShotDirection, Hit, MyOwner->GetInstigatorController(), MyOwner, DamageType);
 				}
 				UseAmmo();
 				PlayFireEffects(EndLocation);
@@ -138,6 +143,11 @@ void AAutomaticRifle::Fire()
 					{
 						UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactEffect, Hit.ImpactPoint, Hit.ImpactNormal.Rotation());
 					}
+					//*Applying damage*//
+					AActor* HitActor = Hit.GetActor();
+					float ActualDamage = BaseDamage;
+					UGameplayStatics::ApplyPointDamage(HitActor, ActualDamage,ShotDirection,Hit,MyOwner->GetInstigatorController(), MyOwner,DamageType);
+
 				}
 				UseAmmo();
 				PlayFireEffects(EndLocation);
@@ -155,6 +165,7 @@ void AAutomaticRifle::Fire()
 	}
 	
 }
+
 
 void AAutomaticRifle::PlayFireEffects(FVector EndLocation)
 {

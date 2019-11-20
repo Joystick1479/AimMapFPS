@@ -94,6 +94,12 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon", meta = (ClampMin = 0.0f))
 	float BulletSpread;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Weapon", meta = (ClampMin = 0.0f))
+	float BaseDamage;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon")
+	TSubclassOf<UDamageType> DamageType;
+
 	EWeaponState::Type CurrentState;
 
 
