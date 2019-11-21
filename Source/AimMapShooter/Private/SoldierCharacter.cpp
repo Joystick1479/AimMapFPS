@@ -148,7 +148,7 @@ void ASoldierCharacter::PickUp()
 	
 	if (bHoloPickUp == true && HoldingWeaponState==EHoldingWeapon::A4)
 	{
-		EHoldingAttachment::Holo;
+		HoldingAttachmentState = EHoldingAttachment::Holo;
 
 		FActorSpawnParameters SpawnParams;
 		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
@@ -156,15 +156,12 @@ void ASoldierCharacter::PickUp()
 		HoloScope = GetWorld()->SpawnActor<AHoloScope>(HoloClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
 		if (HoloScope)
 		{
-			HoloScope->SetOwner(this);
+			HoloScope->SetOwner(AutomaticRifle);
 			FName Socket = AutomaticRifle->ScopeSocket;
-			HoloScope->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, Socket);
+			HoloScope->AttachToComponent(AutomaticRifle->SkelMeshComp, FAttachmentTransformRules::SnapToTargetNotIncludingScale, Socket);
 		}
 	}
-	//else
-	//{
-	//	return;
-//	}
+
 }
 
 void ASoldierCharacter::MoveForward(float Value)
