@@ -6,6 +6,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "HealthComponent.h"
 #include "AimMapShooter.h"
+#include "HoloScope.h"
 #include "SoldierCharacter.h"
 
 
@@ -29,6 +30,8 @@ ASoldierCharacter::ASoldierCharacter()
 	IsSingleFire = false;
 
 	CharacterState = ECharacterState::Idle;
+	HoldingWeaponState = EHoldingWeapon::None;
+	HoldingAttachmentState = EHoldingAttachment::None;
 	MaxUseDistance = 400;
 
 	bRiflePickUp = false;
@@ -65,7 +68,7 @@ void ASoldierCharacter::LineTraceItem()
 
 		FHitResult Hit;
 
-		if (GetWorld()->LineTraceSingleByChannel(Hit, start_trace, end_trace, COLLISION_ITEMS , TraceParams))
+		if (GetWorld()->LineTraceSingleByChannel(Hit, start_trace, end_trace, COLLISION_ITEMS , TraceParams) && HoldingWeaponState == EHoldingWeapon::None)
 		{
 			DrawDebugLine(GetWorld(), start_trace, end_trace, FColor::Red, false, 1.0f, 0, 1.0f);
 			bRiflePickUp = true;
@@ -73,6 +76,15 @@ void ASoldierCharacter::LineTraceItem()
 		else
 		{
 			bRiflePickUp = false;
+		}
+		if (GetWorld()->LineTraceSingleByChannel(Hit, start_trace, end_trace, COLLISION_HOLO, TraceParams) && HoldingAttachmentState == EHoldingAttachment::None )
+		{
+			DrawDebugLine(GetWorld(), start_trace, end_trace, FColor::Green, false, 1.0f, 0, 1.0f);
+			bHoloPickUp = true;
+		}
+		else
+		{
+			bHoloPickUp = false;
 		}
 }
 
@@ -121,6 +133,8 @@ void ASoldierCharacter::PickUp()
 	if (bRiflePickUp == true)
 	{
 
+		HoldingWeaponState = EHoldingWeapon::A4;
+
 		FActorSpawnParameters SpawnParams;
 		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
@@ -132,6 +146,25 @@ void ASoldierCharacter::PickUp()
 		}
 	}
 	
+	if (bHoloPickUp == true && HoldingWeaponState==EHoldingWeapon::A4)
+	{
+		EHoldingAttachment::Holo;
+
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+		HoloScope = GetWorld()->SpawnActor<AHoloScope>(HoloClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
+		if (HoloScope)
+		{
+			HoloScope->SetOwner(this);
+			FName Socket = AutomaticRifle->ScopeSocket;
+			HoloScope->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, Socket);
+		}
+	}
+	//else
+	//{
+	//	return;
+//	}
 }
 
 void ASoldierCharacter::MoveForward(float Value)

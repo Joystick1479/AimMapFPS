@@ -82,6 +82,10 @@ public:
 	void StopReload();
 	void ReloadWeapon();
 
+	FName MuzzleSocket;
+	FName CameraSocket;
+	FName ScopeSocket;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -90,8 +94,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Player")
 	TSubclassOf<AAutomaticRifle> StarterWeaponClass;
 
-	FName MuzzleSocket;
-	FName CameraSocket;
+
 
 	//Start location of holographic sight//
 	FName LineSocket;

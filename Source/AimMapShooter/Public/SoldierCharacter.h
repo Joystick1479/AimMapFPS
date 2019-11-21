@@ -10,6 +10,7 @@ class UCameraComponent;
 class AAutomaticRifle;
 class USkeletalMeshComponent;
 class UHealthComponent;
+class AHoloScope;
 
 namespace ECharacterState
 {
@@ -17,6 +18,26 @@ namespace ECharacterState
 	{
 		Idle,
 		Firing
+	};
+}
+
+namespace EHoldingWeapon
+{
+	enum Type
+	{
+		None,
+		A4,
+		Sniper,
+	};
+}
+
+namespace EHoldingAttachment
+{
+	enum Type
+	{
+		None,
+		Holo,
+		Grip,
 	};
 }
 
@@ -34,13 +55,22 @@ protected:
 	virtual void BeginPlay() override;
 
 	ECharacterState::Type CharacterState;
+
+	EHoldingWeapon::Type HoldingWeaponState;
+
+	EHoldingAttachment::Type HoldingAttachmentState;
 	
 	AAutomaticRifle* AutomaticRifle;
+
+	AHoloScope* HoloScope;
 
 	void LineTraceItem();
 
 	UPROPERTY(EditDefaultsOnly, Category = "Player")
 	TSubclassOf<AAutomaticRifle> StarterWeaponClass;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Player")
+	TSubclassOf<AHoloScope> HoloClass;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
 	float ZoomingTime;
@@ -93,6 +123,9 @@ public:
 	//* Bool if we can pickup Rifle *//
 	UPROPERTY(BlueprintReadOnly, Category = "Player")
 	bool bRiflePickUp;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Player")
+	bool bHoloPickUp;
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
