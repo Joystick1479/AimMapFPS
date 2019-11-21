@@ -41,6 +41,7 @@ AAutomaticRifle::AAutomaticRifle()
 	BaseDamage = 20.0f;
 	BulletSpread = 2.0f;
 	BulletSpreadZooming = 0.5f;
+	BulletSpreadGrip = 1.0f;
 
 }
 
@@ -141,6 +142,10 @@ void AAutomaticRifle::Fire()
 				FVector StartLocation = SkelMeshComp->GetSocketLocation(MuzzleSocket);
 				FRotator Rotation = SkelMeshComp->GetSocketRotation(MuzzleSocket);
 				FVector ShotDirection = Rotation.Vector();
+				if (SoldierChar->isGripAttached == true)
+				{
+					BulletSpread = BulletSpreadGrip;
+				}
 				float HalfRad = FMath::DegreesToRadians(BulletSpread);
 				ShotDirection = FMath::VRandCone(ShotDirection, HalfRad, HalfRad);
 				FVector EndLocation = StartLocation + (ShotDirection * 10000);

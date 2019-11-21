@@ -184,6 +184,7 @@ void ASoldierCharacter::PickUp()
 			Grip->SetOwner(AutomaticRifle);
 			FName GSocket = AutomaticRifle->GripSocket;
 			Grip->AttachToComponent(AutomaticRifle->SkelMeshComp, FAttachmentTransformRules::SnapToTargetNotIncludingScale, GSocket);
+			isGripAttached = true;
 		}
 	}
 
