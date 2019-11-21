@@ -168,12 +168,6 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
 	UCameraComponent* Camera;
 
-	UPROPERTY(VisibleAnywhere, Category = "Components")
-	USphereComponent* SphereComp;
-
-	void Test();
-
-	virtual void NotifyActorBeginOverlap(AActor* OtherActor) override;
 
 	void StartFire();
 
