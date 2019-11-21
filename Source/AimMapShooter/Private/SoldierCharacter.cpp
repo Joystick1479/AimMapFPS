@@ -31,7 +31,7 @@ ASoldierCharacter::ASoldierCharacter()
 	CharacterState = ECharacterState::Idle;
 	MaxUseDistance = 400;
 
-	bFocusItem = false;
+	bRiflePickUp = false;
 
 }
 
@@ -43,26 +43,17 @@ void ASoldierCharacter::BeginPlay()
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-	AutomaticRifle = GetWorld()->SpawnActor<AAutomaticRifle>(StarterWeaponClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
-	if (AutomaticRifle)
-	{
-		AutomaticRifle->SetOwner(this);
-		AutomaticRifle->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocket);
-	}
-
+	//AutomaticRifle = GetWorld()->SpawnActor<AAutomaticRifle>(StarterWeaponClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
+	//if (AutomaticRifle)
+	//{
+	//	AutomaticRifle->SetOwner(this);
+	//	AutomaticRifle->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocket);
+	//}
 	HealthComp->OnHealthChanged.AddDynamic(this, &ASoldierCharacter::OnHealthChanged);
-	
 }
 
 void ASoldierCharacter::LineTraceItem()
 {
-	//Line trace to pickup object//
-	//FVector camLoc;
-	//FRotator camRot;
-
-	//if (Controller == NULL)  return;
-
-	//Controller->GetPlayerViewPoint(camLoc, camRot);
 	const FVector start_trace = CameraComp->GetComponentLocation();
 	const FVector direction = CameraComp->GetComponentRotation().Vector();
 	const FVector end_trace = start_trace + (direction* MaxUseDistance);
@@ -77,13 +68,12 @@ void ASoldierCharacter::LineTraceItem()
 		if (GetWorld()->LineTraceSingleByChannel(Hit, start_trace, end_trace, COLLISION_ITEMS , TraceParams))
 		{
 			DrawDebugLine(GetWorld(), start_trace, end_trace, FColor::Red, false, 1.0f, 0, 1.0f);
-			bFocusItem = true;
+			bRiflePickUp = true;
 		}
 		else
 		{
-			bFocusItem = false;
+			bRiflePickUp = false;
 		}
-	
 }
 
 // Called every frame
@@ -122,7 +112,26 @@ void ASoldierCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
 	PlayerInputComponent->BindAction("FireMode", IE_Pressed, this, &ASoldierCharacter::FireMode);
 
+	PlayerInputComponent->BindAction("PickUp", IE_Pressed, this, &ASoldierCharacter::PickUp);
 
+}
+
+void ASoldierCharacter::PickUp()
+{
+	if (bRiflePickUp == true)
+	{
+
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+		AutomaticRifle = GetWorld()->SpawnActor<AAutomaticRifle>(StarterWeaponClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
+		if (AutomaticRifle)
+		{
+		AutomaticRifle->SetOwner(this);
+		AutomaticRifle->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocket);
+		}
+	}
+	
 }
 
 void ASoldierCharacter::MoveForward(float Value)
@@ -186,7 +195,6 @@ void ASoldierCharacter::StartFire()
 			AutomaticRifle->Fire();
 		}
 	}
-	
 }
 
 void ASoldierCharacter::StopFire()
@@ -221,7 +229,6 @@ void ASoldierCharacter::FireMode()
 			IsSingleFire = false;
 		}
 	}
-		
 }
 
 void ASoldierCharacter::OnHealthChanged(UHealthComponent * OwningHealthComp, float Health, float HealthDelta, const UDamageType * DamageType, AController * InstigatedBy, AActor * DamageCauser)

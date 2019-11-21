@@ -9,6 +9,7 @@
 #include "Particles/ParticleSystemComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Sound/SoundCue.h"
+#include "Components/SphereComponent.h"
 #include "AutomaticRifle.h"
 
 // Sets default values
@@ -21,6 +22,12 @@ AAutomaticRifle::AAutomaticRifle()
 
 	SkelMeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkelMesh"));
 	RootComponent = SkelMeshComp;
+
+	SphereComp = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
+	SphereComp->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	SphereComp->SetCollisionResponseToAllChannels(ECR_Ignore);
+	SphereComp->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+	
 
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	Camera->SetupAttachment(SkelMeshComp, CameraSocket);
@@ -68,7 +75,66 @@ void AAutomaticRifle::BeginPlay()
 void AAutomaticRifle::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	//ASoldierCharacter* Soldier = Cast<ASoldierCharacter>(GetWorld()->GetFirstPlayerController()->GetPawn());
+	//
+	//if (Soldier->IsOverlappingActor(this) == true)
+	//{
+	//	if (Soldier->bFocusItem == true)
+	//	{
+	//		UE_LOG(LogTemp, Warning, TEXT("Overlapping"));
+//			return;
+//		}
+	//	else
+//		{
+//			return;
+//		}
+//	}
+	
+}
 
+void AAutomaticRifle::Test()
+{
+
+			UE_LOG(LogTemp, Warning, TEXT("Tak"));
+
+			if (this)
+			{
+				FActorSpawnParameters SpawnParams;
+				SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+				GetWorld()->SpawnActor<AAutomaticRifle>(StarterWeaponClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
+				//Rifle->AttachToComponent(Soldier->GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, Soldier->WeaponSocket);
+			}
+				
+
+					
+}
+
+void AAutomaticRifle::NotifyActorBeginOverlap(AActor* OtherActor)
+{
+//	ASoldierCharacter* Soldier = Cast<ASoldierCharacter>(GetWorld()->GetFirstPlayerController()->GetPawn());
+//	if (Soldier)
+//	{
+//		if (Soldier->IsOverlappingActor(OtherActor) == true)
+//		{
+//			if (Soldier->bFocusItem == true)
+//			{
+//				//UE_LOG(LogTemp, Warning, TEXT("Overlapping"));
+//				//Name Socket = SoldierChar->GetAttachParentSocketName();
+//				//SkelMeshComp->AttachToComponent(SkelMeshComp, FAttachmentTransformRules::SnapToTargetNotIncludingScale, Socket);
+//				FActorSpawnParameters SpawnParams;
+//				SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+//				AAutomaticRifle* Rifle = GetWorld()->SpawnActor<AAutomaticRifle>(StarterWeaponClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
+//				if (Rifle)
+//				{
+//					Rifle->SetOwner(this);
+//					FName Socket = Soldier->GetAttachParentSocketName();
+//					USkeletalMeshComponent* SkelMesh = Soldier->GetMesh();
+//					Rifle->AttachToComponent(SkelMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale, Socket);
+//				}
+//			}
+//		}
+//		
+//	}
 }
 
 void AAutomaticRifle::StartFire()

@@ -61,11 +61,11 @@ protected:
 	void ZoomIn();
 	void ZoomOut();
 
+	void PickUp();
+
 	UPROPERTY(EditDefaultsOnly, Category = "LineTrace")
 	float MaxUseDistance;
 
-	UPROPERTY(BlueprintReadOnly, Category = "Player")
-	bool bFocusItem;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Player")
 	bool bDied;
@@ -89,6 +89,10 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Zoom")
 	bool IsSingleFire;
+
+	//* Bool if we can pickup Rifle *//
+	UPROPERTY(BlueprintReadOnly, Category = "Player")
+	bool bRiflePickUp;
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
