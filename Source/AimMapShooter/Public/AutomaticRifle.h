@@ -85,6 +85,7 @@ public:
 	FName MuzzleSocket;
 	FName CameraSocket;
 	FName ScopeSocket;
+	FName GripSocket;
 
 protected:
 	// Called when the game starts or when spawned

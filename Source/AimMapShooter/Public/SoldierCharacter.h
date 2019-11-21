@@ -11,6 +11,7 @@ class AAutomaticRifle;
 class USkeletalMeshComponent;
 class UHealthComponent;
 class AHoloScope;
+class AGrip;
 
 namespace ECharacterState
 {
@@ -64,6 +65,8 @@ protected:
 
 	AHoloScope* HoloScope;
 
+	AGrip* Grip;
+
 	void LineTraceItem();
 
 	UPROPERTY(EditDefaultsOnly, Category = "Player")
@@ -71,6 +74,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Player")
 	TSubclassOf<AHoloScope> HoloClass;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Player")
+	TSubclassOf<AGrip> GripClass;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
 	float ZoomingTime;
@@ -126,6 +132,9 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, Category = "Player")
 	bool bHoloPickUp;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Player")
+	bool bGripPickUp;
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
