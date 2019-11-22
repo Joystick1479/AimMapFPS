@@ -8,6 +8,7 @@
 #include "AimMapShooter.h"
 #include "HoloScope.h"
 #include "Grip.h"
+#include "GameFramework/SpringArmComponent.h"
 #include "SoldierCharacter.h"
 
 
@@ -20,11 +21,15 @@ ASoldierCharacter::ASoldierCharacter()
 	HeadSocket = "HeadSocket";
 	WeaponSocket = "WeaponSocket";
 
+	SpringArm = CreateDefaultSubobject <USpringArmComponent>(TEXT("SpringArm"));
+	SpringArm->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, HeadSocket);
 
 	CameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComp"));
-	CameraComp->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, HeadSocket);
+	CameraComp->AttachToComponent(SpringArm, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+
 
 	HealthComp = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComp"));
+
 
 	ZoomingTime = 0.2f;
 
@@ -153,6 +158,7 @@ void ASoldierCharacter::PickUp()
 		{
 		AutomaticRifle->SetOwner(this);
 		AutomaticRifle->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocket);
+		//AutomaticRifle->AttachToComponent(SpringArm, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 		}
 	}
 	

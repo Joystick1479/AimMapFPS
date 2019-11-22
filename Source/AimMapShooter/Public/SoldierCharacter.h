@@ -12,6 +12,7 @@ class USkeletalMeshComponent;
 class UHealthComponent;
 class AHoloScope;
 class AGrip;
+class USpringArmComponent;
 
 namespace ECharacterState
 {
@@ -116,6 +117,10 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera")
 	UCameraComponent* CameraComp;
+
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Camera")
+	USpringArmComponent* SpringArm;
 
 	FName HeadSocket;
 	FName WeaponSocket;
