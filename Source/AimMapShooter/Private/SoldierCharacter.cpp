@@ -9,6 +9,7 @@
 #include "HoloScope.h"
 #include "Grip.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "SoldierCharacter.h"
 
 
@@ -142,6 +143,9 @@ void ASoldierCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
 	PlayerInputComponent->BindAction("PickUp", IE_Pressed, this, &ASoldierCharacter::PickUp);
 
+	PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &ASoldierCharacter::SprintOn);
+	PlayerInputComponent->BindAction("Sprint", IE_Released, this, &ASoldierCharacter::SprintOff);
+
 }
 
 void ASoldierCharacter::PickUp()
@@ -268,6 +272,29 @@ void ASoldierCharacter::StopFire()
 	if (AutomaticRifle)
 	{
 		AutomaticRifle->StopFire();
+	}
+}
+
+void ASoldierCharacter::SprintOn()
+{
+	IsSprinting = true;
+	
+	AActor* MyOwner = GetOwner();
+	UCharacterMovementComponent* MoveComp = Cast<UCharacterMovementComponent>(MyOwner);
+	if (MoveComp)
+	{
+		MoveComp->MaxWalkSpeed = 270;
+	}
+}
+
+void ASoldierCharacter::SprintOff()
+{
+	IsSprinting = false;
+	AActor* MyOwner = GetOwner();
+	UCharacterMovementComponent* MoveComp = Cast<UCharacterMovementComponent>(MyOwner);
+	if (MoveComp)
+	{
+		MoveComp->MaxWalkSpeed = 149;
 	}
 }
 

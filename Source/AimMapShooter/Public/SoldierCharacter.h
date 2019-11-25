@@ -91,6 +91,9 @@ protected:
 	void StartFire();
 	void StopFire();
 
+	void SprintOn();
+	void SprintOff();
+
 	void FireMode();
 
 	void Reload();
@@ -128,6 +131,9 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Zoom")
 	bool IsZooming;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Sprint")
+	bool IsSprinting;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Zoom")
 	bool IsSingleFire;
