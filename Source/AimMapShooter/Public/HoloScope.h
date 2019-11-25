@@ -7,6 +7,7 @@
 #include "HoloScope.generated.h"
 
 class UStaticMeshComponent;
+class USphereComponent;
 
 UCLASS()
 class AIMMAPSHOOTER_API AHoloScope : public AActor
@@ -23,6 +24,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	UStaticMeshComponent* MeshComp;
+
+	UPROPERTY(VisibleAnywhere, Category = "Components")
+	USphereComponent* SphereComp;
 
 public:	
 	// Called every frame

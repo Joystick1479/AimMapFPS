@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Components/StaticMeshComponent.h"
+#include "Components/SphereComponent.h"
 #include "HoloScope.h"
 
 // Sets default values
@@ -12,6 +13,8 @@ AHoloScope::AHoloScope()
 	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComp"));
 	RootComponent = MeshComp;
 
+	SphereComp = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
+	SphereComp->SetupAttachment(MeshComp);
 }
 
 // Called when the game starts or when spawned

@@ -26,6 +26,9 @@ AAutomaticRifle::AAutomaticRifle()
 
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	Camera->SetupAttachment(SkelMeshComp, CameraSocket);
+
+	SphereComp = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
+	SphereComp->SetupAttachment(SkelMeshComp);
 	
 
 	MuzzleSocket = "MuzzleSocket";
@@ -211,9 +214,14 @@ void AAutomaticRifle::PlayFireEffects(FVector EndLocation)
 	if (MyOwner)
 	{
 		APlayerController* PC = Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
-		if (PC)
+		ASoldierCharacter* SoldierChar = Cast<ASoldierCharacter>(GetOwner());
+		if (PC && SoldierChar->IsZooming == true)
 		{
-			PC->ClientPlayCameraShake(CameShakeClass);
+			PC->ClientPlayCameraShake(CameShakeZoomClass);
+		}
+		else
+		{
+			PC->ClientPlayCameraShake(CameShakeHipClass);
 		}
 	}
 	

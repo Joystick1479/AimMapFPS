@@ -97,7 +97,13 @@ protected:
 	TSubclassOf<AAutomaticRifle> StarterWeaponClass;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Player")
-	TSubclassOf<UCameraShake> CameShakeClass;
+	TSubclassOf<UCameraShake> CameShakeHipClass;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Player")
+	TSubclassOf<UCameraShake> CameShakeZoomClass;
+
+	UPROPERTY(VisibleAnywhere, Category = "Components")
+	USphereComponent* SphereComp;
 
 
 

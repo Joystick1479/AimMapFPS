@@ -7,6 +7,7 @@
 #include "Grip.generated.h"
 
 class UStaticMeshComponent;
+class USphereComponent;
 
 UCLASS()
 class AIMMAPSHOOTER_API AGrip : public AActor
@@ -24,6 +25,8 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	UStaticMeshComponent* MeshComp;
 
+	UPROPERTY(VisibleAnywhere, Category = "Components")
+	USphereComponent* SphereComp;
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
