@@ -12,6 +12,7 @@ class UParticleSystem;
 class USoundCue;
 class ASoldierCharacter;
 class USphereComponent;
+class UCameraShake;
 
 namespace EWeaponState
 {
@@ -94,6 +95,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Player")
 	TSubclassOf<AAutomaticRifle> StarterWeaponClass;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Player")
+	TSubclassOf<UCameraShake> CameShakeClass;
 
 
 

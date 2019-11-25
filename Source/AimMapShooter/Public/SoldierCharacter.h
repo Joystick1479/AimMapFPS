@@ -123,6 +123,7 @@ public:
 	USpringArmComponent* SpringArm;
 
 	FName HeadSocket;
+	FName ArmSocket;
 	FName WeaponSocket;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Zoom")

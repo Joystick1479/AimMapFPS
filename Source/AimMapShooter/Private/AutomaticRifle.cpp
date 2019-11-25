@@ -26,6 +26,7 @@ AAutomaticRifle::AAutomaticRifle()
 
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	Camera->SetupAttachment(SkelMeshComp, CameraSocket);
+	
 
 	MuzzleSocket = "MuzzleSocket";
 	LineSocket = "LineSocket";
@@ -206,6 +207,16 @@ void AAutomaticRifle::PlayFireEffects(FVector EndLocation)
 	{
 		UGameplayStatics::PlaySoundAtLocation(GetWorld(), ShootSound, GetActorLocation());
 	}
+	APawn* MyOwner = Cast<APawn>(GetOwner());
+	if (MyOwner)
+	{
+		APlayerController* PC = Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
+		if (PC)
+		{
+			PC->ClientPlayCameraShake(CameShakeClass);
+		}
+	}
+	
 }
 void AAutomaticRifle::StartReload()
 {
