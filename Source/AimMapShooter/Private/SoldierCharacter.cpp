@@ -84,7 +84,7 @@ void ASoldierCharacter::LineTraceItem()
 		{
 			bRiflePickUp = false;
 		}
-		if (GetWorld()->LineTraceSingleByChannel(Hit, start_trace, end_trace, COLLISION_HOLO, TraceParams) && (HoldingAttachmentState == EHoldingAttachment::None || HoldingAttachmentState==EHoldingAttachment::Grip))
+		if (GetWorld()->LineTraceSingleByChannel(Hit, start_trace, end_trace, COLLISION_HOLO, TraceParams) && (HoldingWeaponState == EHoldingWeapon::A4 && isHoloAttached == false))
 		{
 			DrawDebugLine(GetWorld(), start_trace, end_trace, FColor::Green, false, 1.0f, 0, 1.0f);
 			bHoloPickUp = true;
@@ -93,7 +93,7 @@ void ASoldierCharacter::LineTraceItem()
 		{
 			bHoloPickUp = false;
 		}
-		if (GetWorld()->LineTraceSingleByChannel(Hit, start_trace, end_trace, COLLISION_GRIP, TraceParams) && (HoldingAttachmentState == EHoldingAttachment::None || HoldingAttachmentState == EHoldingAttachment::Holo))
+		if (GetWorld()->LineTraceSingleByChannel(Hit, start_trace, end_trace, COLLISION_GRIP, TraceParams) && (HoldingWeaponState == EHoldingWeapon::A4 && isGripAttached == false))
 		{
 			DrawDebugLine(GetWorld(), start_trace, end_trace, FColor::Blue, false, 1.0f, 0, 1.0f);
 			bGripPickUp = true;
@@ -176,6 +176,7 @@ void ASoldierCharacter::PickUp()
 			HoloScope->SetOwner(AutomaticRifle);
 			FName Socket = AutomaticRifle->ScopeSocket;
 			HoloScope->AttachToComponent(AutomaticRifle->SkelMeshComp, FAttachmentTransformRules::SnapToTargetNotIncludingScale, Socket);
+			isHoloAttached = true;
 		}
 	}
 	if (bGripPickUp == true && HoldingWeaponState == EHoldingWeapon::A4)

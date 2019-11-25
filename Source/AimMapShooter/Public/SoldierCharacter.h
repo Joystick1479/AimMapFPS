@@ -145,6 +145,9 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "Player")
 	bool isGripAttached;
 
+	UPROPERTY(BlueprintReadOnly, Category = "Player")
+	bool isHoloAttached;
+
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
