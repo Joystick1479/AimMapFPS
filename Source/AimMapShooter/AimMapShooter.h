@@ -10,3 +10,10 @@
 #define COLLISION_HOLO ECC_GameTraceChannel3
 #define COLLISION_GRIP ECC_GameTraceChannel4
 #define COLLISION_SNIPER ECC_GameTraceChannel5
+#define COLLISION_HELMET ECC_GameTraceChannel6
+
+#define SURFACE_HEAD SurfaceType3
+#define SURFACE_CHEST SurfaceType4
+#define SURFACE_LEG SurfaceType5
+#define SURFACE_ARM SurfaceType6
+#define SURFACE_HELMET SurfaceType7

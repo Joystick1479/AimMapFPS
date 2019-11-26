@@ -10,6 +10,8 @@
 #include "Kismet/GameplayStatics.h"
 #include "Sound/SoundCue.h"
 #include "Components/SphereComponent.h"
+#include "AimMapShooter.h"
+#include "PhysicalMaterials/PhysicalMaterial.h"
 #include "AutomaticRifle.h"
 
 // Sets default values
@@ -118,6 +120,8 @@ void AAutomaticRifle::Fire()
 				FCollisionQueryParams QueryParams;
 				QueryParams.AddIgnoredActor(MyOwner);
 				QueryParams.AddIgnoredActor(this);
+				QueryParams.bReturnPhysicalMaterial = true;
+				QueryParams.bTraceComplex = true;
 
 				if (GetWorld()->LineTraceSingleByChannel(Hit, StartLocation, EndLocation, ECollisionChannel::ECC_Pawn, QueryParams))
 				{
@@ -130,7 +134,28 @@ void AAutomaticRifle::Fire()
 					}
 					//*Applying damage*//
 					AActor* HitActor = Hit.GetActor();
+					EPhysicalSurface SurfaceType = UPhysicalMaterial::DetermineSurfaceType(Hit.PhysMaterial.Get());
 					float ActualDamage = BaseDamage;
+					if (SurfaceType == SURFACE_HEAD)
+					{
+						ActualDamage *= 4.0f;
+					}
+					if (SurfaceType == SURFACE_CHEST)
+					{
+						ActualDamage *= 2.0f;
+					}
+					if (SurfaceType == SURFACE_LEG)
+					{
+						ActualDamage *= 0.5f;
+					}
+					if (SurfaceType == SURFACE_ARM)
+					{
+						ActualDamage *= 1.5f;
+					}
+					if (SurfaceType == SURFACE_HELMET)
+					{
+						ActualDamage *= 1.5f;
+					}
 					UGameplayStatics::ApplyPointDamage(HitActor, ActualDamage, ShotDirection, Hit, MyOwner->GetInstigatorController(), MyOwner, DamageType);
 				}
 				UseAmmo();
@@ -156,6 +181,8 @@ void AAutomaticRifle::Fire()
 				FCollisionQueryParams QueryParams;
 				QueryParams.AddIgnoredActor(MyOwner);
 				QueryParams.AddIgnoredActor(this);
+				QueryParams.bReturnPhysicalMaterial = true;
+				QueryParams.bTraceComplex = true;
 
 				if (GetWorld()->LineTraceSingleByChannel(Hit, StartLocation, EndLocation, ECollisionChannel::ECC_Pawn, QueryParams))
 				{
@@ -167,7 +194,28 @@ void AAutomaticRifle::Fire()
 					}
 					//*Applying damage*//
 					AActor* HitActor = Hit.GetActor();
+					EPhysicalSurface SurfaceType = UPhysicalMaterial::DetermineSurfaceType(Hit.PhysMaterial.Get());
 					float ActualDamage = BaseDamage;
+					if (SurfaceType == SURFACE_HEAD)
+					{
+						ActualDamage *= 4.0f;
+					}
+					if (SurfaceType == SURFACE_CHEST)
+					{
+						ActualDamage *= 2.0f;
+					}
+					if (SurfaceType == SURFACE_LEG)
+					{
+						ActualDamage *= 0.5f;
+					}
+					if (SurfaceType == SURFACE_ARM)
+					{
+						ActualDamage *= 1.5f;
+					}
+					if (SurfaceType == SURFACE_HELMET)
+					{
+						ActualDamage *= 1.5f;
+					}
 					UGameplayStatics::ApplyPointDamage(HitActor, ActualDamage,ShotDirection,Hit,MyOwner->GetInstigatorController(), MyOwner,DamageType);
 
 				}

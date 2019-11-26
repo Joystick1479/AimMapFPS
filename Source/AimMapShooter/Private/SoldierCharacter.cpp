@@ -10,6 +10,7 @@
 #include "Grip.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Helmet.h"
 #include "SoldierCharacter.h"
 
 
@@ -22,6 +23,7 @@ ASoldierCharacter::ASoldierCharacter()
 	HeadSocket = "HeadSocket";
 	WeaponSocket = "WeaponSocket";
 	ArmSocket = "ArmSocket";
+	HelmetSocket = "HelmetSocket";
 
 	SpringArm = CreateDefaultSubobject <USpringArmComponent>(TEXT("SpringArm"));
 	SpringArm->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, ArmSocket);
@@ -105,6 +107,15 @@ void ASoldierCharacter::LineTraceItem()
 		else
 		{
 			bGripPickUp = false;
+		}
+		if (GetWorld()->LineTraceSingleByChannel(Hit, start_trace, end_trace, COLLISION_HELMET, TraceParams))
+		{
+			DrawDebugLine(GetWorld(), start_trace, end_trace, FColor::Blue, false, 1.0f, 0, 1.0f);
+			bHelmetPickUp = true;
+		}
+		else
+		{
+			bHelmetPickUp = false;
 		}
 }
 
@@ -210,6 +221,19 @@ void ASoldierCharacter::PickUp()
 			FName GSocket = AutomaticRifle->GripSocket;
 			Grip->AttachToComponent(AutomaticRifle->SkelMeshComp, FAttachmentTransformRules::SnapToTargetNotIncludingScale, GSocket);
 			isGripAttached = true;
+		}
+	}
+	if (bHelmetPickUp == true)
+	{
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+		Helmet = GetWorld()->SpawnActor<AHelmet>(HelmetClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
+		if (Helmet)
+		{
+			Helmet->SetOwner(this);
+			Helmet->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, HelmetSocket);
+			isHelmetAttached = true;
 		}
 	}
 
