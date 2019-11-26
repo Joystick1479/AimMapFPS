@@ -14,6 +14,8 @@ class AHoloScope;
 class AGrip;
 class USpringArmComponent;
 
+
+
 namespace ECharacterState
 {
 	enum Type
@@ -61,6 +63,7 @@ protected:
 	EHoldingWeapon::Type HoldingWeaponState;
 
 	EHoldingAttachment::Type HoldingAttachmentState;
+
 	
 	AAutomaticRifle* AutomaticRifle;
 
@@ -153,6 +156,12 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, Category = "Player")
 	bool isHoloAttached;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Player")
+	int32 SoldierCurrentAmmoInClip;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Player")
+	int32 SoldierCurrentAmmo;
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

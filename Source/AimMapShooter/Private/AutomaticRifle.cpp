@@ -228,31 +228,39 @@ void AAutomaticRifle::PlayFireEffects(FVector EndLocation)
 }
 void AAutomaticRifle::StartReload()
 {
-	CurrentState = EWeaponState::Reloading;
+	if (ReloadingState == EReloadingState::None)
+	{
+		ReloadingState = EReloadingState::Reloading;
+		CurrentState = EWeaponState::Reloading;
 
-	UGameplayStatics::PlaySoundAtLocation(GetWorld(), ReloadSound, GetActorLocation());
+		UGameplayStatics::PlaySoundAtLocation(GetWorld(), ReloadSound, GetActorLocation());
 
-	GetWorldTimerManager().SetTimer(TimerHandle_ReloadWeapon, this, &AAutomaticRifle::ReloadWeapon, 2.5f, false);
+		GetWorldTimerManager().SetTimer(TimerHandle_ReloadWeapon, this, &AAutomaticRifle::ReloadWeapon, 2.5f, false);
+	}
 
 }
 
 void AAutomaticRifle::StopReload()
 {
+
 	GetWorldTimerManager().ClearTimer(TimerHandle_ReloadWeapon);
 }
 
 void AAutomaticRifle::ReloadWeapon()
 {
+	
+		int32 ClipDelta = FMath::Min(WeaponConfig.AmmoPerClip - CurrentAmmoInClip, CurrentAmmo - CurrentAmmoInClip);
+		if (ClipDelta > 0)
+		{
+			CurrentAmmoInClip += ClipDelta;
+		}
 
-	int32 ClipDelta = FMath::Min(WeaponConfig.AmmoPerClip - CurrentAmmoInClip, CurrentAmmo - CurrentAmmoInClip);
-	if (ClipDelta > 0)
-	{
-		CurrentAmmoInClip += ClipDelta;
-	}
+		CurrentState = EWeaponState::Idle;
+		ReloadingState = EReloadingState::None;
 
-	CurrentState = EWeaponState::Idle;
+		UE_LOG(LogTemp, Warning, TEXT("Reloaded"));
+		//LastReloadTime = GetWorld()->TimeSeconds;
 
-	UE_LOG(LogTemp, Warning, TEXT("Reloaded"));
-	//LastReloadTime = GetWorld()->TimeSeconds;
+	
 }
 

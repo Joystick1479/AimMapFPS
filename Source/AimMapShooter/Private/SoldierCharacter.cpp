@@ -44,6 +44,7 @@ ASoldierCharacter::ASoldierCharacter()
 
 	bRiflePickUp = false;
 
+
 }
 
 // Called when the game starts or when spawned
@@ -80,6 +81,8 @@ void ASoldierCharacter::LineTraceItem()
 		{
 			DrawDebugLine(GetWorld(), start_trace, end_trace, FColor::Red, false, 1.0f, 0, 1.0f);
 			bRiflePickUp = true;
+		
+			AActor* WeaponHit = Hit.GetActor();
 		}
 		else
 		{
@@ -111,6 +114,13 @@ void ASoldierCharacter::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	LineTraceItem();
+
+	if (AutomaticRifle)
+	{
+		SoldierCurrentAmmoInClip = AutomaticRifle->CurrentAmmoInClip;
+		SoldierCurrentAmmo = AutomaticRifle->CurrentAmmo;
+	}
+
 
 }
 
@@ -150,6 +160,7 @@ void ASoldierCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
 void ASoldierCharacter::PickUp()
 {
+
 	if (bRiflePickUp == true)
 	{
 
@@ -158,11 +169,13 @@ void ASoldierCharacter::PickUp()
 		FActorSpawnParameters SpawnParams;
 		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
+
 		AutomaticRifle = GetWorld()->SpawnActor<AAutomaticRifle>(StarterWeaponClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
 		if (AutomaticRifle)
 		{
 		AutomaticRifle->SetOwner(this);
 		AutomaticRifle->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocket);
+		
 		//AutomaticRifle->AttachToComponent(SpringArm, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 		}
 	}

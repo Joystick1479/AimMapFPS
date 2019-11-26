@@ -24,6 +24,14 @@ namespace EWeaponState
 		Equipping,
 	};
 }
+namespace EReloadingState
+{
+	enum Type
+	{
+		None,
+		Reloading,
+	};
+}
 
 USTRUCT()
 struct FWeaponData
@@ -88,6 +96,14 @@ public:
 	FName ScopeSocket;
 	FName GripSocket;
 
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Ammo")
+	int32 CurrentAmmoInClip;
+
+
+	UPROPERTY(BlueprintReadOnly, Category = "Ammo")
+	int32 CurrentAmmo;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -125,17 +141,14 @@ protected:
 	TSubclassOf<UDamageType> DamageType;
 
 	EWeaponState::Type CurrentState;
+	EReloadingState::Type ReloadingState;
 
 
 	/** weapon data */
 	UPROPERTY(EditDefaultsOnly, Category = Config)
 	FWeaponData WeaponConfig;
 
-	UPROPERTY(Transient)
-	int32 CurrentAmmo;
 
-	UPROPERTY(Transient)
-	int32 CurrentAmmoInClip;
 
 
 	FTimerHandle TimerHandle_TimeBetweenShots;
