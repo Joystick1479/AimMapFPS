@@ -12,6 +12,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Helmet.h"
 #include "Headset.h"
+#include "Laser.h"
 #include "SoldierCharacter.h"
 
 
@@ -127,6 +128,15 @@ void ASoldierCharacter::LineTraceItem()
 		else
 		{
 			bHeadsetPickUp = false;
+		}
+		if (GetWorld()->LineTraceSingleByChannel(Hit, start_trace, end_trace, COLLISION_LASER, TraceParams) && isLaserAttached ==false)
+		{
+			DrawDebugLine(GetWorld(), start_trace, end_trace, FColor::Orange, false, 1.0f, 0, 1.0f);
+			bLaserPickUp = true;
+		}
+		else
+		{
+			bLaserPickUp = false;
 		}
 }
 
@@ -258,6 +268,20 @@ void ASoldierCharacter::PickUp()
 			Headset->SetOwner(this);
 			Headset->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, HeadsetSocket);
 			isHeadsetAttached = true;
+		}
+	}
+	if (bLaserPickUp == true)
+	{
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+		Laser = GetWorld()->SpawnActor<ALaser>(LaserClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
+		if (Laser)
+		{
+			Laser->SetOwner(AutomaticRifle);
+			FName LSocket = AutomaticRifle->LaserSocket;
+			Laser->AttachToComponent(AutomaticRifle->SkelMeshComp, FAttachmentTransformRules::SnapToTargetNotIncludingScale, LSocket);
+			isLaserAttached = true;
 		}
 	}
 

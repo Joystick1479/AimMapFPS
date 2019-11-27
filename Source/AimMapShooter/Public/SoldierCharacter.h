@@ -15,6 +15,7 @@ class AGrip;
 class USpringArmComponent;
 class AHelmet;
 class AHeadset;
+class ALaser;
 
 
 
@@ -75,6 +76,8 @@ protected:
 
 	AHeadset* Headset;
 
+	ALaser* Laser;
+
 	AHelmet* Helmet;
 	void LineTraceItem();
 
@@ -92,6 +95,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Player")
 	TSubclassOf<AHeadset> HeadsetClass;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Player")
+	TSubclassOf<ALaser> LaserClass;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
 	float ZoomingTime;
@@ -130,6 +136,8 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components")
 	UHealthComponent* HealthComp;
 
+	
+
 public:	
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Camera")
@@ -144,6 +152,7 @@ public:
 	FName WeaponSocket;
 	FName HelmetSocket;
 	FName HeadsetSocket;
+	
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Zoom")
 	bool IsZooming;
@@ -169,6 +178,12 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, Category = "Player")
 	bool bHeadsetPickUp;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Player")
+	bool bLaserPickUp;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Player")
+	bool isLaserAttached;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Player")
 	bool isHeadsetAttached;

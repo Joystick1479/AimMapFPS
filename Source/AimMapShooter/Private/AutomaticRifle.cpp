@@ -37,6 +37,7 @@ AAutomaticRifle::AAutomaticRifle()
 	LineSocket = "LineSocket";
 	ScopeSocket = "ScopeSocket";
 	GripSocket = "GripSocket";
+	LaserSocket = "LaserSocket";
 
 	CurrentState = EWeaponState::Idle;
 

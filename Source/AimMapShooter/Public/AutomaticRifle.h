@@ -95,6 +95,7 @@ public:
 	FName CameraSocket;
 	FName ScopeSocket;
 	FName GripSocket;
+	FName LaserSocket;
 
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Ammo")
