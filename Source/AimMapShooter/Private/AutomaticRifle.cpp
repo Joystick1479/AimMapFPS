@@ -12,6 +12,9 @@
 #include "Components/SphereComponent.h"
 #include "AimMapShooter.h"
 #include "PhysicalMaterials/PhysicalMaterial.h"
+#include "Laser.h"
+#include "Math/Vector.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "AutomaticRifle.h"
 
 // Sets default values
@@ -103,7 +106,7 @@ void AAutomaticRifle::Fire()
 	{
 		CurrentState = EWeaponState::Firing;
 
-
+		
 		ASoldierCharacter* SoldierChar = Cast<ASoldierCharacter>(GetOwner());
 		if (SoldierChar->IsZooming == true)
 		{
@@ -133,6 +136,7 @@ void AAutomaticRifle::Fire()
 					{
 						UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactEffect, Hit.ImpactPoint, Hit.ImpactNormal.Rotation());
 					}
+
 					//*Applying damage*//
 					AActor* HitActor = Hit.GetActor();
 					EPhysicalSurface SurfaceType = UPhysicalMaterial::DetermineSurfaceType(Hit.PhysMaterial.Get());
@@ -185,6 +189,7 @@ void AAutomaticRifle::Fire()
 				QueryParams.bReturnPhysicalMaterial = true;
 				QueryParams.bTraceComplex = true;
 
+
 				if (GetWorld()->LineTraceSingleByChannel(Hit, StartLocation, EndLocation, ECollisionChannel::ECC_Pawn, QueryParams))
 				{
 					//DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::White, false, 1.0f, 0, 1.0f);
@@ -193,6 +198,7 @@ void AAutomaticRifle::Fire()
 					{
 						UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactEffect, Hit.ImpactPoint, Hit.ImpactNormal.Rotation());
 					}
+
 					//*Applying damage*//
 					AActor* HitActor = Hit.GetActor();
 					EPhysicalSurface SurfaceType = UPhysicalMaterial::DetermineSurfaceType(Hit.PhysMaterial.Get());
@@ -222,11 +228,37 @@ void AAutomaticRifle::Fire()
 				}
 				UseAmmo();
 				PlayFireEffects(EndLocation);
+
+			}
+			if (SoldierChar->isLaserAttached == true)
+			{
+				ALaser* Laser = Cast<ALaser>(GetOwner());
+				if (Laser)
+				{
+					FName Socket = Laser->LaserSocket;
+
+					FHitResult Hit;
+					FVector StartLocation = Laser->GetRootComponent()->GetSocketLocation(Socket);
+					FRotator Rotation = SkelMeshComp->GetSocketRotation(MuzzleSocket);
+					FVector ShotDirection = Rotation.Vector();
+					FVector EndLocation = StartLocation + (ShotDirection * 10000);
+					FCollisionQueryParams QueryParams;
+					QueryParams.AddIgnoredActor(this);
+					QueryParams.bReturnPhysicalMaterial = true;
+					QueryParams.bTraceComplex = true;
+
+
+					if (GetWorld()->LineTraceSingleByChannel(Hit, StartLocation, EndLocation, ECollisionChannel::ECC_Pawn, QueryParams))
+					{
+						DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::White, false, 1.0f, 0, 1.0f);
+					}
+				}
 			}
 		}
 
 		LastFireTime = GetWorld()->TimeSeconds;
 	}
+
 
 	//*Sound when no ammo in clip*//
 

@@ -13,6 +13,7 @@ class USoundCue;
 class ASoldierCharacter;
 class USphereComponent;
 class UCameraShake;
+class ALaser;
 
 namespace EWeaponState
 {
@@ -96,6 +97,8 @@ public:
 	FName ScopeSocket;
 	FName GripSocket;
 	FName LaserSocket;
+
+	ALaser* Laser;
 
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Ammo")

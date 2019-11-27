@@ -129,7 +129,7 @@ void ASoldierCharacter::LineTraceItem()
 		{
 			bHeadsetPickUp = false;
 		}
-		if (GetWorld()->LineTraceSingleByChannel(Hit, start_trace, end_trace, COLLISION_LASER, TraceParams) && isLaserAttached ==false)
+		if (GetWorld()->LineTraceSingleByChannel(Hit, start_trace, end_trace, COLLISION_LASER, TraceParams) && isLaserAttached ==false && HoldingWeaponState==EHoldingWeapon::A4)
 		{
 			DrawDebugLine(GetWorld(), start_trace, end_trace, FColor::Orange, false, 1.0f, 0, 1.0f);
 			bLaserPickUp = true;

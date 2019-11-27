@@ -4,10 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "AutomaticRifle.h"
 #include "Laser.generated.h"
 
 class UStaticMeshComponent;
 class USphereComponent;
+class ASoldierCharacter;
+class AAutomaticRifle;
 
 UCLASS()
 class AIMMAPSHOOTER_API ALaser : public AActor
@@ -17,13 +20,18 @@ class AIMMAPSHOOTER_API ALaser : public AActor
 public:	
 	// Sets default values for this actor's properties
 	ALaser();
+	UPROPERTY(VisibleAnywhere, Category = "Components")
+	UStaticMeshComponent* MeshComp;
 
+	FName LaserSocket;
+
+	AAutomaticRifle* Rifle;
+	
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	UPROPERTY(VisibleAnywhere, Category = "Components")
-	UStaticMeshComponent* MeshComp;
+
 
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	USphereComponent* SphereComp;
