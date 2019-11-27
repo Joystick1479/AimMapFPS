@@ -11,6 +11,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Helmet.h"
+#include "Headset.h"
 #include "SoldierCharacter.h"
 
 
@@ -24,6 +25,7 @@ ASoldierCharacter::ASoldierCharacter()
 	WeaponSocket = "WeaponSocket";
 	ArmSocket = "ArmSocket";
 	HelmetSocket = "HelmetSocket";
+	HeadsetSocket = "HeadsetSocket";
 
 	SpringArm = CreateDefaultSubobject <USpringArmComponent>(TEXT("SpringArm"));
 	SpringArm->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, ArmSocket);
@@ -116,6 +118,15 @@ void ASoldierCharacter::LineTraceItem()
 		else
 		{
 			bHelmetPickUp = false;
+		}
+		if (GetWorld()->LineTraceSingleByChannel(Hit, start_trace, end_trace, COLLISION_HEADSET, TraceParams))
+		{
+			DrawDebugLine(GetWorld(), start_trace, end_trace, FColor::Black, false, 1.0f, 0, 1.0f);
+			bHeadsetPickUp = true;
+		}
+		else
+		{
+			bHeadsetPickUp = false;
 		}
 }
 
@@ -234,6 +245,19 @@ void ASoldierCharacter::PickUp()
 			Helmet->SetOwner(this);
 			Helmet->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, HelmetSocket);
 			isHelmetAttached = true;
+		}
+	}
+	if (bHeadsetPickUp == true)
+	{
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+		Headset = GetWorld()->SpawnActor<AHeadset>(HeadsetClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
+		if (Headset)
+		{
+			Headset->SetOwner(this);
+			Headset->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, HeadsetSocket);
+			isHeadsetAttached = true;
 		}
 	}
 

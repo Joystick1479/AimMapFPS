@@ -11,6 +11,7 @@
 #define COLLISION_GRIP ECC_GameTraceChannel4
 #define COLLISION_SNIPER ECC_GameTraceChannel5
 #define COLLISION_HELMET ECC_GameTraceChannel6
+#define COLLISION_HEADSET ECC_GameTraceChannel7
 
 #define SURFACE_HEAD SurfaceType3
 #define SURFACE_CHEST SurfaceType4
