@@ -103,12 +103,13 @@ void AAutomaticRifle::StopFire()
 
 void AAutomaticRifle::Fire()
 {
-	if (CurrentAmmoInClip > 0 && CurrentState!=EWeaponState::Reloading)
+	if (CurrentAmmoInClip > 0 && CurrentState != EWeaponState::Reloading)
 	{
 		CurrentState = EWeaponState::Firing;
 
-		
+
 		ASoldierCharacter* SoldierChar = Cast<ASoldierCharacter>(GetOwner());
+		ALaser* Laser = Cast<ALaser>(GetOwner());
 		if (SoldierChar->IsZooming == true)
 		{
 			AActor* MyOwner = GetOwner();
@@ -224,42 +225,21 @@ void AAutomaticRifle::Fire()
 					{
 						ActualDamage *= 1.5f;
 					}
-					UGameplayStatics::ApplyPointDamage(HitActor, ActualDamage,ShotDirection,Hit,MyOwner->GetInstigatorController(), MyOwner,DamageType);
+					UGameplayStatics::ApplyPointDamage(HitActor, ActualDamage, ShotDirection, Hit, MyOwner->GetInstigatorController(), MyOwner, DamageType);
 
 				}
 				UseAmmo();
 				PlayFireEffects(EndLocation);
 
-				
+
 
 			}
 		}
-		if (SoldierChar->isLaserAttached == true)
-		{
-			AActor* MyOwner = GetOwner();
-			if (MyOwner)
-			{
-					FHitResult Hit;
-					FVector StartLocation = SkelMeshComp->GetSocketLocation(LaserSocketEnd);
-					//FRotator Rotation = SkelMeshComp->GetSocketRotation(MuzzleSocket);
-					FRotator Rotation = SkelMeshComp->GetSocketRotation(LaserSocketEnd);
-					FVector ShotDirection = Rotation.Vector();
-					FVector EndLocation = StartLocation + (ShotDirection * 10000);
-					FCollisionQueryParams QueryParams;
-					QueryParams.AddIgnoredActor(MyOwner);
-					QueryParams.AddIgnoredActor(this);
-					QueryParams.bReturnPhysicalMaterial = true;
-					QueryParams.bTraceComplex = true;
-
-					if (GetWorld()->LineTraceSingleByChannel(Hit, StartLocation, EndLocation, ECollisionChannel::ECC_Pawn, QueryParams))
-					{
-						DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::White, false, 1.0f, 0, 1.0f);
-					}
-			}
-		}
+	}
+	
 		
 		LastFireTime = GetWorld()->TimeSeconds;
-	}
+	
 
 	//*Sound when no ammo in clip*//
 

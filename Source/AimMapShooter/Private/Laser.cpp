@@ -63,10 +63,13 @@ void ALaser::StartLaser()
 
 		if (GetWorld()->LineTraceSingleByChannel(Hit, StartLocation, EndLocation, ECollisionChannel::ECC_Visibility, QueryParams))
 		{
+
 			//DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::White, false, 1.0f, 0, 1.0f);
 			FVector StartLocation = Hit.TraceStart;
 			FVector EndLocation = Hit.Location;
-			FVector Laser = StartLocation - EndLocation;
+			//**Adding offset to match muzzle fire**//
+			FVector FinalLocation = Hit.Location + FVector(0, 0, 2000);
+			FVector Laser = StartLocation - FinalLocation;
 			float LaserLentgh = Laser.Size() / LengthOfLaser;
 			FVector Last = FVector(LaserLentgh, ThickOfLaser, ThickOfLaser);
 			MeshComp2->SetWorldScale3D(Last);

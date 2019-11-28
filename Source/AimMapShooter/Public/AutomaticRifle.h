@@ -101,7 +101,6 @@ public:
 
 	ALaser* Laser;
 
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Ammo")
 	int32 CurrentAmmoInClip;
 

@@ -349,6 +349,7 @@ void ASoldierCharacter::StartFire()
 		if (AutomaticRifle)
 		{
 			AutomaticRifle->StartFire();
+
 		}
 	}
 	else
@@ -356,6 +357,7 @@ void ASoldierCharacter::StartFire()
 		if (AutomaticRifle)
 		{
 			AutomaticRifle->Fire();
+
 		}
 	}
 }

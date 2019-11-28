@@ -30,9 +30,9 @@ public:
 
 	AAutomaticRifle* Rifle;
 
-	ASoldierCharacter* SoldierChar;
 
 	void StartLaser();
+
 
 
 	
