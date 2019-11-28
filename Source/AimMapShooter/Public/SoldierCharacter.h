@@ -17,7 +17,14 @@ class AHelmet;
 class AHeadset;
 class ALaser;
 
-
+namespace ELaserState
+{
+	enum Type
+	{
+		Idle,
+		Start
+	};
+}
 
 namespace ECharacterState
 {
@@ -67,6 +74,7 @@ protected:
 
 	EHoldingAttachment::Type HoldingAttachmentState;
 
+	ELaserState::Type LaserState;
 	
 	AAutomaticRifle* AutomaticRifle;
 
@@ -95,6 +103,7 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Player")
 	TSubclassOf<AHeadset> HeadsetClass;
+
 
 	UPROPERTY(EditDefaultsOnly, Category = "Player")
 	TSubclassOf<ALaser> LaserClass;

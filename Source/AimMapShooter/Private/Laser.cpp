@@ -42,39 +42,39 @@ void ALaser::BeginPlay()
 void ALaser::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	StartLaser();
-
 }
+
+
 void ALaser::StartLaser()
 {
-	AAutomaticRifle* Rifle = Cast<AAutomaticRifle>(GetOwner());
-	if (Rifle)
-	{
-		FName Socket = Rifle->MuzzleSocket;
-		FHitResult Hit;
-		FVector StartLocation = MeshComp->GetSocketLocation(LaserSocket);
-		FRotator Rotation = Rifle->GetRootComponent()->GetSocketRotation(Socket);
-		FVector ShotDirection = Rotation.Vector();
-		FVector EndLocation = StartLocation + (ShotDirection * 10000);
-		FCollisionQueryParams QueryParams;
-		QueryParams.AddIgnoredActor(this);
-		QueryParams.bTraceComplex = false;
-
-		if (GetWorld()->LineTraceSingleByChannel(Hit, StartLocation, EndLocation, ECollisionChannel::ECC_Visibility, QueryParams))
+		AAutomaticRifle* Rifle = Cast<AAutomaticRifle>(GetOwner());
+		if (Rifle)
 		{
+			FName Socket = Rifle->MuzzleSocket;
+			FHitResult Hit;
+			FVector StartLocation = MeshComp->GetSocketLocation(LaserSocket);
+			FRotator Rotation = Rifle->GetRootComponent()->GetSocketRotation(Socket);
+			FVector ShotDirection = Rotation.Vector();
+			FVector EndLocation = StartLocation + (ShotDirection * 10000);
+			FCollisionQueryParams QueryParams;
+			QueryParams.AddIgnoredActor(this);
+			QueryParams.bTraceComplex = false;
 
-			//DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::White, false, 1.0f, 0, 1.0f);
-			FVector StartLocation = Hit.TraceStart;
-			FVector EndLocation = Hit.Location;
-			//**Adding offset to match muzzle fire**//
-			FVector FinalLocation = Hit.Location + FVector(0, 0, 2000);
-			FVector Laser = StartLocation - FinalLocation;
-			float LaserLentgh = Laser.Size() / LengthOfLaser;
-			FVector Last = FVector(LaserLentgh, ThickOfLaser, ThickOfLaser);
-			MeshComp2->SetWorldScale3D(Last);
+			if (GetWorld()->LineTraceSingleByChannel(Hit, StartLocation, EndLocation, ECollisionChannel::ECC_Visibility, QueryParams))
+			{
+
+				//DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::White, false, 1.0f, 0, 1.0f);
+				FVector StartLocation = Hit.TraceStart;
+				FVector EndLocation = Hit.Location;
+				//**Adding offset to match muzzle fire**//
+				FVector FinalLocation = Hit.Location + FVector(0, 0, 2000);
+				FVector Laser = StartLocation - FinalLocation;
+				float LaserLentgh = Laser.Size() / LengthOfLaser;
+				FVector Last = FVector(LaserLentgh, ThickOfLaser, ThickOfLaser);
+				MeshComp2->SetWorldScale3D(Last);
+			}
 		}
-	}
+	
 }
 
 

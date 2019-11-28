@@ -45,6 +45,7 @@ ASoldierCharacter::ASoldierCharacter()
 	CharacterState = ECharacterState::Idle;
 	HoldingWeaponState = EHoldingWeapon::None;
 	HoldingAttachmentState = EHoldingAttachment::None;
+	LaserState = ELaserState::Idle;
 	MaxUseDistance = 400;
 
 	bRiflePickUp = false;
@@ -193,11 +194,18 @@ void ASoldierCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 }
 void ASoldierCharacter::TurnOnLaser()
 {
-	//if (isLaserAttached == true)
-	//{
-		isLaserON = true;
-	//}
-
+	if (Laser && LaserState == ELaserState::Start)
+	{
+		Laser->MeshComp2->SetVisibility(false);
+		LaserState = ELaserState::Idle;
+	}
+	else 
+	{
+		Laser->StartLaser();
+		Laser->MeshComp2->SetVisibility(true);
+		LaserState = ELaserState::Start;
+	}
+	
 }
 
 void ASoldierCharacter::PickUp()

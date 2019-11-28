@@ -30,6 +30,8 @@ public:
 
 	AAutomaticRifle* Rifle;
 
+	ASoldierCharacter* SoldierChar;
+
 
 	void StartLaser();
 
@@ -48,6 +50,7 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Laser")
 	double ThickOfLaser;
+
 
 public:	
 	// Called every frame
