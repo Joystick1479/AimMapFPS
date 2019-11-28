@@ -24,7 +24,8 @@ ALaser::ALaser()
 
 	LaserSocket = "LaserSocket";
 
-	LengthOfLaser = 10;
+	LengthOfLaser = 5;
+	ThickOfLaser = 0.1;
 	
 }
 
@@ -63,9 +64,11 @@ void ALaser::StartLaser()
 		if (GetWorld()->LineTraceSingleByChannel(Hit, StartLocation, EndLocation, ECollisionChannel::ECC_Visibility, QueryParams))
 		{
 			//DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::White, false, 1.0f, 0, 1.0f);
+			FVector StartLocation = Hit.TraceStart;
+			FVector EndLocation = Hit.Location;
 			FVector Laser = StartLocation - EndLocation;
-			float LaserLentgh = Laser.Size() / 10;
-			FVector Last = FVector(LaserLentgh, 1, 1);
+			float LaserLentgh = Laser.Size() / LengthOfLaser;
+			FVector Last = FVector(LaserLentgh, ThickOfLaser, ThickOfLaser);
 			MeshComp2->SetWorldScale3D(Last);
 		}
 	}

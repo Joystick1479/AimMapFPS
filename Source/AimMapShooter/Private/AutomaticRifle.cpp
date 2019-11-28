@@ -41,6 +41,7 @@ AAutomaticRifle::AAutomaticRifle()
 	ScopeSocket = "ScopeSocket";
 	GripSocket = "GripSocket";
 	LaserSocket = "LaserSocket";
+	LaserSocketEnd = "LaserSocketEnd";
 
 	CurrentState = EWeaponState::Idle;
 
@@ -229,8 +230,34 @@ void AAutomaticRifle::Fire()
 				UseAmmo();
 				PlayFireEffects(EndLocation);
 
+				
+
 			}
 		}
+		if (SoldierChar->isLaserAttached == true)
+		{
+			AActor* MyOwner = GetOwner();
+			if (MyOwner)
+			{
+					FHitResult Hit;
+					FVector StartLocation = SkelMeshComp->GetSocketLocation(LaserSocketEnd);
+					//FRotator Rotation = SkelMeshComp->GetSocketRotation(MuzzleSocket);
+					FRotator Rotation = SkelMeshComp->GetSocketRotation(LaserSocketEnd);
+					FVector ShotDirection = Rotation.Vector();
+					FVector EndLocation = StartLocation + (ShotDirection * 10000);
+					FCollisionQueryParams QueryParams;
+					QueryParams.AddIgnoredActor(MyOwner);
+					QueryParams.AddIgnoredActor(this);
+					QueryParams.bReturnPhysicalMaterial = true;
+					QueryParams.bTraceComplex = true;
+
+					if (GetWorld()->LineTraceSingleByChannel(Hit, StartLocation, EndLocation, ECollisionChannel::ECC_Pawn, QueryParams))
+					{
+						DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::White, false, 1.0f, 0, 1.0f);
+					}
+			}
+		}
+		
 		LastFireTime = GetWorld()->TimeSeconds;
 	}
 

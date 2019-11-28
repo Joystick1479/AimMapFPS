@@ -97,6 +97,7 @@ public:
 	FName ScopeSocket;
 	FName GripSocket;
 	FName LaserSocket;
+	FName LaserSocketEnd;
 
 	ALaser* Laser;
 

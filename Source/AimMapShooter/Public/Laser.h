@@ -46,6 +46,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	USphereComponent* SphereComp;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Laser")
+	double ThickOfLaser;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
