@@ -16,10 +16,15 @@ ALaser::ALaser()
 	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComp"));
 	RootComponent = MeshComp;
 
+	MeshComp2 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComp2"));
+	MeshComp2->SetupAttachment(MeshComp);
+
 	SphereComp = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
 	SphereComp->SetupAttachment(MeshComp);
 
 	LaserSocket = "LaserSocket";
+
+	LengthOfLaser = 10;
 	
 }
 
@@ -36,14 +41,16 @@ void ALaser::BeginPlay()
 void ALaser::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	
 
+	StartLaser();
 
+}
+void ALaser::StartLaser()
+{
 	AAutomaticRifle* Rifle = Cast<AAutomaticRifle>(GetOwner());
 	if (Rifle)
 	{
 		FName Socket = Rifle->MuzzleSocket;
-
 		FHitResult Hit;
 		FVector StartLocation = MeshComp->GetSocketLocation(LaserSocket);
 		FRotator Rotation = Rifle->GetRootComponent()->GetSocketRotation(Socket);
@@ -51,16 +58,18 @@ void ALaser::Tick(float DeltaTime)
 		FVector EndLocation = StartLocation + (ShotDirection * 10000);
 		FCollisionQueryParams QueryParams;
 		QueryParams.AddIgnoredActor(this);
-		QueryParams.bReturnPhysicalMaterial = true;
-		QueryParams.bTraceComplex = true;
+		QueryParams.bTraceComplex = false;
 
-
-		if (GetWorld()->LineTraceSingleByChannel(Hit, StartLocation, EndLocation, ECollisionChannel::ECC_Pawn, QueryParams))
+		if (GetWorld()->LineTraceSingleByChannel(Hit, StartLocation, EndLocation, ECollisionChannel::ECC_Visibility, QueryParams))
 		{
-			DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::White, false, 1.0f, 0, 1.0f);
+			//DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::White, false, 1.0f, 0, 1.0f);
+			FVector Laser = StartLocation - EndLocation;
+			float LaserLentgh = Laser.Size() / 10;
+			FVector Last = FVector(LaserLentgh, 1, 1);
+			MeshComp2->SetWorldScale3D(Last);
 		}
 	}
-		
-
 }
+
+
 

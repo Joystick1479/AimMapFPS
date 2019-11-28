@@ -121,6 +121,7 @@ protected:
 	void ZoomIn();
 	void ZoomOut();
 
+
 	void PickUp();
 
 	UPROPERTY(EditDefaultsOnly, Category = "LineTrace")
@@ -143,6 +144,7 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Camera")
 	UCameraComponent* CameraComp;
 
+	void TurnOnLaser();
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Camera")
 	USpringArmComponent* SpringArm;
@@ -196,6 +198,9 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, Category = "Player")
 	bool isHelmetAttached;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Player")
+	bool isLaserON;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Player")
 	int32 SoldierCurrentAmmoInClip;

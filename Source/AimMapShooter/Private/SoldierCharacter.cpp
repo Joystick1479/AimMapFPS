@@ -188,6 +188,16 @@ void ASoldierCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &ASoldierCharacter::SprintOn);
 	PlayerInputComponent->BindAction("Sprint", IE_Released, this, &ASoldierCharacter::SprintOff);
 
+	PlayerInputComponent->BindAction("ToogleLaser", IE_Pressed, this, &ASoldierCharacter::TurnOnLaser);
+
+}
+void ASoldierCharacter::TurnOnLaser()
+{
+	//if (isLaserAttached == true)
+	//{
+		isLaserON = true;
+	//}
+
 }
 
 void ASoldierCharacter::PickUp()

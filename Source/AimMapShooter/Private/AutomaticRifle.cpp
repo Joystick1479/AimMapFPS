@@ -230,35 +230,9 @@ void AAutomaticRifle::Fire()
 				PlayFireEffects(EndLocation);
 
 			}
-			if (SoldierChar->isLaserAttached == true)
-			{
-				ALaser* Laser = Cast<ALaser>(GetOwner());
-				if (Laser)
-				{
-					FName Socket = Laser->LaserSocket;
-
-					FHitResult Hit;
-					FVector StartLocation = Laser->GetRootComponent()->GetSocketLocation(Socket);
-					FRotator Rotation = SkelMeshComp->GetSocketRotation(MuzzleSocket);
-					FVector ShotDirection = Rotation.Vector();
-					FVector EndLocation = StartLocation + (ShotDirection * 10000);
-					FCollisionQueryParams QueryParams;
-					QueryParams.AddIgnoredActor(this);
-					QueryParams.bReturnPhysicalMaterial = true;
-					QueryParams.bTraceComplex = true;
-
-
-					if (GetWorld()->LineTraceSingleByChannel(Hit, StartLocation, EndLocation, ECollisionChannel::ECC_Pawn, QueryParams))
-					{
-						DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::White, false, 1.0f, 0, 1.0f);
-					}
-				}
-			}
 		}
-
 		LastFireTime = GetWorld()->TimeSeconds;
 	}
-
 
 	//*Sound when no ammo in clip*//
 

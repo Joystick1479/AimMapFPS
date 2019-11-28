@@ -20,18 +20,28 @@ class AIMMAPSHOOTER_API ALaser : public AActor
 public:	
 	// Sets default values for this actor's properties
 	ALaser();
-	UPROPERTY(VisibleAnywhere, Category = "Components")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly,Category = "Components")
 	UStaticMeshComponent* MeshComp;
+
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly, Category = "Components")
+	UStaticMeshComponent* MeshComp2;
 
 	FName LaserSocket;
 
 	AAutomaticRifle* Rifle;
+
+	ASoldierCharacter* SoldierChar;
+
+	void StartLaser();
+
+
 	
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-
+	UPROPERTY(EditDefaultsOnly, Category = "Laser")
+	float LengthOfLaser;
 
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	USphereComponent* SphereComp;
