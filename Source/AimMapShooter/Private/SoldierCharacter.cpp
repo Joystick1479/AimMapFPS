@@ -112,7 +112,7 @@ void ASoldierCharacter::LineTraceItem()
 		{
 			bGripPickUp = false;
 		}
-		if (GetWorld()->LineTraceSingleByChannel(Hit, start_trace, end_trace, COLLISION_HELMET, TraceParams))
+		if (GetWorld()->LineTraceSingleByChannel(Hit, start_trace, end_trace, COLLISION_HELMET, TraceParams) && isHelmetAttached == false)
 		{
 			DrawDebugLine(GetWorld(), start_trace, end_trace, FColor::Blue, false, 1.0f, 0, 1.0f);
 			bHelmetPickUp = true;
@@ -121,7 +121,7 @@ void ASoldierCharacter::LineTraceItem()
 		{
 			bHelmetPickUp = false;
 		}
-		if (GetWorld()->LineTraceSingleByChannel(Hit, start_trace, end_trace, COLLISION_HEADSET, TraceParams))
+		if (GetWorld()->LineTraceSingleByChannel(Hit, start_trace, end_trace, COLLISION_HEADSET, TraceParams) && isHeadsetAttached == false)
 		{
 			DrawDebugLine(GetWorld(), start_trace, end_trace, FColor::Black, false, 1.0f, 0, 1.0f);
 			bHeadsetPickUp = true;
