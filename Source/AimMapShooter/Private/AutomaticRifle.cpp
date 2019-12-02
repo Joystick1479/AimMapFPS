@@ -55,6 +55,10 @@ AAutomaticRifle::AAutomaticRifle()
 	BulletSpreadZooming = 0.5f;
 	BulletSpreadGrip = 1.0f;
 
+	//*Multiplayer repliaction **//
+	SetReplicates(true);
+	SetReplicateMovement(true);
+
 }
 
 
