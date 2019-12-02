@@ -217,6 +217,9 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "Player")
 	int32 SoldierCurrentAmmo;
 
+	UPROPERTY(BlueprintReadOnly, Category = "Player")
+	int32 SoldierCurrentClips;
+
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 

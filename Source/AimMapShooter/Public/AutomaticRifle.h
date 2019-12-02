@@ -59,7 +59,7 @@ struct FWeaponData
 	{
 		MaxAmmo = 100;
 		AmmoPerClip = 20;
-		InitialClips = 4;
+		InitialClips = 2;
 		TimeBetweenShots = 0.2f;
 		TimeBetweenReload = 2.0f;
 	}
@@ -107,6 +107,9 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, Category = "Ammo")
 	int32 CurrentAmmo;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Ammo")
+	int32 CurrentAmountOfClips;
 
 protected:
 	// Called when the game starts or when spawned

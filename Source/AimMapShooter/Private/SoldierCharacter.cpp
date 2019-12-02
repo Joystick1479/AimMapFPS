@@ -152,6 +152,7 @@ void ASoldierCharacter::Tick(float DeltaTime)
 	{
 		SoldierCurrentAmmoInClip = AutomaticRifle->CurrentAmmoInClip;
 		SoldierCurrentAmmo = AutomaticRifle->CurrentAmmo;
+		SoldierCurrentClips = AutomaticRifle->CurrentAmountOfClips;
 	}
 
 

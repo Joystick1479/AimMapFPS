@@ -42,6 +42,7 @@ void ALaser::BeginPlay()
 void ALaser::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	StartLaser();
 }
 
 
@@ -66,9 +67,7 @@ void ALaser::StartLaser()
 				//DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::White, false, 1.0f, 0, 1.0f);
 				FVector StartLocation = Hit.TraceStart;
 				FVector EndLocation = Hit.Location;
-				//**Adding offset to match muzzle fire**//
-				FVector FinalLocation = Hit.Location + FVector(0, 0, 2000);
-				FVector Laser = StartLocation - FinalLocation;
+				FVector Laser = StartLocation - EndLocation;
 				float LaserLentgh = Laser.Size() / LengthOfLaser;
 				FVector Last = FVector(LaserLentgh, ThickOfLaser, ThickOfLaser);
 				MeshComp2->SetWorldScale3D(Last);

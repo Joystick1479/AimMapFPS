@@ -47,6 +47,7 @@ AAutomaticRifle::AAutomaticRifle()
 
 	CurrentAmmo = 0;
 	CurrentAmmoInClip = 0;
+	CurrentAmountOfClips = 0;
 
 	RateOfFire = 600;
 	BaseDamage = 20.0f;
@@ -74,6 +75,8 @@ void AAutomaticRifle::BeginPlay()
 	{
 		CurrentAmmoInClip = WeaponConfig.AmmoPerClip;
 		CurrentAmmo = WeaponConfig.AmmoPerClip * WeaponConfig.InitialClips;
+		WeaponConfig.InitialClips--; ///* Minus one clip when we pick up the gun because it's already loaded *///
+		CurrentAmountOfClips = WeaponConfig.InitialClips;
 	}
 
 	WeaponConfig.TimeBetweenShots = 60 / RateOfFire;
@@ -290,7 +293,7 @@ void AAutomaticRifle::PlayFireEffects(FVector EndLocation)
 }
 void AAutomaticRifle::StartReload()
 {
-	if (ReloadingState == EReloadingState::None)
+	if (ReloadingState == EReloadingState::None && CurrentAmountOfClips>0)
 	{
 		ReloadingState = EReloadingState::Reloading;
 		CurrentState = EWeaponState::Reloading;
@@ -315,6 +318,7 @@ void AAutomaticRifle::ReloadWeapon()
 		if (ClipDelta > 0)
 		{
 			CurrentAmmoInClip += ClipDelta;
+			CurrentAmountOfClips--;
 		}
 
 		CurrentState = EWeaponState::Idle;
