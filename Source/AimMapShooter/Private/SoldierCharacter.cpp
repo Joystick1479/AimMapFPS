@@ -218,7 +218,7 @@ void ASoldierCharacter::PickUp()
 	if (Role < ROLE_Authority)
 	{
 		ServerPickUpItem();
-		return;
+		//return;
 	}
 		if (bRiflePickUp == true)
 		{
