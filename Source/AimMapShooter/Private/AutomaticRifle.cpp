@@ -1,5 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
-
+#include "AutomaticRifle.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Camera/CameraComponent.h"
 #include "DrawDebugHelpers.h"
@@ -15,7 +15,7 @@
 #include "Laser.h"
 #include "Math/Vector.h"
 #include "Kismet/KismetMathLibrary.h"
-#include "AutomaticRifle.h"
+#include "Net/UnrealNetwork.h"
 
 // Sets default values
 AAutomaticRifle::AAutomaticRifle()
@@ -107,8 +107,25 @@ void AAutomaticRifle::StopFire()
 	GetWorldTimerManager().ClearTimer(TimerHandle_TimeBetweenShots);
 }
 
+void AAutomaticRifle::ServerFire_Implementation()
+{
+	Fire();
+}
+bool AAutomaticRifle::ServerFire_Validate()
+{
+	return true;
+}
+void AAutomaticRifle::OnRep_HitScanTrace()
+{
+	// Play cosmetic FX//
+	PlayFireEffects(HitScanTrace.TraceTo);
+}
 void AAutomaticRifle::Fire()
 {
+	if (Role < ROLE_Authority)
+	{
+		ServerFire();
+	}
 	if (CurrentAmmoInClip > 0 && CurrentState != EWeaponState::Reloading)
 	{
 		CurrentState = EWeaponState::Firing;
@@ -173,6 +190,10 @@ void AAutomaticRifle::Fire()
 				}
 				UseAmmo();
 				PlayFireEffects(EndLocation);
+				if (Role == ROLE_Authority)
+				{
+					HitScanTrace.TraceTo = EndLocation;
+				}
 			}
 		}
 		else
@@ -236,16 +257,14 @@ void AAutomaticRifle::Fire()
 				}
 				UseAmmo();
 				PlayFireEffects(EndLocation);
-
-
-
+				if (Role == ROLE_Authority)
+				{
+					HitScanTrace.TraceTo = EndLocation;
+				}
 			}
 		}
 	}
-	
-		
 		LastFireTime = GetWorld()->TimeSeconds;
-	
 
 	//*Sound when no ammo in clip*//
 
@@ -255,6 +274,7 @@ void AAutomaticRifle::Fire()
 	}
 	
 }
+
 
 
 void AAutomaticRifle::PlayFireEffects(FVector EndLocation)
@@ -329,7 +349,12 @@ void AAutomaticRifle::ReloadWeapon()
 
 		UE_LOG(LogTemp, Warning, TEXT("Reloaded"));
 		//LastReloadTime = GetWorld()->TimeSeconds;
+}
+void AAutomaticRifle::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	//This function tells us how we want to replicate things//
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	
+	DOREPLIFETIME_CONDITION(AAutomaticRifle, HitScanTrace,COND_SkipOwner);
 }
 

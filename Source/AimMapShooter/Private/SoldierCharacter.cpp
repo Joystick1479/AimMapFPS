@@ -50,6 +50,7 @@ ASoldierCharacter::ASoldierCharacter()
 
 	bRiflePickUp = false;
 
+	SetReplicates(true);
 
 }
 

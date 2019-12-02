@@ -15,6 +15,21 @@ class USphereComponent;
 class UCameraShake;
 class ALaser;
 
+//Contains information of a single hitscan weapon line trace//
+USTRUCT()
+struct  FHitScanTrace
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY()
+	FVector_NetQuantize TraceFrom;
+
+	UPROPERTY()
+	FVector_NetQuantize TraceTo;
+
+};
+
 namespace EWeaponState
 {
 	enum Type
@@ -88,6 +103,9 @@ public:
 	void UseAmmo();
 
 	void Fire();
+	UFUNCTION(Server,Reliable, WithValidation)
+	void ServerFire();
+
 	void StartReload();
 	void StopReload();
 	void ReloadWeapon();
@@ -169,6 +187,11 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
 	float RateOfFire;
 
+	UPROPERTY(ReplicatedUsing=OnRep_HitScanTrace)
+	FHitScanTrace HitScanTrace;
+
+	UFUNCTION()
+	void OnRep_HitScanTrace();
 
 
 	//*Particle effects*//
