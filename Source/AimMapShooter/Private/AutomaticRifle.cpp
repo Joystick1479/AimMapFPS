@@ -57,7 +57,6 @@ AAutomaticRifle::AAutomaticRifle()
 
 	//*Multiplayer repliaction **//
 	SetReplicates(true);
-	SetReplicateMovement(true);
 
 }
 

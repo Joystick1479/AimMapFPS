@@ -26,6 +26,8 @@ ALaser::ALaser()
 
 	LengthOfLaser = 5;
 	ThickOfLaser = 0.1;
+
+	SetReplicates(true);
 	
 }
 

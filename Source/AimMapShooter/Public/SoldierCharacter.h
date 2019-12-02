@@ -76,6 +76,7 @@ protected:
 
 	ELaserState::Type LaserState;
 	
+	UPROPERTY(Replicated)
 	AAutomaticRifle* AutomaticRifle;
 
 	AHoloScope* HoloScope;
@@ -87,6 +88,10 @@ protected:
 	ALaser* Laser;
 
 	AHelmet* Helmet;
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerPickUpItem();
+	
 	void LineTraceItem();
 
 	UPROPERTY(EditDefaultsOnly, Category = "Player")

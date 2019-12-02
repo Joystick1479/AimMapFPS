@@ -1,5 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
-
+#include "SoldierCharacter.h"
 #include "Camera/CameraComponent.h"
 #include "AutomaticRifle.h"
 #include "Components/SkeletalMeshComponent.h"
@@ -13,7 +13,7 @@
 #include "Helmet.h"
 #include "Headset.h"
 #include "Laser.h"
-#include "SoldierCharacter.h"
+#include "Net/UnrealNetwork.h"
 
 
 // Sets default values
@@ -53,6 +53,7 @@ ASoldierCharacter::ASoldierCharacter()
 
 }
 
+
 // Called when the game starts or when spawned
 void ASoldierCharacter::BeginPlay()
 {
@@ -60,34 +61,28 @@ void ASoldierCharacter::BeginPlay()
 
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-
-	//AutomaticRifle = GetWorld()->SpawnActor<AAutomaticRifle>(StarterWeaponClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
-	//if (AutomaticRifle)
-	//{
-	//	AutomaticRifle->SetOwner(this);
-	//	AutomaticRifle->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocket);
-	//}
+	
 	HealthComp->OnHealthChanged.AddDynamic(this, &ASoldierCharacter::OnHealthChanged);
 }
 
 void ASoldierCharacter::LineTraceItem()
 {
-	const FVector start_trace = CameraComp->GetComponentLocation();
-	const FVector direction = CameraComp->GetComponentRotation().Vector();
-	const FVector end_trace = start_trace + (direction* MaxUseDistance);
+		const FVector start_trace = CameraComp->GetComponentLocation();
+		const FVector direction = CameraComp->GetComponentRotation().Vector();
+		const FVector end_trace = start_trace + (direction* MaxUseDistance);
 
-	FCollisionQueryParams TraceParams(FName(TEXT("")), true, this);
-	TraceParams.bReturnPhysicalMaterial = false;
-	TraceParams.bTraceComplex = true;
-	TraceParams.AddIgnoredActor(this);
+		FCollisionQueryParams TraceParams(FName(TEXT("")), true, this);
+		TraceParams.bReturnPhysicalMaterial = false;
+		TraceParams.bTraceComplex = true;
+		TraceParams.AddIgnoredActor(this);
 
 		FHitResult Hit;
 
-		if (GetWorld()->LineTraceSingleByChannel(Hit, start_trace, end_trace, COLLISION_ITEMS , TraceParams) && HoldingWeaponState == EHoldingWeapon::None)
+		if (GetWorld()->LineTraceSingleByChannel(Hit, start_trace, end_trace, COLLISION_ITEMS, TraceParams) && HoldingWeaponState == EHoldingWeapon::None)
 		{
 			DrawDebugLine(GetWorld(), start_trace, end_trace, FColor::Red, false, 1.0f, 0, 1.0f);
 			bRiflePickUp = true;
-		
+
 			AActor* WeaponHit = Hit.GetActor();
 		}
 		else
@@ -130,7 +125,7 @@ void ASoldierCharacter::LineTraceItem()
 		{
 			bHeadsetPickUp = false;
 		}
-		if (GetWorld()->LineTraceSingleByChannel(Hit, start_trace, end_trace, COLLISION_LASER, TraceParams) && isLaserAttached ==false && HoldingWeaponState==EHoldingWeapon::A4)
+		if (GetWorld()->LineTraceSingleByChannel(Hit, start_trace, end_trace, COLLISION_LASER, TraceParams) && isLaserAttached == false && HoldingWeaponState == EHoldingWeapon::A4)
 		{
 			DrawDebugLine(GetWorld(), start_trace, end_trace, FColor::Orange, false, 1.0f, 0, 1.0f);
 			bLaserPickUp = true;
@@ -139,6 +134,7 @@ void ASoldierCharacter::LineTraceItem()
 		{
 			bLaserPickUp = false;
 		}
+	
 }
 
 // Called every frame
@@ -209,101 +205,109 @@ void ASoldierCharacter::TurnOnLaser()
 	
 }
 
+void ASoldierCharacter::ServerPickUpItem_Implementation()
+{
+	PickUp();
+}
+bool ASoldierCharacter::ServerPickUpItem_Validate()
+{
+	return true;
+}
 void ASoldierCharacter::PickUp()
 {
-
-	if (bRiflePickUp == true)
+	if (Role < ROLE_Authority)
 	{
-
-		HoldingWeaponState = EHoldingWeapon::A4;
-
-		FActorSpawnParameters SpawnParams;
-		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-
-
-		AutomaticRifle = GetWorld()->SpawnActor<AAutomaticRifle>(StarterWeaponClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
-		if (AutomaticRifle)
-		{
-		AutomaticRifle->SetOwner(this);
-		AutomaticRifle->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocket);
-		
-		//AutomaticRifle->AttachToComponent(SpringArm, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-		}
+		ServerPickUpItem();
+		return;
 	}
-	
-	if (bHoloPickUp == true && HoldingWeaponState==EHoldingWeapon::A4)
-	{
-		HoldingAttachmentState = EHoldingAttachment::Holo;
-
-		FActorSpawnParameters SpawnParams;
-		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-
-		HoloScope = GetWorld()->SpawnActor<AHoloScope>(HoloClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
-		if (HoloScope)
+		if (bRiflePickUp == true)
 		{
-			HoloScope->SetOwner(AutomaticRifle);
-			FName Socket = AutomaticRifle->ScopeSocket;
-			HoloScope->AttachToComponent(AutomaticRifle->SkelMeshComp, FAttachmentTransformRules::SnapToTargetNotIncludingScale, Socket);
-			isHoloAttached = true;
+
+			HoldingWeaponState = EHoldingWeapon::A4;
+
+			FActorSpawnParameters SpawnParams;
+			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+			AutomaticRifle = GetWorld()->SpawnActor<AAutomaticRifle>(StarterWeaponClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
+			if (AutomaticRifle)
+			{
+				AutomaticRifle->SetOwner(this);
+				AutomaticRifle->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocket);
+			}
 		}
-	}
-	if (bGripPickUp == true && HoldingWeaponState == EHoldingWeapon::A4)
-	{
-		HoldingAttachmentState = EHoldingAttachment::Grip;
 
-		FActorSpawnParameters SpawnParams;
-		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-
-		Grip = GetWorld()->SpawnActor<AGrip>(GripClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
-		if (Grip)
+		if (bHoloPickUp == true && HoldingWeaponState == EHoldingWeapon::A4)
 		{
-			Grip->SetOwner(AutomaticRifle);
-			FName GSocket = AutomaticRifle->GripSocket;
-			Grip->AttachToComponent(AutomaticRifle->SkelMeshComp, FAttachmentTransformRules::SnapToTargetNotIncludingScale, GSocket);
-			isGripAttached = true;
-		}
-	}
-	if (bHelmetPickUp == true)
-	{
-		FActorSpawnParameters SpawnParams;
-		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+			HoldingAttachmentState = EHoldingAttachment::Holo;
 
-		Helmet = GetWorld()->SpawnActor<AHelmet>(HelmetClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
-		if (Helmet)
+			FActorSpawnParameters SpawnParams;
+			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+			HoloScope = GetWorld()->SpawnActor<AHoloScope>(HoloClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
+			if (HoloScope)
+			{
+				HoloScope->SetOwner(AutomaticRifle);
+				FName Socket = AutomaticRifle->ScopeSocket;
+				HoloScope->AttachToComponent(AutomaticRifle->SkelMeshComp, FAttachmentTransformRules::SnapToTargetNotIncludingScale, Socket);
+				isHoloAttached = true;
+			}
+		}
+		if (bGripPickUp == true && HoldingWeaponState == EHoldingWeapon::A4)
 		{
-			Helmet->SetOwner(this);
-			Helmet->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, HelmetSocket);
-			isHelmetAttached = true;
-		}
-	}
-	if (bHeadsetPickUp == true)
-	{
-		FActorSpawnParameters SpawnParams;
-		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+			HoldingAttachmentState = EHoldingAttachment::Grip;
 
-		Headset = GetWorld()->SpawnActor<AHeadset>(HeadsetClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
-		if (Headset)
+			FActorSpawnParameters SpawnParams;
+			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+			Grip = GetWorld()->SpawnActor<AGrip>(GripClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
+			if (Grip)
+			{
+				Grip->SetOwner(AutomaticRifle);
+				FName GSocket = AutomaticRifle->GripSocket;
+				Grip->AttachToComponent(AutomaticRifle->SkelMeshComp, FAttachmentTransformRules::SnapToTargetNotIncludingScale, GSocket);
+				isGripAttached = true;
+			}
+		}
+		if (bHelmetPickUp == true)
 		{
-			Headset->SetOwner(this);
-			Headset->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, HeadsetSocket);
-			isHeadsetAttached = true;
-		}
-	}
-	if (bLaserPickUp == true)
-	{
-		FActorSpawnParameters SpawnParams;
-		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+			FActorSpawnParameters SpawnParams;
+			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-		Laser = GetWorld()->SpawnActor<ALaser>(LaserClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
-		if (Laser)
+			Helmet = GetWorld()->SpawnActor<AHelmet>(HelmetClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
+			if (Helmet)
+			{
+				Helmet->SetOwner(this);
+				Helmet->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, HelmetSocket);
+				isHelmetAttached = true;
+			}
+		}
+		if (bHeadsetPickUp == true)
 		{
-			Laser->SetOwner(AutomaticRifle);
-			FName LSocket = AutomaticRifle->LaserSocket;
-			Laser->AttachToComponent(AutomaticRifle->SkelMeshComp, FAttachmentTransformRules::SnapToTargetNotIncludingScale, LSocket);
-			isLaserAttached = true;
-		}
-	}
+			FActorSpawnParameters SpawnParams;
+			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
+			Headset = GetWorld()->SpawnActor<AHeadset>(HeadsetClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
+			if (Headset)
+			{
+				Headset->SetOwner(this);
+				Headset->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, HeadsetSocket);
+				isHeadsetAttached = true;
+			}
+		}
+		if (bLaserPickUp == true)
+		{
+			FActorSpawnParameters SpawnParams;
+			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+			Laser = GetWorld()->SpawnActor<ALaser>(LaserClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
+			if (Laser)
+			{
+				Laser->SetOwner(AutomaticRifle);
+				FName LSocket = AutomaticRifle->LaserSocket;
+				Laser->AttachToComponent(AutomaticRifle->SkelMeshComp, FAttachmentTransformRules::SnapToTargetNotIncludingScale, LSocket);
+				isLaserAttached = true;
+			}
+		}
 }
 
 void ASoldierCharacter::MoveForward(float Value)
@@ -435,4 +439,12 @@ void ASoldierCharacter::OnHealthChanged(UHealthComponent * OwningHealthComp, flo
 		bDied = true;
 
 	}
+}
+
+void ASoldierCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	//This function tells us how we want to replicate things//
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ASoldierCharacter, AutomaticRifle);
 }
