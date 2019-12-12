@@ -22,8 +22,6 @@ struct  FHitScanTrace
 	GENERATED_BODY()
 
 public:
-	UPROPERTY()
-	FVector_NetQuantize TraceFrom;
 
 	UPROPERTY()
 	FVector_NetQuantize TraceTo;
@@ -195,6 +193,8 @@ protected:
 
 
 	//*Particle effects*//
+
+	void PlayImpactEffects(FVector ImpactPoint);
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Effects")
 	UParticleSystem* ImpactEffect;

@@ -57,6 +57,9 @@ AAutomaticRifle::AAutomaticRifle()
 
 	//*Multiplayer repliaction **//
 	SetReplicates(true);
+	NetUpdateFrequency = 66.0f;
+	MinNetUpdateFrequency = 33.0f;
+
 
 }
 
@@ -119,7 +122,10 @@ void AAutomaticRifle::OnRep_HitScanTrace()
 {
 	// Play cosmetic FX//
 	PlayFireEffects(HitScanTrace.TraceTo);
+
+	PlayImpactEffects(HitScanTrace.TraceTo);
 }
+
 void AAutomaticRifle::Fire()
 {
 	if (Role < ROLE_Authority)
@@ -157,10 +163,7 @@ void AAutomaticRifle::Fire()
 
 					//DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::Red, false, 1.0f, 0, 1.0f);
 
-					if (ImpactEffect)
-					{
-						UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactEffect, Hit.ImpactPoint, Hit.ImpactNormal.Rotation());
-					}
+					PlayImpactEffects(Hit.ImpactPoint);
 
 					//*Applying damage*//
 					AActor* HitActor = Hit.GetActor();
@@ -223,10 +226,7 @@ void AAutomaticRifle::Fire()
 				{
 					//DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::White, false, 1.0f, 0, 1.0f);
 
-					if (ImpactEffect)
-					{
-						UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactEffect, Hit.ImpactPoint, Hit.ImpactNormal.Rotation());
-					}
+					PlayImpactEffects(Hit.ImpactPoint);
 
 					//*Applying damage*//
 					AActor* HitActor = Hit.GetActor();
@@ -274,8 +274,16 @@ void AAutomaticRifle::Fire()
 	}
 	
 }
-
-
+void AAutomaticRifle::PlayImpactEffects(FVector ImpactPoint)
+{
+	if (ImpactEffect)
+	{
+		FVector MuzzleLocation = SkelMeshComp->GetSocketLocation(MuzzleSocket);
+		FVector ShotDirection = ImpactPoint - MuzzleLocation;
+		ShotDirection.Normalize();
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactEffect, ImpactPoint, ShotDirection.Rotation());
+	}
+}
 
 void AAutomaticRifle::PlayFireEffects(FVector EndLocation)
 {
