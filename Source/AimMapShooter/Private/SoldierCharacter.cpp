@@ -220,6 +220,10 @@ void ASoldierCharacter::Vault()
 		DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::Green, false, 1.0f, 0, 1.0f);
 		isAbleToVault = true;
 	}
+	else
+	{
+		isAbleToVault = false;
+	}
 	FHitResult Hit2;
 	FRotator Rotator = UKismetMathLibrary::MakeRotFromX(WallNormal);
 	FVector TempStartLocation2 = UKismetMathLibrary::GetForwardVector(Rotator);
@@ -230,6 +234,8 @@ void ASoldierCharacter::Vault()
 	{
 		DrawDebugLine(GetWorld(), StartLocation2, EndLocation2, FColor::Blue, false, 1.0f, 0, 1.0f);
 		WallHight = Hit2.ImpactPoint;
+		//float Test = (WallHight - WallLocation).Z;
+		//UE_LOG(LogTemp, Warning, TEXT("Test is: %s"), *Test);
 	}
 
 	//TEST IF CAN CLIMB//
@@ -259,6 +265,9 @@ void ASoldierCharacter::Vault()
 	{
 		isAllowClimbing = false;
 	}
+
+
+	
 	//float TestIfThick = (WallHight - NextWallHight).Z;
 //	if (TestIfThick > 30)
 	//{
