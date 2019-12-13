@@ -54,6 +54,9 @@ ASoldierCharacter::ASoldierCharacter()
 
 	SetReplicates(true);
 
+	///// VAULTING /////
+	float MaxHeightForVault = 60;
+
 }
 
 
@@ -195,14 +198,6 @@ void ASoldierCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
 
 }
-
-void ASoldierCharacter::TestVault()
-{
-	FVector StartLocation = GetActorLocation() - FVector(0, 0, 44);
-	FVector EndLocation = (GetActorForwardVector() * 100) + StartLocation;
-	//if(UKismetSystemLibrary::LineTraceSingleForObjects(GetWorld(),StartLocation,EndLocation,EObjectTypeQuery::ObjectTypeQuery1,)
-}
-
 void ASoldierCharacter::Vault()
 {
 	FHitResult Hit;
@@ -211,50 +206,55 @@ void ASoldierCharacter::Vault()
 	FCollisionObjectQueryParams QueryParams;
 	FCollisionQueryParams CollisionParams;
 	CollisionParams.bTraceComplex = true;
-	QueryParams.ObjectTypesToQuery = 1;
-	//QueryParams.AllStaticObjects;
+
+	///// CHECKING IF OBJECT IS CLOSE ENOUGH////
 	if (GetWorld()->LineTraceSingleByChannel(Hit,StartLocation,EndLocation,COLLISION_TRACE,CollisionParams))
 	{
 		WallLocation = Hit.ImpactPoint;
 		WallNormal = Hit.Normal;
 		DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::Green, false, 1.0f, 0, 1.0f);
 		isAbleToVault = true;
+
+		///// CHECKING IF OBJECT IS HIGH ENOUGH ////
+		FHitResult Hit2;
+		FRotator Rotator = UKismetMathLibrary::MakeRotFromX(WallNormal);
+		FVector TempStartLocation2 = UKismetMathLibrary::GetForwardVector(Rotator);
+		FVector AlmostStartLocation2 = (TempStartLocation2 * (-10)) + WallLocation;
+		FVector StartLocation2 = AlmostStartLocation2 + FVector(0, 0, 200);
+		FVector EndLocation2 = StartLocation2 - FVector(0, 0, 200);
+
+		if (GetWorld()->LineTraceSingleByChannel(Hit2, StartLocation2, EndLocation2, COLLISION_TRACE, CollisionParams) && isAbleToVault == true)
+		{
+			DrawDebugLine(GetWorld(), StartLocation2, EndLocation2, FColor::Blue, false, 1.0f, 0, 1.0f);
+			WallHight = Hit2.ImpactPoint;
+			float Test = (WallHight - WallLocation).Z;
+			if (Test < MaxHeightForVault)
+			{
+				isObjectTooHigh = false;
+				UE_LOG(LogTemp, Warning, TEXT("Object is not to high:%f "), Test);
+
+			}
+			else
+			{
+				isObjectTooHigh = true;
+				UE_LOG(LogTemp, Warning, TEXT("Object is to high. It is:%f "), Test);
+			}
+		}
+
 	}
 	else
 	{
 		isAbleToVault = false;
 	}
-	FHitResult Hit2;
-	FRotator Rotator = UKismetMathLibrary::MakeRotFromX(WallNormal);
-	FVector TempStartLocation2 = UKismetMathLibrary::GetForwardVector(Rotator);
-	FVector AlmostStartLocation2 = (TempStartLocation2 * (-10)) + WallLocation;
-	FVector StartLocation2 = AlmostStartLocation2 + FVector(0, 0, 200);
-	FVector EndLocation2 = StartLocation2 - FVector(0, 0, 200);
-	if (GetWorld()->LineTraceSingleByChannel(Hit2, StartLocation2, EndLocation2, COLLISION_TRACE, CollisionParams) && isAbleToVault == true)
-	{
-		DrawDebugLine(GetWorld(), StartLocation2, EndLocation2, FColor::Blue, false, 1.0f, 0, 1.0f);
-		WallHight = Hit2.ImpactPoint;
-		//float Test = (WallHight - WallLocation).Z;
-		//UE_LOG(LogTemp, Warning, TEXT("Test is: %s"), *Test);
-	}
 
-	//TEST IF CAN CLIMB//
-//	float Test = (WallHight - WallLocation).Z;
-//	if (Test > 60)
-//	{
-//		isAllowClimbing = true;
-//	}
-	//else
-//	{
-//		isAllowClimbing = false;
-//	}
+	/// GETTING THIRD LINE TRACE FOR THICKNESS TO DECIDE IF VAULT OR CLIMB ///
+
 	FHitResult Hit3;
 	FRotator Rotator2 = UKismetMathLibrary::MakeRotFromX(WallNormal);
 	FVector TempStartLocation3 = UKismetMathLibrary::GetForwardVector(Rotator2);
 	FVector AlmostStartLocation3 = (TempStartLocation3 * (-50)) + WallLocation;
 	FVector StartLocation3 = AlmostStartLocation3 + FVector(0, 0, 250);
 	FVector EndLocation3 = StartLocation3 - FVector(0, 0, 300);
-
 	if (GetWorld()->LineTraceSingleByChannel(Hit, StartLocation3, EndLocation3, COLLISION_TRACE, CollisionParams) && isAbleToVault == true)
 	{
 		DrawDebugLine(GetWorld(), StartLocation3, EndLocation3, FColor::Yellow, false, 1.0f, 0, 1.0f);
@@ -266,22 +266,12 @@ void ASoldierCharacter::Vault()
 		isAllowClimbing = false;
 	}
 
-
-	
-	//float TestIfThick = (WallHight - NextWallHight).Z;
-//	if (TestIfThick > 30)
-	//{
-	//	isWallThick = false;
-//	}
-//	else
-//	{
-//		isWallThick = true;
-//	}
-	if (isAllowClimbing == true && isAbleToVault == true)
+	//// IF ALL THE TERMS ARE GOOD THEN GO VAULT OR CLIMB ////
+	if (isAllowClimbing == true && isAbleToVault == true && isObjectTooHigh == false)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Climb"));
 	}
-	else if (isAbleToVault == true && isAllowClimbing == false)
+	else if (isAbleToVault == true && isAllowClimbing == false && isObjectTooHigh == false)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Vault"));
 	}

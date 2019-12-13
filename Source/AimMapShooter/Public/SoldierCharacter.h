@@ -97,7 +97,6 @@ protected:
 
 	//*Vaulting stuff//*
 	void Vault();
-	void TestVault();
 	FVector WallLocation;
 	FVector WallNormal;
 	FVector WallHight;
@@ -105,6 +104,10 @@ protected:
 	bool isAllowClimbing;
 	bool isWallThick;
 	bool isAbleToVault;
+	bool isObjectTooHigh;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Vaulting")
+	float MaxHeightForVault;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Player")
 	TSubclassOf<AAutomaticRifle> StarterWeaponClass;
