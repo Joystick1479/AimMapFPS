@@ -4,6 +4,8 @@
 #include "AutomaticRifle.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
+#include "Kismet/KismetSystemLibrary.h"
 #include "HealthComponent.h"
 #include "AimMapShooter.h"
 #include "HoloScope.h"
@@ -189,7 +191,93 @@ void ASoldierCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
 	PlayerInputComponent->BindAction("ToogleLaser", IE_Pressed, this, &ASoldierCharacter::TurnOnLaser);
 
+	PlayerInputComponent->BindAction("Vault", IE_Pressed, this, &ASoldierCharacter::Vault);
+
+
 }
+
+void ASoldierCharacter::TestVault()
+{
+	FVector StartLocation = GetActorLocation() - FVector(0, 0, 44);
+	FVector EndLocation = (GetActorForwardVector() * 100) + StartLocation;
+	//if(UKismetSystemLibrary::LineTraceSingleForObjects(GetWorld(),StartLocation,EndLocation,EObjectTypeQuery::ObjectTypeQuery1,)
+}
+
+void ASoldierCharacter::Vault()
+{
+	FHitResult Hit;
+	FVector StartLocation = GetActorLocation() - FVector(0, 0, 44);
+	FVector EndLocation = (GetActorForwardVector() * 100) + StartLocation;
+	FCollisionObjectQueryParams QueryParams;
+	FCollisionQueryParams CollisionParams;
+	CollisionParams.bTraceComplex = true;
+	QueryParams.ObjectTypesToQuery = 1;
+	//QueryParams.AllStaticObjects;
+	if (GetWorld()->LineTraceSingleByChannel(Hit,StartLocation,EndLocation,COLLISION_TRACE,CollisionParams))
+	{
+		WallLocation = Hit.ImpactPoint;
+		WallNormal = Hit.Normal;
+		DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::Green, false, 1.0f, 0, 1.0f);
+		isAbleToVault = true;
+	}
+	FHitResult Hit2;
+	FRotator Rotator = UKismetMathLibrary::MakeRotFromX(WallNormal);
+	FVector TempStartLocation2 = UKismetMathLibrary::GetForwardVector(Rotator);
+	FVector AlmostStartLocation2 = (TempStartLocation2 * (-10)) + WallLocation;
+	FVector StartLocation2 = AlmostStartLocation2 + FVector(0, 0, 200);
+	FVector EndLocation2 = StartLocation2 - FVector(0, 0, 200);
+	if (GetWorld()->LineTraceSingleByChannel(Hit2, StartLocation2, EndLocation2, COLLISION_TRACE, CollisionParams) && isAbleToVault == true)
+	{
+		DrawDebugLine(GetWorld(), StartLocation2, EndLocation2, FColor::Blue, false, 1.0f, 0, 1.0f);
+		WallHight = Hit2.ImpactPoint;
+	}
+
+	//TEST IF CAN CLIMB//
+//	float Test = (WallHight - WallLocation).Z;
+//	if (Test > 60)
+//	{
+//		isAllowClimbing = true;
+//	}
+	//else
+//	{
+//		isAllowClimbing = false;
+//	}
+	FHitResult Hit3;
+	FRotator Rotator2 = UKismetMathLibrary::MakeRotFromX(WallNormal);
+	FVector TempStartLocation3 = UKismetMathLibrary::GetForwardVector(Rotator2);
+	FVector AlmostStartLocation3 = (TempStartLocation3 * (-50)) + WallLocation;
+	FVector StartLocation3 = AlmostStartLocation3 + FVector(0, 0, 250);
+	FVector EndLocation3 = StartLocation3 - FVector(0, 0, 300);
+
+	if (GetWorld()->LineTraceSingleByChannel(Hit, StartLocation3, EndLocation3, COLLISION_TRACE, CollisionParams) && isAbleToVault == true)
+	{
+		DrawDebugLine(GetWorld(), StartLocation3, EndLocation3, FColor::Yellow, false, 1.0f, 0, 1.0f);
+		NextWallHight = Hit3.ImpactPoint;
+		isAllowClimbing = true;
+	}
+	else
+	{
+		isAllowClimbing = false;
+	}
+	//float TestIfThick = (WallHight - NextWallHight).Z;
+//	if (TestIfThick > 30)
+	//{
+	//	isWallThick = false;
+//	}
+//	else
+//	{
+//		isWallThick = true;
+//	}
+	if (isAllowClimbing == true && isAbleToVault == true)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Climb"));
+	}
+	else if (isAbleToVault == true && isAllowClimbing == false)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Vault"));
+	}
+}
+
 void ASoldierCharacter::TurnOnLaser()
 {
 	if (Laser && LaserState == ELaserState::Start)

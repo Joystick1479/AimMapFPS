@@ -55,6 +55,7 @@ namespace EHoldingAttachment
 	};
 }
 
+
 UCLASS()
 class AIMMAPSHOOTER_API ASoldierCharacter : public ACharacter
 {
@@ -93,6 +94,17 @@ protected:
 	void ServerPickUpItem();
 	
 	void LineTraceItem();
+
+	//*Vaulting stuff//*
+	void Vault();
+	void TestVault();
+	FVector WallLocation;
+	FVector WallNormal;
+	FVector WallHight;
+	FVector NextWallHight;
+	bool isAllowClimbing;
+	bool isWallThick;
+	bool isAbleToVault;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Player")
 	TSubclassOf<AAutomaticRifle> StarterWeaponClass;

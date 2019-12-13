@@ -13,9 +13,12 @@
 #define COLLISION_HELMET ECC_GameTraceChannel6
 #define COLLISION_HEADSET ECC_GameTraceChannel7
 #define COLLISION_LASER ECC_GameTraceChannel8
+#define COLLISION_TRACE ECC_GameTraceChannel9
 
 #define SURFACE_HEAD SurfaceType3
 #define SURFACE_CHEST SurfaceType4
 #define SURFACE_LEG SurfaceType5
 #define SURFACE_ARM SurfaceType6
 #define SURFACE_HELMET SurfaceType7
+
+#define OBJECT_TRACE ObjectTypeQuery1
