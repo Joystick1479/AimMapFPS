@@ -270,10 +270,21 @@ void ASoldierCharacter::Vault()
 	if (isAllowClimbing == true && isAbleToVault == true && isObjectTooHigh == false)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Climb"));
+		//this->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		GoClimb = true;
+		GoVault = false;
 	}
 	else if (isAbleToVault == true && isAllowClimbing == false && isObjectTooHigh == false)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Vault"));
+		//this->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		GoClimb = false;
+		GoVault = true;
+	}
+	else
+	{
+		GoVault = false;
+		GoClimb = false;
 	}
 }
 

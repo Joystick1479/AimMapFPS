@@ -106,6 +106,12 @@ protected:
 	bool isAbleToVault;
 	bool isObjectTooHigh;
 
+	UPROPERTY(BlueprintReadOnly, Category = "Vaulting")
+	bool GoVault;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Vaulting")
+	bool GoClimb;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Vaulting")
 	float MaxHeightForVault;
 
