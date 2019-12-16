@@ -57,6 +57,8 @@ ASoldierCharacter::ASoldierCharacter()
 
 	///// VAULTING /////
 	float MaxHeightForVault = 60;
+	isAllowClimbing = false;
+	isAbleToVault = false;
 
 }
 
@@ -271,28 +273,52 @@ void ASoldierCharacter::Vault()
 	if (isAllowClimbing == true && isAbleToVault == true && isObjectTooHigh == false)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Climb"));
+
+		///***Turning off collision when getting on the obstacle***//
 		UCapsuleComponent* CapsuleComponent = this->FindComponentByClass<UCapsuleComponent>();
 		if (CapsuleComponent)
 		{
 			CapsuleComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 		}
+
+		//***Setting up flying movement when vaulting/climbing**//
+		UCharacterMovementComponent* CharMovement = this->FindComponentByClass<UCharacterMovementComponent>();
+		if(CharMovement)
+		{
+			CharMovement->SetMovementMode(EMovementMode::MOVE_Flying);
+		}
+		
+		this->PlayAnimMontage(ClimbAnim);
+
 		GoClimb = true;
 		GoVault = false;
-		GetWorld()->GetTimerManager().SetTimer(TimerHandle_Vault, this, &ASoldierCharacter::ResetVaultTimer, 2.0f, false);
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle_Vault, this, &ASoldierCharacter::ResetVaultTimer, 1.0f, false);
 	}
 	else if (isAbleToVault == true && isAllowClimbing == false && isObjectTooHigh == false)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Vault"));
+
+		///***Turning off collision when getting on the obstacle***//
 		UCapsuleComponent* CapsuleComponent = this->FindComponentByClass<UCapsuleComponent>();
 		if (CapsuleComponent)
 		{
 			CapsuleComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 		}
+
+		//***Setting up flying movement when vaulting/climbing**//
+		UCharacterMovementComponent* CharMovement = this->FindComponentByClass<UCharacterMovementComponent>();
+		if (CharMovement)
+		{
+			CharMovement->SetMovementMode(EMovementMode::MOVE_Flying);
+		}
+
+		this->PlayAnimMontage(VaultAnim);
+
 		GoClimb = false;
 		GoVault = true;
-		GetWorld()->GetTimerManager().SetTimer(TimerHandle_Vault, this, &ASoldierCharacter::ResetVaultTimer, 2.0f, false);
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle_Vault, this, &ASoldierCharacter::ResetVaultTimer, 1.0f, false);
 	}
 	else
 	{
@@ -304,15 +330,37 @@ void ASoldierCharacter::Vault()
 void ASoldierCharacter::ResetVaultTimer()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Resetting timer"));
+
 	GetWorld()->GetTimerManager().ClearTimer(TimerHandle_Vault);
+
 	UCapsuleComponent* CapsuleComponent = this->FindComponentByClass<UCapsuleComponent>();
 	if (CapsuleComponent)
 	{
-		CapsuleComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+		CapsuleComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	}
 
+	UCharacterMovementComponent* CharMovement = this->FindComponentByClass<UCharacterMovementComponent>();
+	if (CharMovement)
+	{
+		CharMovement->SetMovementMode(EMovementMode::MOVE_Walking);
 	}
 
 }
+
+//float ASoldierCharacter::TimeVaultAnimation(const FVaultingAnim& Animation)
+//{
+//	float Duration = 0.0f;
+//	
+//	UAnimMontage* UseAnim = isAllowClimbing ? Animation.VaultAnim : Animation.ClimbAnim;
+//	USkeletalMeshComponent* SkelMesh = this->FindComponentByClass<USkeletalMeshComponent>();
+//
+//	if (UseAnim)
+//	{
+//		//Duration = UseAnim->Play;
+//
+//	}
+//	return Duration;
+//}
 
 void ASoldierCharacter::TurnOnLaser()
 {
