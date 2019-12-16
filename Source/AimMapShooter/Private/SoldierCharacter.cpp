@@ -291,9 +291,15 @@ void ASoldierCharacter::Vault()
 		
 		this->PlayAnimMontage(ClimbAnim);
 
+		APlayerController* PC = GetWorld()->GetFirstPlayerController();
+		if (PC)
+		{
+			PC->DisableInput(PC);
+		}
+
 		GoClimb = true;
 		GoVault = false;
-		GetWorld()->GetTimerManager().SetTimer(TimerHandle_Vault, this, &ASoldierCharacter::ResetVaultTimer, 1.0f, false);
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle_Vault, this, &ASoldierCharacter::ResetVaultTimer, 0.7f, false);
 	}
 	else if (isAbleToVault == true && isAllowClimbing == false && isObjectTooHigh == false)
 	{
@@ -316,9 +322,15 @@ void ASoldierCharacter::Vault()
 
 		this->PlayAnimMontage(VaultAnim);
 
+		APlayerController* PC = GetWorld()->GetFirstPlayerController();
+		if (PC)
+		{
+			PC->DisableInput(PC);
+		}
+
 		GoClimb = false;
 		GoVault = true;
-		GetWorld()->GetTimerManager().SetTimer(TimerHandle_Vault, this, &ASoldierCharacter::ResetVaultTimer, 1.0f, false);
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle_Vault, this, &ASoldierCharacter::ResetVaultTimer, 0.95f, false);
 	}
 	else
 	{
@@ -345,6 +357,11 @@ void ASoldierCharacter::ResetVaultTimer()
 		CharMovement->SetMovementMode(EMovementMode::MOVE_Walking);
 	}
 
+	APlayerController* PC = GetWorld()->GetFirstPlayerController();
+	if (PC)
+	{
+		PC->EnableInput(PC);
+	}
 }
 
 //float ASoldierCharacter::TimeVaultAnimation(const FVaultingAnim& Animation)
