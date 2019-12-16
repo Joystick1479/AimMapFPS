@@ -16,6 +16,7 @@ class USpringArmComponent;
 class AHelmet;
 class AHeadset;
 class ALaser;
+class UCapsuleComponent;
 
 namespace ELaserState
 {
@@ -97,6 +98,7 @@ protected:
 
 	//*Vaulting stuff//*
 	void Vault();
+	void ResetVaultTimer();
 	FVector WallLocation;
 	FVector WallNormal;
 	FVector WallHight;
@@ -105,6 +107,7 @@ protected:
 	bool isWallThick;
 	bool isAbleToVault;
 	bool isObjectTooHigh;
+	FTimerHandle TimerHandle_Vault;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Vaulting")
 	bool GoVault;

@@ -3,6 +3,7 @@
 #include "Camera/CameraComponent.h"
 #include "AutomaticRifle.h"
 #include "Components/SkeletalMeshComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
@@ -15,6 +16,7 @@
 #include "Helmet.h"
 #include "Headset.h"
 #include "Laser.h"
+#include "TimerManager.h"
 #include "Net/UnrealNetwork.h"
 
 
@@ -35,7 +37,6 @@ ASoldierCharacter::ASoldierCharacter()
 
 	CameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComp"));
 	CameraComp->AttachToComponent(SpringArm, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-
 
 	HealthComp = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComp"));
 
@@ -270,22 +271,47 @@ void ASoldierCharacter::Vault()
 	if (isAllowClimbing == true && isAbleToVault == true && isObjectTooHigh == false)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Climb"));
-		//this->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		UCapsuleComponent* CapsuleComponent = this->FindComponentByClass<UCapsuleComponent>();
+		if (CapsuleComponent)
+		{
+			CapsuleComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+		}
 		GoClimb = true;
 		GoVault = false;
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle_Vault, this, &ASoldierCharacter::ResetVaultTimer, 2.0f, false);
 	}
 	else if (isAbleToVault == true && isAllowClimbing == false && isObjectTooHigh == false)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Vault"));
-		//this->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		UCapsuleComponent* CapsuleComponent = this->FindComponentByClass<UCapsuleComponent>();
+		if (CapsuleComponent)
+		{
+			CapsuleComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+		}
 		GoClimb = false;
 		GoVault = true;
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle_Vault, this, &ASoldierCharacter::ResetVaultTimer, 2.0f, false);
 	}
 	else
 	{
 		GoVault = false;
 		GoClimb = false;
 	}
+}
+
+void ASoldierCharacter::ResetVaultTimer()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Resetting timer"));
+	GetWorld()->GetTimerManager().ClearTimer(TimerHandle_Vault);
+	UCapsuleComponent* CapsuleComponent = this->FindComponentByClass<UCapsuleComponent>();
+	if (CapsuleComponent)
+	{
+		CapsuleComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+
+	}
+
 }
 
 void ASoldierCharacter::TurnOnLaser()
