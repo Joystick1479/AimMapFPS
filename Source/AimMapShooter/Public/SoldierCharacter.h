@@ -56,20 +56,6 @@ namespace EHoldingAttachment
 	};
 }
 
-//USTRUCT()
-//struct FVaultingAnim
-//{
-//	GENERATED_USTRUCT_BODY()
-//
-//
-//	UPROPERTY(EditDefaultsOnly, Category = Animation)
-//	UAnimMontage* VaultAnim;
-//
-//	UPROPERTY(EditDefaultsOnly, Category = Animation)
-//	UAnimMontage* ClimbAnim;
-//};
-
-
 UCLASS()
 class AIMMAPSHOOTER_API ASoldierCharacter : public ACharacter
 {

@@ -364,21 +364,6 @@ void ASoldierCharacter::ResetVaultTimer()
 	}
 }
 
-//float ASoldierCharacter::TimeVaultAnimation(const FVaultingAnim& Animation)
-//{
-//	float Duration = 0.0f;
-//	
-//	UAnimMontage* UseAnim = isAllowClimbing ? Animation.VaultAnim : Animation.ClimbAnim;
-//	USkeletalMeshComponent* SkelMesh = this->FindComponentByClass<USkeletalMeshComponent>();
-//
-//	if (UseAnim)
-//	{
-//		//Duration = UseAnim->Play;
-//
-//	}
-//	return Duration;
-//}
-
 void ASoldierCharacter::TurnOnLaser()
 {
 	if (Laser && LaserState == ELaserState::Start)
