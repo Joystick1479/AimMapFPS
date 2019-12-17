@@ -505,6 +505,7 @@ void ASoldierCharacter::EndCrouch()
 	IsCrouching = false;
 	UnCrouch();
 }
+///*** TODO MULTIPLAYER CONTROLLER IS WRONG ///***
 void ASoldierCharacter::ZoomIn()
 {
 	if (Role < ROLE_Authority)
@@ -514,7 +515,7 @@ void ASoldierCharacter::ZoomIn()
 	}
 	IsZooming = true;
 
-	APlayerController* PC = Cast<APlayerController>(GetWorld()->GetFirstLocalPlayerFromController());
+	APlayerController* PC = Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
 	if (PC)
 	{
 		if (AutomaticRifle)
@@ -523,7 +524,6 @@ void ASoldierCharacter::ZoomIn()
 		}
 	}
 }
-
 void ASoldierCharacter::ZoomOut()
 {
 	if (Role < ROLE_Authority)
@@ -533,11 +533,15 @@ void ASoldierCharacter::ZoomOut()
 	}
 	IsZooming = false;
 
-	APlayerController* PC = Cast<APlayerController>(GetWorld()->GetFirstLocalPlayerFromController());
+	APlayerController* PC = Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
 	if (PC)
 	{
+		if (AutomaticRifle)
+		{
 			PC->SetViewTargetWithBlend(this, ZoomingTime, EViewTargetBlendFunction::VTBlend_Linear);
+		}
 	}
+
 }
 
 void ASoldierCharacter::StartFire()
@@ -574,8 +578,12 @@ void ASoldierCharacter::StopFire()
 
 void ASoldierCharacter::SprintOn()
 {
+	if (Role < ROLE_Authority)
+	{
+		ServerSprintOn();
+	}
+
 	IsSprinting = true;
-	
 	UCharacterMovementComponent* MoveComp = this->FindComponentByClass<UCharacterMovementComponent>();
 	if (MoveComp)
 	{
@@ -585,6 +593,10 @@ void ASoldierCharacter::SprintOn()
 
 void ASoldierCharacter::SprintOff()
 {
+	if (Role < ROLE_Authority)
+	{
+		ServerSprintOff();
+	}
 	IsSprinting = false;
 	UCharacterMovementComponent* MoveComp = this->FindComponentByClass<UCharacterMovementComponent>();
 	if (MoveComp)
@@ -670,6 +682,22 @@ bool ASoldierCharacter::ServerZoomOut_Validate()
 {
 	return true;
 }
+void ASoldierCharacter::ServerSprintOn_Implementation()
+{
+	SprintOn();
+}
+bool ASoldierCharacter::ServerSprintOn_Validate()
+{
+	return true;
+}
+void ASoldierCharacter::ServerSprintOff_Implementation()
+{
+	SprintOff();
+}
+bool ASoldierCharacter::ServerSprintOff_Validate()
+{
+	return true;
+}
 void ASoldierCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	//This function tells us how we want to replicate things//
@@ -680,6 +708,8 @@ void ASoldierCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	///GAME CHANGER!!!///
 	DOREPLIFETIME(ASoldierCharacter,IsReloading);
 	DOREPLIFETIME(ASoldierCharacter, IsZooming);
+	DOREPLIFETIME(ASoldierCharacter, IsSprinting);
+
 
 
 }

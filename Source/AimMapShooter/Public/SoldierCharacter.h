@@ -102,6 +102,11 @@ protected:
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerZoomOut();
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerSprintOn();
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerSprintOff();
 	
 	void LineTraceItem();
 
@@ -220,7 +225,7 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated,Category = "Zoom")
 	bool IsZooming;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Sprint")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated, Category = "Sprint")
 	bool IsSprinting;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Zoom")
