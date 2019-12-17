@@ -101,8 +101,12 @@ public:
 	void UseAmmo();
 
 	void Fire();
+	///////****MUTLIPLAYER REPLICATION*****////
 	UFUNCTION(Server,Reliable, WithValidation)
 	void ServerFire();
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerStartReload();
 
 	void StartReload();
 	void StopReload();

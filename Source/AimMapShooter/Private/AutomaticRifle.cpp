@@ -118,6 +118,14 @@ bool AAutomaticRifle::ServerFire_Validate()
 {
 	return true;
 }
+void AAutomaticRifle::ServerStartReload_Implementation()
+{
+	StartReload();
+}
+bool AAutomaticRifle::ServerStartReload_Validate()
+{
+	return true;
+}
 void AAutomaticRifle::OnRep_HitScanTrace()
 {
 	// Play cosmetic FX//
@@ -324,6 +332,11 @@ void AAutomaticRifle::PlayFireEffects(FVector EndLocation)
 }
 void AAutomaticRifle::StartReload()
 {
+	if (Role < ROLE_Authority)
+	{
+		ServerStartReload();
+		//return;
+	}
 	if (ReloadingState == EReloadingState::None && CurrentAmountOfClips>0)
 	{
 		ReloadingState = EReloadingState::Reloading;

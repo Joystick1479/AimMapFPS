@@ -488,6 +488,7 @@ void ASoldierCharacter::PickUp()
 
 void ASoldierCharacter::MoveForward(float Value)
 {
+
 	AddMovementInput(GetActorForwardVector()*Value);
 }
 void ASoldierCharacter::MoveRight(float Value)
@@ -586,6 +587,10 @@ void ASoldierCharacter::SprintOff()
 
 void ASoldierCharacter::Reload()
 {
+	if (Role < ROLE_Authority)
+	{
+		ServerReload();
+	}
 	if (CharacterState == ECharacterState::Idle && (SoldierCurrentClips > 0))
 	{
 		if (AutomaticRifle)
@@ -633,10 +638,21 @@ void ASoldierCharacter::OnHealthChanged(UHealthComponent * OwningHealthComp, flo
 	}
 }
 
+void ASoldierCharacter::ServerReload_Implementation()
+{
+	Reload();
+}
+bool ASoldierCharacter::ServerReload_Validate()
+{
+	return true;
+}
 void ASoldierCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	//This function tells us how we want to replicate things//
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(ASoldierCharacter, AutomaticRifle);
+
+	///GAME CHANGER!!!///
+	DOREPLIFETIME(ASoldierCharacter,IsReloading);
 }

@@ -90,9 +90,13 @@ protected:
 	ALaser* Laser;
 
 	AHelmet* Helmet;
-
+	////***Replication stuff***///
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerPickUpItem();
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerReload();
+
 	
 	void LineTraceItem();
 
@@ -223,7 +227,7 @@ public:
 
 
 	///Bool for reloading///
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Reloading")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated, Category = "Reloading")
 	bool IsReloading;
 
 	//* Bool if we can pickup Rifle *//
