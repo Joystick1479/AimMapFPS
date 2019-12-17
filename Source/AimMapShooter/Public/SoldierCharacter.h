@@ -32,7 +32,8 @@ namespace ECharacterState
 	enum Type
 	{
 		Idle,
-		Firing
+		Firing,
+		Reloading
 	};
 }
 
@@ -163,6 +164,8 @@ protected:
 	void FireMode();
 
 	void Reload();
+	FTimerHandle ReloadTimer;
+	void StopReload();
 
 	void ZoomIn();
 	void ZoomOut();
@@ -189,9 +192,6 @@ public:
 	/// Variable for sprinting ///
 	float MaxWalkSpeed;
 
-	///Bool for crouching///
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Sprint")
-	bool IsCrouching;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Camera")
 	UCameraComponent* CameraComp;
@@ -216,6 +216,15 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Zoom")
 	bool IsSingleFire;
+
+	///Bool for crouching///
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Crouch")
+	bool IsCrouching;
+
+
+	///Bool for reloading///
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Reloading")
+	bool IsReloading;
 
 	//* Bool if we can pickup Rifle *//
 	UPROPERTY(BlueprintReadOnly, Category = "Player")

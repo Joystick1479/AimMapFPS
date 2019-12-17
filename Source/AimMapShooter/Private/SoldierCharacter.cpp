@@ -44,6 +44,7 @@ ASoldierCharacter::ASoldierCharacter()
 	ZoomingTime = 0.2f;
 
 	IsSingleFire = false;
+	IsReloading = false;
 
 	CharacterState = ECharacterState::Idle;
 	HoldingWeaponState = EHoldingWeapon::None;
@@ -585,9 +586,25 @@ void ASoldierCharacter::SprintOff()
 
 void ASoldierCharacter::Reload()
 {
-	if (AutomaticRifle)
+	if (CharacterState == ECharacterState::Idle && (SoldierCurrentClips > 0))
 	{
-		AutomaticRifle->StartReload();
+		if (AutomaticRifle)
+		{
+			CharacterState = ECharacterState::Reloading;
+			IsReloading = true;
+			AutomaticRifle->StartReload();
+			GetWorldTimerManager().SetTimer(ReloadTimer, this, &ASoldierCharacter::StopReload, 2.167f, false);
+		}
+	}
+}
+
+void ASoldierCharacter::StopReload()
+{
+	if (CharacterState == ECharacterState::Reloading)
+	{
+		SoldierCurrentClips--;
+		CharacterState = ECharacterState::Idle;
+		IsReloading = false;
 	}
 }
 
