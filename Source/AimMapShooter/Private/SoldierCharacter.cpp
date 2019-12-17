@@ -495,10 +495,12 @@ void ASoldierCharacter::MoveRight(float Value)
 }
 void ASoldierCharacter::BeginCrouch()
 {
+	IsCrouching = true;
 	Crouch();
 }
 void ASoldierCharacter::EndCrouch()
 {
+	IsCrouching = false;
 	UnCrouch();
 }
 void ASoldierCharacter::ZoomIn()

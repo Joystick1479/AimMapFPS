@@ -186,7 +186,12 @@ protected:
 	
 
 public:	
+	/// Variable for sprinting ///
 	float MaxWalkSpeed;
+
+	///Bool for crouching///
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Sprint")
+	bool IsCrouching;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Camera")
 	UCameraComponent* CameraComp;
