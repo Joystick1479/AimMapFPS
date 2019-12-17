@@ -602,9 +602,9 @@ void ASoldierCharacter::StopReload()
 {
 	if (CharacterState == ECharacterState::Reloading)
 	{
-		SoldierCurrentClips--;
 		CharacterState = ECharacterState::Idle;
 		IsReloading = false;
+		GetWorldTimerManager().ClearTimer(ReloadTimer);
 	}
 }
 
