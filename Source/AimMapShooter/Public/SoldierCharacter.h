@@ -186,6 +186,7 @@ protected:
 	
 
 public:	
+	float MaxWalkSpeed;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Camera")
 	UCameraComponent* CameraComp;

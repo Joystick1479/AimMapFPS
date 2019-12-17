@@ -564,22 +564,20 @@ void ASoldierCharacter::SprintOn()
 {
 	IsSprinting = true;
 	
-	AActor* MyOwner = GetOwner();
-	UCharacterMovementComponent* MoveComp = Cast<UCharacterMovementComponent>(MyOwner);
+	UCharacterMovementComponent* MoveComp = this->FindComponentByClass<UCharacterMovementComponent>();
 	if (MoveComp)
 	{
-		MoveComp->MaxWalkSpeed = 270;
+		MoveComp->MaxWalkSpeed = 270.0f;
 	}
 }
 
 void ASoldierCharacter::SprintOff()
 {
 	IsSprinting = false;
-	AActor* MyOwner = GetOwner();
-	UCharacterMovementComponent* MoveComp = Cast<UCharacterMovementComponent>(MyOwner);
+	UCharacterMovementComponent* MoveComp = this->FindComponentByClass<UCharacterMovementComponent>();
 	if (MoveComp)
 	{
-		MoveComp->MaxWalkSpeed = 149;
+		MoveComp->MaxWalkSpeed = 149.0f;
 	}
 }
 
