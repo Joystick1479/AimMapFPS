@@ -97,6 +97,11 @@ protected:
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerReload();
 
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerZoomIn();
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerZoomOut();
 	
 	void LineTraceItem();
 
@@ -212,7 +217,7 @@ public:
 	FName HeadsetSocket;
 	
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Zoom")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated,Category = "Zoom")
 	bool IsZooming;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Sprint")

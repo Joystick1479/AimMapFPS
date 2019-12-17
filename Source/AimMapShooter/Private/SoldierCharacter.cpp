@@ -507,9 +507,14 @@ void ASoldierCharacter::EndCrouch()
 }
 void ASoldierCharacter::ZoomIn()
 {
+	if (Role < ROLE_Authority)
+	{
+		ServerZoomIn();
+		//return;
+	}
 	IsZooming = true;
 
-	APlayerController* PC = Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
+	APlayerController* PC = Cast<APlayerController>(GetWorld()->GetFirstLocalPlayerFromController());
 	if (PC)
 	{
 		if (AutomaticRifle)
@@ -521,16 +526,19 @@ void ASoldierCharacter::ZoomIn()
 
 void ASoldierCharacter::ZoomOut()
 {
+	if (Role < ROLE_Authority)
+	{
+		ServerZoomOut();
+		//return;
+	}
 	IsZooming = false;
 
-	APlayerController* PC = Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
+	APlayerController* PC = Cast<APlayerController>(GetWorld()->GetFirstLocalPlayerFromController());
 	if (PC)
 	{
 			PC->SetViewTargetWithBlend(this, ZoomingTime, EViewTargetBlendFunction::VTBlend_Linear);
 	}
 }
-
-
 
 void ASoldierCharacter::StartFire()
 {
@@ -646,6 +654,22 @@ bool ASoldierCharacter::ServerReload_Validate()
 {
 	return true;
 }
+void ASoldierCharacter::ServerZoomIn_Implementation()
+{
+	ZoomIn();
+}
+bool ASoldierCharacter::ServerZoomIn_Validate()
+{
+	return true;
+}
+void ASoldierCharacter::ServerZoomOut_Implementation()
+{
+	ZoomOut();
+}
+bool ASoldierCharacter::ServerZoomOut_Validate()
+{
+	return true;
+}
 void ASoldierCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	//This function tells us how we want to replicate things//
@@ -655,4 +679,7 @@ void ASoldierCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 
 	///GAME CHANGER!!!///
 	DOREPLIFETIME(ASoldierCharacter,IsReloading);
+	DOREPLIFETIME(ASoldierCharacter, IsZooming);
+
+
 }
