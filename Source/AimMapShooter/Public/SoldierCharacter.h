@@ -140,13 +140,8 @@ protected:
 	UAnimMontage* ClimbAnim;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated, Category = "Animation")
 	UAnimMontage* VaultAnim;
-
-	//float TimeVaultAnimation(const FVaultingAnim& Animation);
-
-	/////////////////////////////////////////////
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated, Category = "Vaulting")
 	bool GoVault;
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated, Category = "Vaulting")
 	bool GoClimb;
 
@@ -167,7 +162,6 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Player")
 	TSubclassOf<AHeadset> HeadsetClass;
-
 
 	UPROPERTY(EditDefaultsOnly, Category = "Player")
 	TSubclassOf<ALaser> LaserClass;
