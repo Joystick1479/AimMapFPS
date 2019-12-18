@@ -107,38 +107,50 @@ protected:
 	void ServerSprintOn();
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerSprintOff();
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerVault();
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerResetTimerVault();
 	
 	void LineTraceItem();
 
 	//*Vaulting stuff//*
 	void Vault();
 	void ResetVaultTimer();
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated, Category = "Vault")
 	FVector WallLocation;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated, Category = "Vault")
 	FVector WallNormal;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated, Category = "Vault")
 	FVector WallHight;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated, Category = "Vault")
 	FVector NextWallHight;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated, Category = "Vault")
 	bool isAllowClimbing;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated, Category = "Vault")
 	bool isWallThick;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated, Category = "Vault")
 	bool isAbleToVault;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated, Category = "Vault")
 	bool isObjectTooHigh;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated, Category = "Vault")
 	FTimerHandle TimerHandle_Vault;
-
-	UPROPERTY(EditDefaultsOnly, Category = Animation)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated, Category = "Animation")
 	UAnimMontage* ClimbAnim;
-
-	UPROPERTY(EditDefaultsOnly, Category = Animation)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated, Category = "Animation")
 	UAnimMontage* VaultAnim;
 
 	//float TimeVaultAnimation(const FVaultingAnim& Animation);
 
 	/////////////////////////////////////////////
-	UPROPERTY(BlueprintReadOnly, Category = "Vaulting")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated, Category = "Vaulting")
 	bool GoVault;
 
-	UPROPERTY(BlueprintReadOnly, Category = "Vaulting")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated, Category = "Vaulting")
 	bool GoClimb;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Vaulting")
+	UPROPERTY(EditDefaultsOnly, Replicated, Category = "Vaulting")
 	float MaxHeightForVault;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Player")

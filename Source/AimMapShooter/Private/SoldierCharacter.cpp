@@ -204,6 +204,11 @@ void ASoldierCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 }
 void ASoldierCharacter::Vault()
 {
+	if (Role < ROLE_Authority)
+	{
+		ServerVault();
+	}
+
 	FHitResult Hit;
 	FVector StartLocation = GetActorLocation() - FVector(0, 0, 44);
 	FVector EndLocation = (GetActorForwardVector() * 100) + StartLocation;
@@ -342,6 +347,14 @@ void ASoldierCharacter::Vault()
 
 void ASoldierCharacter::ResetVaultTimer()
 {
+	if (Role < ROLE_Authority)
+	{
+		ServerResetTimerVault();
+	}
+
+	GoClimb = false;
+	GoVault = false;
+
 	UE_LOG(LogTemp, Warning, TEXT("Resetting timer"));
 
 	GetWorld()->GetTimerManager().ClearTimer(TimerHandle_Vault);
@@ -658,6 +671,22 @@ void ASoldierCharacter::OnHealthChanged(UHealthComponent * OwningHealthComp, flo
 	}
 }
 
+void ASoldierCharacter::ServerResetTimerVault_Implementation()
+{
+	ResetVaultTimer();
+}
+bool ASoldierCharacter::ServerResetTimerVault_Validate()
+{
+	return true;
+}
+void ASoldierCharacter::ServerVault_Implementation()
+{
+	Vault();
+}
+bool ASoldierCharacter::ServerVault_Validate()
+{
+	return true;
+}
 void ASoldierCharacter::ServerReload_Implementation()
 {
 	Reload();
@@ -708,8 +737,15 @@ void ASoldierCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	///GAME CHANGER!!!///
 	DOREPLIFETIME(ASoldierCharacter,IsReloading);
 	DOREPLIFETIME(ASoldierCharacter, IsZooming);
-	DOREPLIFETIME(ASoldierCharacter, IsSprinting);
-
-
+	DOREPLIFETIME(ASoldierCharacter, ClimbAnim);
+	DOREPLIFETIME(ASoldierCharacter, VaultAnim);
+	DOREPLIFETIME(ASoldierCharacter, isAllowClimbing);
+	DOREPLIFETIME(ASoldierCharacter, isWallThick);
+	DOREPLIFETIME(ASoldierCharacter, isAbleToVault);
+	DOREPLIFETIME(ASoldierCharacter, isObjectTooHigh);
+	DOREPLIFETIME(ASoldierCharacter, GoClimb);
+	DOREPLIFETIME(ASoldierCharacter, GoVault);
+	DOREPLIFETIME(ASoldierCharacter, MaxHeightForVault);
+	DOREPLIFETIME(ASoldierCharacter, TimerHandle_Vault);
 
 }
