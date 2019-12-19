@@ -29,12 +29,15 @@ void UHealthComponent::BeginPlay()
 			MyOwner->OnTakeAnyDamage.AddDynamic(this, &UHealthComponent::HandleTakeAnyDamage);
 		}
 	}
-
-	
-
 	Health = DefaultHealth;
-	
 }
+
+void UHealthComponent::OnRep_Health(float OldHealth)
+{
+	float Damage = Health - OldHealth;
+	OnHealthChanged.Broadcast(this, Health, Damage, nullptr,nullptr, nullptr);
+}
+
 
 
 void UHealthComponent::HandleTakeAnyDamage(AActor * DamagedActor, float Damage, const UDamageType * DamageType, AController * InstigatedBy, AActor * DamageCauser)
