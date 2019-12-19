@@ -161,8 +161,19 @@ void ASoldierCharacter::Tick(float DeltaTime)
 		SoldierCurrentClips = AutomaticRifle->CurrentAmountOfClips;
 	}
 
-}
+	///***IF DEAD, DESTROY ACTOR AFTER 2 seconds ***///
+	if (bDied == true)
+	{
+		FTimerHandle DeathTimer;
+		GetWorldTimerManager().SetTimer(DeathTimer, this, &ASoldierCharacter::OnDeath, 2.5f, false);
+	}
 
+}
+void ASoldierCharacter::OnDeath()
+{
+	this->Destroy();
+	UE_LOG(LogTemp, Warning, TEXT("DEAD"));
+}
 // Called to bind functionality to input
 void ASoldierCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {

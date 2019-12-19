@@ -199,6 +199,8 @@ protected:
 
 	void PickUp();
 
+	void OnDeath();
+
 	UPROPERTY(EditDefaultsOnly, Category = "LineTrace")
 	float MaxUseDistance;
 
