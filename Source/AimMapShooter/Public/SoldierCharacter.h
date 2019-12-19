@@ -112,6 +112,11 @@ protected:
 	void ServerVault();
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerResetTimerVault();
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerBeginCrouch();
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerEndCrouch();
 	
 	void LineTraceItem();
 
@@ -238,7 +243,7 @@ public:
 	bool IsSingleFire;
 
 	///Bool for crouching///
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Crouch")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated, Category = "Crouch")
 	bool IsCrouching;
 
 

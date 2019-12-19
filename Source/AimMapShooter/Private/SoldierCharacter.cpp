@@ -510,13 +510,22 @@ void ASoldierCharacter::MoveRight(float Value)
 }
 void ASoldierCharacter::BeginCrouch()
 {
+	if (Role < ROLE_Authority)
+	{
+		ServerBeginCrouch();
+	}
 	IsCrouching = true;
 	Crouch();
 }
 void ASoldierCharacter::EndCrouch()
 {
+	if (Role < ROLE_Authority)
+	{
+		ServerEndCrouch();
+	}
 	IsCrouching = false;
 	UnCrouch();
+
 }
 ///*** TODO MULTIPLAYER CONTROLLER IS WRONG ///***
 void ASoldierCharacter::ZoomIn()
@@ -737,6 +746,22 @@ bool ASoldierCharacter::ServerSprintOff_Validate()
 {
 	return true;
 }
+void ASoldierCharacter::ServerBeginCrouch_Implementation()
+{
+	BeginCrouch();
+}
+bool ASoldierCharacter::ServerBeginCrouch_Validate()
+{
+	return true;
+}
+void ASoldierCharacter::ServerEndCrouch_Implementation()
+{
+	EndCrouch();
+}
+bool ASoldierCharacter::ServerEndCrouch_Validate()
+{
+	return true;
+}
 void ASoldierCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	//This function tells us how we want to replicate things//
@@ -758,6 +783,6 @@ void ASoldierCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	DOREPLIFETIME(ASoldierCharacter, MaxHeightForVault);
 	DOREPLIFETIME(ASoldierCharacter, TimerHandle_Vault);
 	DOREPLIFETIME(ASoldierCharacter, bDied);
-
+	DOREPLIFETIME(ASoldierCharacter, IsCrouching);
 
 }
