@@ -164,6 +164,11 @@ void ASoldierCharacter::Tick(float DeltaTime)
 	///***IF DEAD, DESTROY ACTOR AFTER 2 seconds ***///
 	if (bDied == true)
 	{
+		APlayerController* PC = Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
+		if (PC)
+		{
+			this->DisableInput(PC);
+		}
 		FTimerHandle DeathTimer;
 		GetWorldTimerManager().SetTimer(DeathTimer, this, &ASoldierCharacter::OnDeath, 2.5f, false);
 	}
@@ -173,6 +178,12 @@ void ASoldierCharacter::OnDeath()
 {
 	this->Destroy();
 	UE_LOG(LogTemp, Warning, TEXT("DEAD"));
+
+	APlayerController* PC = Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
+	if (PC)
+	{
+		this->EnableInput(PC);
+	}
 }
 // Called to bind functionality to input
 void ASoldierCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
