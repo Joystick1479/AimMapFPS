@@ -501,11 +501,11 @@ void ASoldierCharacter::PickUp()
 
 void ASoldierCharacter::MoveForward(float Value)
 {
-
 	AddMovementInput(GetActorForwardVector()*Value);
 }
 void ASoldierCharacter::MoveRight(float Value)
 {
+	CharacterState = ECharacterState::Walking;
 	AddMovementInput(GetActorRightVector() * Value);
 }
 void ASoldierCharacter::BeginCrouch()
@@ -527,25 +527,34 @@ void ASoldierCharacter::EndCrouch()
 	UnCrouch();
 
 }
-///*** TODO MULTIPLAYER CONTROLLER IS WRONG ///***
 void ASoldierCharacter::ZoomIn()
 {
-	if (Role < ROLE_Authority)
+	UCharacterMovementComponent* MoveComp = this->FindComponentByClass<UCharacterMovementComponent>();
+	if (MoveComp)
 	{
-		ServerZoomIn();
-		//return;
-	}
-	IsZooming = true;
-
-	if (IsLocallyControlled())
-	{
-
-		APlayerController* PC = Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
-		if (PC)
+		///***Checking for character speed*////
+		FVector Velocity = MoveComp->GetLastUpdateVelocity();
+		float Velocity2 = Velocity.Size();
+		if (Velocity2 < 1)
 		{
-			if (AutomaticRifle)
+			if (Role < ROLE_Authority)
 			{
-				PC->SetViewTargetWithBlend(AutomaticRifle, ZoomingTime, EViewTargetBlendFunction::VTBlend_Linear);
+				ServerZoomIn();
+				//return;
+			}
+			IsZooming = true;
+
+			if (IsLocallyControlled())
+			{
+
+				APlayerController* PC = Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
+				if (PC)
+				{
+					if (AutomaticRifle)
+					{
+						PC->SetViewTargetWithBlend(AutomaticRifle, ZoomingTime, EViewTargetBlendFunction::VTBlend_Linear);
+					}
+				}
 			}
 		}
 	}

@@ -32,6 +32,7 @@ namespace ECharacterState
 	enum Type
 	{
 		Idle,
+		Walking,
 		Firing,
 		Reloading
 	};
