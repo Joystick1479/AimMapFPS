@@ -748,5 +748,7 @@ void ASoldierCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	DOREPLIFETIME(ASoldierCharacter, GoVault);
 	DOREPLIFETIME(ASoldierCharacter, MaxHeightForVault);
 	DOREPLIFETIME(ASoldierCharacter, TimerHandle_Vault);
+	DOREPLIFETIME(ASoldierCharacter, bDied);
+
 
 }

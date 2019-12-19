@@ -197,7 +197,7 @@ protected:
 	float MaxUseDistance;
 
 
-	UPROPERTY(BlueprintReadOnly, Category = "Player")
+	UPROPERTY(Replicated,BlueprintReadOnly, Category = "Player")
 	bool bDied;
 
 	UFUNCTION()
