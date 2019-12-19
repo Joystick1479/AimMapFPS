@@ -528,14 +528,19 @@ void ASoldierCharacter::ZoomIn()
 	}
 	IsZooming = true;
 
-	APlayerController* PC = Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
-	if (PC)
+	if (IsLocallyControlled())
 	{
-		if (AutomaticRifle)
+
+		APlayerController* PC = Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
+		if (PC)
 		{
-			PC->SetViewTargetWithBlend(AutomaticRifle, ZoomingTime, EViewTargetBlendFunction::VTBlend_Linear);
-		}		
+			if (AutomaticRifle)
+			{
+				PC->SetViewTargetWithBlend(AutomaticRifle, ZoomingTime, EViewTargetBlendFunction::VTBlend_Linear);
+			}
+		}
 	}
+	
 
 }
 void ASoldierCharacter::ZoomOut()
@@ -547,12 +552,16 @@ void ASoldierCharacter::ZoomOut()
 	}
 	IsZooming = false;
 
-	APlayerController* PC = Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
-	if (PC)
+	if (IsLocallyControlled())
 	{
-		if (AutomaticRifle)
+
+		APlayerController* PC = Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
+		if (PC)
 		{
-			PC->SetViewTargetWithBlend(this, ZoomingTime, EViewTargetBlendFunction::VTBlend_Linear);
+			if (AutomaticRifle)
+			{
+				PC->SetViewTargetWithBlend(this, ZoomingTime, EViewTargetBlendFunction::VTBlend_Linear);
+			}
 		}
 	}
 
