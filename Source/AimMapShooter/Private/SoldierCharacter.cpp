@@ -18,6 +18,8 @@
 #include "Laser.h"
 #include "TimerManager.h"
 #include "Net/UnrealNetwork.h"
+#include "Blueprint/UserWidget.h"
+#include "Blueprint/WidgetBlueprintLibrary.h" 
 
 
 // Sets default values
@@ -39,6 +41,7 @@ ASoldierCharacter::ASoldierCharacter()
 	CameraComp->AttachToComponent(SpringArm, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 
 	HealthComp = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComp"));
+
 
 
 	ZoomingTime = 0.2f;
@@ -73,6 +76,9 @@ void ASoldierCharacter::BeginPlay()
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	
 	HealthComp->OnHealthChanged.AddDynamic(this, &ASoldierCharacter::OnHealthChanged);
+
+
+	
 }
 
 void ASoldierCharacter::LineTraceItem()
@@ -95,7 +101,7 @@ void ASoldierCharacter::LineTraceItem()
 
 			AActor* WeaponHit = Hit.GetActor();
 		}
-		else
+		else 
 		{
 			bRiflePickUp = false;
 		}
@@ -153,6 +159,7 @@ void ASoldierCharacter::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	LineTraceItem();
+	ShowingPickUpHud();
 
 	if (AutomaticRifle)
 	{
@@ -520,6 +527,32 @@ void ASoldierCharacter::PickUp()
 			}
 		}
 }
+void ASoldierCharacter::ShowingPickUpHud()
+{
+	if (Role < ROLE_Authority)
+	{
+		ServerShowingPickUpHud();
+	}
+	APlayerController* PC = GetWorld()->GetFirstPlayerController();
+	if (PC)
+	{
+		if (wPickUp)
+		{
+			wPickUpvar = CreateWidget<UUserWidget>(PC, wPickUp);
+			if (wPickUpvar)
+			{
+				if ((bRiflePickUp || bHeadsetPickUp || bLaserPickUp || bHelmetPickUp || bGripPickUp || bHoloPickUp) == true)
+				{
+					wPickUpvar->AddToViewport();
+				}
+				else
+				{
+					bRemoveHud = true;
+				}
+			}
+		}
+	}
+}
 
 void ASoldierCharacter::MoveForward(float Value)
 {
@@ -792,6 +825,14 @@ bool ASoldierCharacter::ServerEndCrouch_Validate()
 {
 	return true;
 }
+void ASoldierCharacter::ServerShowingPickUpHud_Implementation()
+{
+	ShowingPickUpHud();
+}
+bool ASoldierCharacter::ServerShowingPickUpHud_Validate()
+{
+	return true;
+}
 void ASoldierCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	//This function tells us how we want to replicate things//
@@ -814,5 +855,7 @@ void ASoldierCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	DOREPLIFETIME(ASoldierCharacter, TimerHandle_Vault);
 	DOREPLIFETIME(ASoldierCharacter, bDied);
 	DOREPLIFETIME(ASoldierCharacter, IsCrouching);
+	DOREPLIFETIME(ASoldierCharacter, bRemoveHud);
+
 
 }

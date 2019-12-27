@@ -17,6 +17,7 @@ class AHelmet;
 class AHeadset;
 class ALaser;
 class UCapsuleComponent;
+class UUserWidget;
 
 namespace ELaserState
 {
@@ -118,6 +119,12 @@ protected:
 	void ServerBeginCrouch();
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerEndCrouch();
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerShowingPickUpHud();
+
+	/////*** DISPLAYING HUD ****////
+	void ShowingPickUpHud();
 	
 	void LineTraceItem();
 
@@ -174,6 +181,8 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
 	float ZoomingTime;
+
+
 
 	//Character Movement//
 	void MoveForward(float Value);
@@ -272,6 +281,15 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, Category = "Player")
 	bool bLaserPickUp;
+
+	UPROPERTY(EditDefaultsOnly, Replicated,Category = "Player")
+	TSubclassOf<UUserWidget> wPickUp;
+
+	UPROPERTY(Replicated)
+	UUserWidget* wPickUpvar;
+
+	UPROPERTY(BlueprintReadOnly, Replicated,Category = "Player")
+	bool bRemoveHud;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Player")
 	bool isLaserAttached;
