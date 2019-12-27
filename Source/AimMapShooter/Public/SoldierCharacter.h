@@ -19,6 +19,7 @@ class ALaser;
 class UCapsuleComponent;
 class UUserWidget;
 class USoundCue;
+class UAudioComponent;
 
 namespace ELaserState
 {
@@ -232,6 +233,13 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Sounds")
 	USoundCue* ItemsPickUp;
+
+
+	UPROPERTY(EditDefaultsOnly, Category = "Sounds")
+	USoundCue* LowHealthSound;
+
+	UPROPERTY(VisibleAnywhere, Category = "Sounds")
+	UAudioComponent* AudioComp;
 	
 
 public:	

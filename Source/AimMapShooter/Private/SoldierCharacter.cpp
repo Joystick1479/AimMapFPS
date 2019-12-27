@@ -21,6 +21,7 @@
 #include "Blueprint/UserWidget.h"
 #include "Blueprint/WidgetBlueprintLibrary.h" 
 #include "Sound/SoundCue.h" 
+#include "Components/AudioComponent.h"
 
 
 // Sets default values
@@ -42,6 +43,9 @@ ASoldierCharacter::ASoldierCharacter()
 	CameraComp->AttachToComponent(SpringArm, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 
 	HealthComp = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComp"));
+
+	AudioComp = CreateDefaultSubobject<UAudioComponent>(TEXT("AudioComp"));
+
 
 
 
@@ -779,10 +783,20 @@ void ASoldierCharacter::FireMode()
 
 void ASoldierCharacter::OnHealthChanged(UHealthComponent * OwningHealthComp, float Health, float HealthDelta, const UDamageType * DamageType, AController * InstigatedBy, AActor * DamageCauser)
 {
+
 	if (Health <= 0.0f && !bDied)
 	{
 		bDied = true;
 
+	}
+	if (Health == 40.0f && bDied == false)
+	{
+		AudioComp->Play();
+	
+	}
+	if (bDied == true)
+	{
+		AudioComp->Stop();
 	}
 }
 
