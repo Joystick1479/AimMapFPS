@@ -20,6 +20,7 @@
 #include "Net/UnrealNetwork.h"
 #include "Blueprint/UserWidget.h"
 #include "Blueprint/WidgetBlueprintLibrary.h" 
+#include "Sound/SoundCue.h" 
 
 
 // Sets default values
@@ -35,7 +36,7 @@ ASoldierCharacter::ASoldierCharacter()
 	HeadsetSocket = "HeadsetSocket";
 
 	SpringArm = CreateDefaultSubobject <USpringArmComponent>(TEXT("SpringArm"));
-	SpringArm->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, ArmSocket);
+	SpringArm->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, HeadSocket);
 
 	CameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComp"));
 	CameraComp->AttachToComponent(SpringArm, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
@@ -474,6 +475,7 @@ void ASoldierCharacter::PickUp()
 				AutomaticRifle->SetOwner(this);
 				AutomaticRifle->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocket);
 			}
+			UGameplayStatics::PlaySoundAtLocation(this, RiflePickUp, GetActorLocation());
 		}
 
 		if (bHoloPickUp == true && HoldingWeaponState == EHoldingWeapon::A4)
@@ -491,6 +493,7 @@ void ASoldierCharacter::PickUp()
 				HoloScope->AttachToComponent(AutomaticRifle->SkelMeshComp, FAttachmentTransformRules::SnapToTargetNotIncludingScale, Socket);
 				isHoloAttached = true;
 			}
+			UGameplayStatics::PlaySoundAtLocation(this, ItemsPickUp, GetActorLocation());
 		}
 		if (bGripPickUp == true && HoldingWeaponState == EHoldingWeapon::A4)
 		{
@@ -507,6 +510,7 @@ void ASoldierCharacter::PickUp()
 				Grip->AttachToComponent(AutomaticRifle->SkelMeshComp, FAttachmentTransformRules::SnapToTargetNotIncludingScale, GSocket);
 				isGripAttached = true;
 			}
+			UGameplayStatics::PlaySoundAtLocation(this, ItemsPickUp, GetActorLocation());
 		}
 		if (bHelmetPickUp == true)
 		{
@@ -520,6 +524,7 @@ void ASoldierCharacter::PickUp()
 				Helmet->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, HelmetSocket);
 				isHelmetAttached = true;
 			}
+			UGameplayStatics::PlaySoundAtLocation(this, ItemsPickUp, GetActorLocation());
 		}
 		if (bHeadsetPickUp == true)
 		{
@@ -533,6 +538,7 @@ void ASoldierCharacter::PickUp()
 				Headset->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, HeadsetSocket);
 				isHeadsetAttached = true;
 			}
+			UGameplayStatics::PlaySoundAtLocation(this, ItemsPickUp, GetActorLocation());
 		}
 		if (bLaserPickUp == true)
 		{
@@ -547,6 +553,7 @@ void ASoldierCharacter::PickUp()
 				Laser->AttachToComponent(AutomaticRifle->SkelMeshComp, FAttachmentTransformRules::SnapToTargetNotIncludingScale, LSocket);
 				isLaserAttached = true;
 			}
+			UGameplayStatics::PlaySoundAtLocation(this, ItemsPickUp, GetActorLocation());
 		}
 }
 void ASoldierCharacter::ShowingPickUpHud()

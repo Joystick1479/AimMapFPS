@@ -18,6 +18,7 @@ class AHeadset;
 class ALaser;
 class UCapsuleComponent;
 class UUserWidget;
+class USoundCue;
 
 namespace ELaserState
 {
@@ -223,6 +224,14 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	UHealthComponent* HealthComp;
 
+	/////*SOUNDS WHEN PICK UP OBJECTS***////
+
+	UPROPERTY(EditDefaultsOnly, Category = "Sounds")
+	USoundCue* RiflePickUp;
+
+
+	UPROPERTY(EditDefaultsOnly, Category = "Sounds")
+	USoundCue* ItemsPickUp;
 	
 
 public:	
