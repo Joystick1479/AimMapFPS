@@ -533,25 +533,29 @@ void ASoldierCharacter::ShowingPickUpHud()
 	{
 		ServerShowingPickUpHud();
 	}
-	APlayerController* PC = GetWorld()->GetFirstPlayerController();
-	if (PC)
+	if (IsLocallyControlled())
 	{
-		if (wPickUp)
+		APlayerController* PC = GetWorld()->GetFirstPlayerController();
+		if (PC)
 		{
-			wPickUpvar = CreateWidget<UUserWidget>(PC, wPickUp);
-			if (wPickUpvar)
+			if (wPickUp)
 			{
-				if ((bRiflePickUp || bHeadsetPickUp || bLaserPickUp || bHelmetPickUp || bGripPickUp || bHoloPickUp) == true)
+				wPickUpvar = CreateWidget<UUserWidget>(PC, wPickUp);
+				if (wPickUpvar)
 				{
-					wPickUpvar->AddToViewport();
-				}
-				else
-				{
-					bRemoveHud = true;
+					if ((bRiflePickUp || bHeadsetPickUp || bLaserPickUp || bHelmetPickUp || bGripPickUp || bHoloPickUp) == true)
+					{
+						wPickUpvar->AddToViewport();
+					}
+					else
+					{
+						bRemoveHud = true;
+					}
 				}
 			}
 		}
 	}
+	
 }
 
 void ASoldierCharacter::MoveForward(float Value)
@@ -856,6 +860,8 @@ void ASoldierCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	DOREPLIFETIME(ASoldierCharacter, bDied);
 	DOREPLIFETIME(ASoldierCharacter, IsCrouching);
 	DOREPLIFETIME(ASoldierCharacter, bRemoveHud);
+	DOREPLIFETIME(ASoldierCharacter, wPickUpvar);
+	DOREPLIFETIME(ASoldierCharacter, wPickUp);
 
 
 }
