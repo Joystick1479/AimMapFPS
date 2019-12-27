@@ -288,6 +288,19 @@ public:
 	UPROPERTY(Replicated)
 	UUserWidget* wPickUpvar;
 
+
+	UPROPERTY(EditDefaultsOnly, Replicated, Category = "Player")
+	TSubclassOf<UUserWidget> wAmmoCount;
+
+	UPROPERTY(Replicated)
+	UUserWidget* wAmmoCountvar;
+
+	UPROPERTY(EditDefaultsOnly, Replicated, Category = "Player")
+	TSubclassOf<UUserWidget> wHealthIndicator;
+
+	UPROPERTY(Replicated)
+	UUserWidget* wHealthIndicatorvar;
+
 	UPROPERTY(BlueprintReadOnly, Replicated,Category = "Player")
 	bool bRemoveHud;
 

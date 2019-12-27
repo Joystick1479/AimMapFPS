@@ -77,8 +77,30 @@ void ASoldierCharacter::BeginPlay()
 	
 	HealthComp->OnHealthChanged.AddDynamic(this, &ASoldierCharacter::OnHealthChanged);
 
-
-	
+	///***Creating hud displaying***////
+	if (IsLocallyControlled())
+	{
+		APlayerController* PC = GetWorld()->GetFirstPlayerController();
+		if (PC)
+		{
+			if (wAmmoCount)
+			{
+				wAmmoCountvar = CreateWidget<UUserWidget>(PC, wAmmoCount);
+				if (wAmmoCountvar)
+				{
+					wAmmoCountvar->AddToViewport();
+				}
+			}
+			if (wHealthIndicator)
+			{
+				wHealthIndicatorvar = CreateWidget<UUserWidget>(PC, wHealthIndicator);
+				if (wHealthIndicatorvar)
+				{
+					wHealthIndicatorvar->AddToViewport();
+				}
+			}
+		}
+	}
 }
 
 void ASoldierCharacter::LineTraceItem()
@@ -862,6 +884,10 @@ void ASoldierCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	DOREPLIFETIME(ASoldierCharacter, bRemoveHud);
 	DOREPLIFETIME(ASoldierCharacter, wPickUpvar);
 	DOREPLIFETIME(ASoldierCharacter, wPickUp);
+	DOREPLIFETIME(ASoldierCharacter, wHealthIndicator);
+	DOREPLIFETIME(ASoldierCharacter, wHealthIndicatorvar);
+	DOREPLIFETIME(ASoldierCharacter, wAmmoCount);
+	DOREPLIFETIME(ASoldierCharacter, wAmmoCountvar);
 
 
 }
