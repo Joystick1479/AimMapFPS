@@ -317,16 +317,20 @@ void AAutomaticRifle::PlayFireEffects(FVector EndLocation)
 	APawn* MyOwner = Cast<APawn>(GetOwner());
 	if (MyOwner)
 	{
-		APlayerController* PC = Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
-		ASoldierCharacter* SoldierChar = Cast<ASoldierCharacter>(GetOwner());
-		if (PC && SoldierChar->IsZooming == true)
+		if (MyOwner->IsLocallyControlled())
 		{
-			PC->ClientPlayCameraShake(CameShakeZoomClass);
+			APlayerController* PC = Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
+			ASoldierCharacter* SoldierChar = Cast<ASoldierCharacter>(GetOwner());
+			if (PC && SoldierChar->IsZooming == true)
+			{
+				PC->ClientPlayCameraShake(CameShakeZoomClass);
+			}
+			else
+			{
+				PC->ClientPlayCameraShake(CameShakeHipClass);
+			}
 		}
-		else
-		{
-			PC->ClientPlayCameraShake(CameShakeHipClass);
-		}
+		
 	}
 	
 }
