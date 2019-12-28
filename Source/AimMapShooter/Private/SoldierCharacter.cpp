@@ -42,6 +42,10 @@ ASoldierCharacter::ASoldierCharacter()
 	CameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComp"));
 	CameraComp->AttachToComponent(SpringArm, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 
+	CameraSprintComp = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraSprintComp"));
+	CameraSprintComp->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, HeadSocket);
+
+
 	HealthComp = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComp"));
 
 	AudioComp = CreateDefaultSubobject<UAudioComponent>(TEXT("AudioComp"));
@@ -721,6 +725,8 @@ void ASoldierCharacter::SprintOn()
 	{
 		MoveComp->MaxWalkSpeed = 270.0f;
 	}
+	CameraComp->ToggleActive();
+	CameraSprintComp->ToggleActive();
 }
 
 void ASoldierCharacter::SprintOff()
@@ -735,6 +741,8 @@ void ASoldierCharacter::SprintOff()
 	{
 		MoveComp->MaxWalkSpeed = 149.0f;
 	}
+	CameraComp->ToggleActive();
+	CameraSprintComp->ToggleActive();
 }
 
 void ASoldierCharacter::Reload()
