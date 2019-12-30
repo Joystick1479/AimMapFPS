@@ -17,5 +17,11 @@ class AIMMAPSHOOTER_API UAimMapGameInstance : public UGameInstance
 	UAimMapGameInstance(const FObjectInitializer & ObjectInitializer);
 
 	virtual void Init();
+
+	UFUNCTION(exec)
+	void Host();
+
+	UFUNCTION(exec)
+	void Join(const FString& Address);
 	
 };
