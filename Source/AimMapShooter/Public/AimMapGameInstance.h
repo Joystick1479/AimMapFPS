@@ -23,5 +23,8 @@ class AIMMAPSHOOTER_API UAimMapGameInstance : public UGameInstance
 
 	UFUNCTION(exec)
 	void Join(const FString& Address);
+
+	UFUNCTION(exec)
+	void Reset();
 	
 };

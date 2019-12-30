@@ -21,8 +21,8 @@ void UAimMapGameInstance::Host()
 
 	UWorld* World = GetWorld();
 	if (!ensure(World != nullptr)) return;
-
-	World->ServerTravel("/Game/FirstPersonBP/Maps/Map");
+	World->ServerTravel("/Game/FirstPersonBP/Maps/Map?listen");
+	
 }
 void UAimMapGameInstance::Join(const FString& Address)
 {
@@ -30,4 +30,17 @@ void UAimMapGameInstance::Join(const FString& Address)
 	if (!ensure(Engine != nullptr)) return;
 
 	Engine->AddOnScreenDebugMessage(0, 2, FColor::Green, FString::Printf(TEXT("Joining %s"), *Address));
+
+	APlayerController* PC = GetFirstLocalPlayerController();
+	if (!ensure(PC != nullptr)) return;
+
+	PC->ClientTravel(Address, ETravelType::TRAVEL_Absolute);
+
+}
+
+void UAimMapGameInstance::Reset()
+{
+	UWorld* World = GetWorld();
+	if (!ensure(World != nullptr)) return;
+	World->ServerTravel("/Game/FirstPersonBP/Maps/Map");
 }
