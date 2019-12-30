@@ -725,8 +725,8 @@ void ASoldierCharacter::SprintOn()
 	{
 		MoveComp->MaxWalkSpeed = 270.0f;
 	}
-	CameraComp->ToggleActive();
-	CameraSprintComp->ToggleActive();
+	//CameraComp->ToggleActive();
+	//CameraSprintComp->ToggleActive();
 }
 
 void ASoldierCharacter::SprintOff()
@@ -741,8 +741,8 @@ void ASoldierCharacter::SprintOff()
 	{
 		MoveComp->MaxWalkSpeed = 149.0f;
 	}
-	CameraComp->ToggleActive();
-	CameraSprintComp->ToggleActive();
+	//CameraComp->ToggleActive();
+	//CameraSprintComp->ToggleActive();
 }
 
 void ASoldierCharacter::Reload()
