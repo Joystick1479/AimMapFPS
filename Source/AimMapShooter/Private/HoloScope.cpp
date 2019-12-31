@@ -2,6 +2,7 @@
 
 #include "Components/StaticMeshComponent.h"
 #include "Components/SphereComponent.h"
+#include "SoldierCharacter.h"
 #include "HoloScope.h"
 
 // Sets default values
@@ -24,6 +25,29 @@ void AHoloScope::BeginPlay()
 {
 	Super::BeginPlay();
 	
+}
+
+void AHoloScope::NotifyActorBeginOverlap(AActor * OtherActor)
+{
+	Super::NotifyActorBeginOverlap(OtherActor);
+
+	ASoldierCharacter* SoldierCharacter = Cast<ASoldierCharacter>(OtherActor);
+	if (SoldierCharacter)
+	{
+		SoldierCharacter->bHoloPickUp = true;
+		SphereComp->ToggleActive();
+	}
+}
+
+void AHoloScope::NotifyActorEndOverlap(AActor * OtherActor)
+{
+	Super::NotifyActorEndOverlap(OtherActor);
+
+	ASoldierCharacter* SoldierCharacter = Cast<ASoldierCharacter>(OtherActor);
+	if (SoldierCharacter)
+	{
+		SoldierCharacter->bHoloPickUp = false;
+	}
 }
 
 // Called every frame

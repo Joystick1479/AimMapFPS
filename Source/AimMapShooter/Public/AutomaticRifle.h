@@ -38,14 +38,6 @@ namespace EWeaponState
 		Equipping,
 	};
 }
-namespace EWeaponPickupState
-{
-	enum Type
-	{
-		None,
-		PickedUp,
-	};
-}
 namespace EReloadingState
 {
 	enum Type
@@ -180,7 +172,6 @@ protected:
 
 	EWeaponState::Type CurrentState;
 	EReloadingState::Type ReloadingState;
-	EWeaponPickupState::Type PickupState;
 
 
 	/** weapon data */

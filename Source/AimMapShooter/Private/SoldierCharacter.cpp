@@ -144,15 +144,15 @@ void ASoldierCharacter::LineTraceItem()
 			//{
 			//	bRiflePickUp = false;
 		//	}
-			if (GetWorld()->LineTraceSingleByChannel(Hit, start_trace, end_trace, COLLISION_HOLO, TraceParams) && (HoldingWeaponState == EHoldingWeapon::A4 && isHoloAttached == false))
-			{
-				DrawDebugLine(GetWorld(), start_trace, end_trace, FColor::Green, false, 1.0f, 0, 1.0f);
-				bHoloPickUp = true;
-			}
-			else
-			{
-				bHoloPickUp = false;
-			}
+		//	if (GetWorld()->LineTraceSingleByChannel(Hit, start_trace, end_trace, COLLISION_HOLO, TraceParams) && (HoldingWeaponState == EHoldingWeapon::A4 && isHoloAttached == false))
+		//	{
+		//		DrawDebugLine(GetWorld(), start_trace, end_trace, FColor::Green, false, 1.0f, 0, 1.0f);
+		//		bHoloPickUp = true;
+		//	}
+		//	else
+		//	{
+		//		bHoloPickUp = false;
+		//	}
 			if (GetWorld()->LineTraceSingleByChannel(Hit, start_trace, end_trace, COLLISION_GRIP, TraceParams) && (HoldingWeaponState == EHoldingWeapon::A4 && isGripAttached == false))
 			{
 				DrawDebugLine(GetWorld(), start_trace, end_trace, FColor::Blue, false, 1.0f, 0, 1.0f);
@@ -499,9 +499,10 @@ void ASoldierCharacter::PickUp()
 			bRiflePickedUp = true;
 		}
 
-		if (bHoloPickUp == true && HoldingWeaponState == EHoldingWeapon::A4)
+		if (bHoloPickUp == true && HoldingWeaponState == EHoldingWeapon::A4 && HoloEquipState == EHoloAttachment::None)
 		{
 			HoldingAttachmentState = EHoldingAttachment::Holo;
+			HoloEquipState = EHoloAttachment::Equipped;
 
 			FActorSpawnParameters SpawnParams;
 			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
@@ -941,5 +942,7 @@ void ASoldierCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	DOREPLIFETIME(ASoldierCharacter, wAmmoCount);
 	DOREPLIFETIME(ASoldierCharacter, wAmmoCountvar);
 	DOREPLIFETIME(ASoldierCharacter, bRiflePickUp);
+	DOREPLIFETIME(ASoldierCharacter, bHoloPickUp);
+
 	
 }

@@ -61,6 +61,15 @@ namespace EHoldingAttachment
 	};
 }
 
+namespace EHoloAttachment
+{
+	enum Type
+	{
+		None,
+		Equipped,
+	};
+}
+
 UCLASS()
 class AIMMAPSHOOTER_API ASoldierCharacter : public ACharacter
 {
@@ -81,6 +90,8 @@ protected:
 	EHoldingAttachment::Type HoldingAttachmentState;
 
 	ELaserState::Type LaserState;
+
+	EHoloAttachment::Type HoloEquipState;
 	
 	UPROPERTY(Replicated)
 	AAutomaticRifle* AutomaticRifle;
@@ -294,7 +305,7 @@ public:
 	UPROPERTY(BlueprintReadWrite, Replicated, Category = "Player")
 	bool bRiflePickUp;
 
-	UPROPERTY(BlueprintReadOnly, Category = "Player")
+	UPROPERTY(BlueprintReadOnly, Replicated, Category = "Player")
 	bool bHoloPickUp;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Player")

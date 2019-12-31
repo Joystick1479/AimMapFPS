@@ -44,7 +44,6 @@ AAutomaticRifle::AAutomaticRifle()
 	LaserSocketEnd = "LaserSocketEnd";
 
 	CurrentState = EWeaponState::Idle;
-	PickupState = EWeaponPickupState::None;
 
 	CurrentAmmo = 0;
 	CurrentAmmoInClip = 0;
