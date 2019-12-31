@@ -44,6 +44,7 @@ AAutomaticRifle::AAutomaticRifle()
 	LaserSocketEnd = "LaserSocketEnd";
 
 	CurrentState = EWeaponState::Idle;
+	PickupState = EWeaponPickupState::None;
 
 	CurrentAmmo = 0;
 	CurrentAmmoInClip = 0;
@@ -59,10 +60,10 @@ AAutomaticRifle::AAutomaticRifle()
 	SetReplicates(true);
 	NetUpdateFrequency = 66.0f;
 	MinNetUpdateFrequency = 33.0f;
+	
 
 
 }
-
 
 
 void AAutomaticRifle::UseAmmo()
@@ -96,7 +97,28 @@ void AAutomaticRifle::Tick(float DeltaTime)
 
 }
 
+void AAutomaticRifle::NotifyActorBeginOverlap(AActor* OtherActor)
+{
+	Super::NotifyActorBeginOverlap(OtherActor);
 
+	ASoldierCharacter* SoldierCharacter = Cast<ASoldierCharacter>(OtherActor);
+	if (SoldierCharacter)
+	{
+		SoldierCharacter->bRiflePickUp = true;
+		SphereComp->ToggleActive();
+	}
+}
+void AAutomaticRifle::NotifyActorEndOverlap(AActor* OtherActor)
+{
+	Super::NotifyActorEndOverlap(OtherActor);
+
+	ASoldierCharacter* SoldierCharacter = Cast<ASoldierCharacter>(OtherActor);
+	if (SoldierCharacter)
+	{
+		SoldierCharacter->bRiflePickUp = false;
+
+	}
+}
 void AAutomaticRifle::StartFire()
 {
 

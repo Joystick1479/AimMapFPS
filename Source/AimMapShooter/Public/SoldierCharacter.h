@@ -85,14 +85,19 @@ protected:
 	UPROPERTY(Replicated)
 	AAutomaticRifle* AutomaticRifle;
 
+	UPROPERTY(Replicated)
 	AHoloScope* HoloScope;
 
+	UPROPERTY(Replicated)
 	AGrip* Grip;
 
+	UPROPERTY(Replicated)
 	AHeadset* Headset;
 
+	UPROPERTY(Replicated)
 	ALaser* Laser;
 
+	UPROPERTY(Replicated)
 	AHelmet* Helmet;
 	////***Replication stuff***///
 	UFUNCTION(Server, Reliable, WithValidation)
@@ -127,7 +132,10 @@ protected:
 
 	/////*** DISPLAYING HUD ****////
 	void ShowingPickUpHud();
-	
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerLineTraceItem();
+
 	void LineTraceItem();
 
 	//*Vaulting stuff//*
@@ -163,25 +171,25 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Replicated, Category = "Vaulting")
 	float MaxHeightForVault;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Player")
+	UPROPERTY(EditDefaultsOnly, Replicated, Category = "Player")
 	TSubclassOf<AAutomaticRifle> StarterWeaponClass;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Player")
+	UPROPERTY(EditDefaultsOnly, Replicated, Category = "Player")
 	TSubclassOf<AHoloScope> HoloClass;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Player")
+	UPROPERTY(EditDefaultsOnly, Replicated, Category = "Player")
 	TSubclassOf<AGrip> GripClass;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Player")
+	UPROPERTY(EditDefaultsOnly, Replicated, Category = "Player")
 	TSubclassOf<AHelmet> HelmetClass;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Player")
+	UPROPERTY(EditDefaultsOnly, Replicated, Category = "Player")
 	TSubclassOf<AHeadset> HeadsetClass;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Player")
+	UPROPERTY(EditDefaultsOnly, Replicated, Category = "Player")
 	TSubclassOf<ALaser> LaserClass;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
+	UPROPERTY(EditDefaultsOnly, Replicated, Category = "Weapon")
 	float ZoomingTime;
 
 
@@ -206,7 +214,6 @@ protected:
 
 	void ZoomIn();
 	void ZoomOut();
-
 
 	void PickUp();
 
@@ -284,7 +291,7 @@ public:
 	bool IsReloading;
 
 	//* Bool if we can pickup Rifle *//
-	UPROPERTY(BlueprintReadOnly, Category = "Player")
+	UPROPERTY(BlueprintReadWrite, Replicated, Category = "Player")
 	bool bRiflePickUp;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Player")
@@ -301,6 +308,8 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, Category = "Player")
 	bool bLaserPickUp;
+
+	bool bRiflePickedUp;
 
 	UPROPERTY(EditDefaultsOnly, Replicated,Category = "Player")
 	TSubclassOf<UUserWidget> wPickUp;

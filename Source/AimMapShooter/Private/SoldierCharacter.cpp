@@ -67,6 +67,8 @@ ASoldierCharacter::ASoldierCharacter()
 	bRiflePickUp = false;
 
 	SetReplicates(true);
+	NetUpdateFrequency = 66.0f;
+	MinNetUpdateFrequency = 33.0f;
 
 	///// VAULTING /////
 	float MaxHeightForVault = 60;
@@ -114,9 +116,15 @@ void ASoldierCharacter::BeginPlay()
 
 void ASoldierCharacter::LineTraceItem()
 {
-		const FVector start_trace = CameraComp->GetComponentLocation();
-		const FVector direction = CameraComp->GetComponentRotation().Vector();
-		const FVector end_trace = start_trace + (direction* MaxUseDistance);
+	if (Role < ROLE_Authority)
+	{
+		ServerLineTraceItem();
+		//return;
+	}
+
+		 FVector start_trace = CameraComp->GetComponentLocation();
+		 FVector direction = CameraComp->GetComponentRotation().Vector();
+		 FVector end_trace = start_trace + (direction* MaxUseDistance);
 
 		FCollisionQueryParams TraceParams(FName(TEXT("")), true, this);
 		TraceParams.bReturnPhysicalMaterial = false;
@@ -125,62 +133,65 @@ void ASoldierCharacter::LineTraceItem()
 
 		FHitResult Hit;
 
-		if (GetWorld()->LineTraceSingleByChannel(Hit, start_trace, end_trace, COLLISION_ITEMS, TraceParams) && HoldingWeaponState == EHoldingWeapon::None)
-		{
-			DrawDebugLine(GetWorld(), start_trace, end_trace, FColor::Red, false, 1.0f, 0, 1.0f);
-			bRiflePickUp = true;
+		//	if (GetWorld()->LineTraceSingleByChannel(Hit, start_trace, end_trace, COLLISION_ITEMS, TraceParams) && HoldingWeaponState == EHoldingWeapon::None)
+		//	{
+		//		DrawDebugLine(GetWorld(), start_trace, end_trace, FColor::Red, false, 1.0f, 0, 1.0f);
+		//		bRiflePickUp = true;
+		//
+		//		AActor* WeaponHit = Hit.GetActor();
+		//	}
+			//else
+			//{
+			//	bRiflePickUp = false;
+		//	}
+			if (GetWorld()->LineTraceSingleByChannel(Hit, start_trace, end_trace, COLLISION_HOLO, TraceParams) && (HoldingWeaponState == EHoldingWeapon::A4 && isHoloAttached == false))
+			{
+				DrawDebugLine(GetWorld(), start_trace, end_trace, FColor::Green, false, 1.0f, 0, 1.0f);
+				bHoloPickUp = true;
+			}
+			else
+			{
+				bHoloPickUp = false;
+			}
+			if (GetWorld()->LineTraceSingleByChannel(Hit, start_trace, end_trace, COLLISION_GRIP, TraceParams) && (HoldingWeaponState == EHoldingWeapon::A4 && isGripAttached == false))
+			{
+				DrawDebugLine(GetWorld(), start_trace, end_trace, FColor::Blue, false, 1.0f, 0, 1.0f);
+				bGripPickUp = true;
+			}
+			else
+			{
+				bGripPickUp = false;
+			}
+			if (GetWorld()->LineTraceSingleByChannel(Hit, start_trace, end_trace, COLLISION_HELMET, TraceParams) && isHelmetAttached == false)
+			{
+				DrawDebugLine(GetWorld(), start_trace, end_trace, FColor::Blue, false, 1.0f, 0, 1.0f);
+				bHelmetPickUp = true;
+			}
+			else
+			{
+				bHelmetPickUp = false;
+			}
+			if (GetWorld()->LineTraceSingleByChannel(Hit, start_trace, end_trace, COLLISION_HEADSET, TraceParams) && isHeadsetAttached == false)
+			{
+				DrawDebugLine(GetWorld(), start_trace, end_trace, FColor::Black, false, 1.0f, 0, 1.0f);
+				bHeadsetPickUp = true;
+			}
+			else
+			{
+				bHeadsetPickUp = false;
+			}
+			if (GetWorld()->LineTraceSingleByChannel(Hit, start_trace, end_trace, COLLISION_LASER, TraceParams) && isLaserAttached == false && HoldingWeaponState == EHoldingWeapon::A4)
+			{
+				DrawDebugLine(GetWorld(), start_trace, end_trace, FColor::Orange, false, 1.0f, 0, 1.0f);
+				bLaserPickUp = true;
+			}
+			else
+			{
+				bLaserPickUp = false;
+			}
+		
 
-			AActor* WeaponHit = Hit.GetActor();
-		}
-		else 
-		{
-			bRiflePickUp = false;
-		}
-		if (GetWorld()->LineTraceSingleByChannel(Hit, start_trace, end_trace, COLLISION_HOLO, TraceParams) && (HoldingWeaponState == EHoldingWeapon::A4 && isHoloAttached == false))
-		{
-			DrawDebugLine(GetWorld(), start_trace, end_trace, FColor::Green, false, 1.0f, 0, 1.0f);
-			bHoloPickUp = true;
-		}
-		else
-		{
-			bHoloPickUp = false;
-		}
-		if (GetWorld()->LineTraceSingleByChannel(Hit, start_trace, end_trace, COLLISION_GRIP, TraceParams) && (HoldingWeaponState == EHoldingWeapon::A4 && isGripAttached == false))
-		{
-			DrawDebugLine(GetWorld(), start_trace, end_trace, FColor::Blue, false, 1.0f, 0, 1.0f);
-			bGripPickUp = true;
-		}
-		else
-		{
-			bGripPickUp = false;
-		}
-		if (GetWorld()->LineTraceSingleByChannel(Hit, start_trace, end_trace, COLLISION_HELMET, TraceParams) && isHelmetAttached == false)
-		{
-			DrawDebugLine(GetWorld(), start_trace, end_trace, FColor::Blue, false, 1.0f, 0, 1.0f);
-			bHelmetPickUp = true;
-		}
-		else
-		{
-			bHelmetPickUp = false;
-		}
-		if (GetWorld()->LineTraceSingleByChannel(Hit, start_trace, end_trace, COLLISION_HEADSET, TraceParams) && isHeadsetAttached == false)
-		{
-			DrawDebugLine(GetWorld(), start_trace, end_trace, FColor::Black, false, 1.0f, 0, 1.0f);
-			bHeadsetPickUp = true;
-		}
-		else
-		{
-			bHeadsetPickUp = false;
-		}
-		if (GetWorld()->LineTraceSingleByChannel(Hit, start_trace, end_trace, COLLISION_LASER, TraceParams) && isLaserAttached == false && HoldingWeaponState == EHoldingWeapon::A4)
-		{
-			DrawDebugLine(GetWorld(), start_trace, end_trace, FColor::Orange, false, 1.0f, 0, 1.0f);
-			bLaserPickUp = true;
-		}
-		else
-		{
-			bLaserPickUp = false;
-		}
+		
 	
 }
 
@@ -464,12 +475,13 @@ bool ASoldierCharacter::ServerPickUpItem_Validate()
 }
 void ASoldierCharacter::PickUp()
 {
-	if (Role < ROLE_Authority)
-	{
-		ServerPickUpItem();
-		//return;
-	}
-		if (bRiflePickUp == true)
+
+		if (Role < ROLE_Authority)
+		{
+			ServerPickUpItem();
+			//return;
+		}
+		if (bRiflePickUp == true && HoldingWeaponState==EHoldingWeapon::None)
 		{
 
 			HoldingWeaponState = EHoldingWeapon::A4;
@@ -484,6 +496,7 @@ void ASoldierCharacter::PickUp()
 				AutomaticRifle->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocket);
 			}
 			UGameplayStatics::PlaySoundAtLocation(this, RiflePickUp, GetActorLocation());
+			bRiflePickedUp = true;
 		}
 
 		if (bHoloPickUp == true && HoldingWeaponState == EHoldingWeapon::A4)
@@ -563,7 +576,9 @@ void ASoldierCharacter::PickUp()
 			}
 			UGameplayStatics::PlaySoundAtLocation(this, ItemsPickUp, GetActorLocation());
 		}
+	
 }
+	
 void ASoldierCharacter::ShowingPickUpHud()
 {
 	if (Role < ROLE_Authority)
@@ -808,6 +823,14 @@ void ASoldierCharacter::OnHealthChanged(UHealthComponent * OwningHealthComp, flo
 	}
 }
 
+void ASoldierCharacter::ServerLineTraceItem_Implementation()
+{
+	LineTraceItem();
+}
+bool ASoldierCharacter::ServerLineTraceItem_Validate()
+{
+	return true;
+}
 void ASoldierCharacter::ServerResetTimerVault_Implementation()
 {
 	ResetVaultTimer();
@@ -917,6 +940,6 @@ void ASoldierCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	DOREPLIFETIME(ASoldierCharacter, wHealthIndicatorvar);
 	DOREPLIFETIME(ASoldierCharacter, wAmmoCount);
 	DOREPLIFETIME(ASoldierCharacter, wAmmoCountvar);
-
-
+	DOREPLIFETIME(ASoldierCharacter, bRiflePickUp);
+	
 }

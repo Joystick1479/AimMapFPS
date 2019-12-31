@@ -38,6 +38,14 @@ namespace EWeaponState
 		Equipping,
 	};
 }
+namespace EWeaponPickupState
+{
+	enum Type
+	{
+		None,
+		PickedUp,
+	};
+}
 namespace EReloadingState
 {
 	enum Type
@@ -112,6 +120,9 @@ public:
 	void StopReload();
 	void ReloadWeapon();
 
+	void NotifyActorBeginOverlap(AActor* OtherActor);
+	void NotifyActorEndOverlap(AActor* OtherActor);
+
 	FName MuzzleSocket;
 	FName CameraSocket;
 	FName ScopeSocket;
@@ -145,7 +156,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Player")
 	TSubclassOf<UCameraShake> CameShakeZoomClass;
 
-	UPROPERTY(VisibleAnywhere, Category = "Components")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
 	USphereComponent* SphereComp;
 
 
@@ -169,6 +180,7 @@ protected:
 
 	EWeaponState::Type CurrentState;
 	EReloadingState::Type ReloadingState;
+	EWeaponPickupState::Type PickupState;
 
 
 	/** weapon data */
