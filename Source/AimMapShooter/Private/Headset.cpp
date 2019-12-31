@@ -2,6 +2,7 @@
 
 #include "Components/StaticMeshComponent.h"
 #include "Components/SphereComponent.h"
+#include "SoldierCharacter.h"
 #include "Headset.h"
 
 // Sets default values
@@ -24,6 +25,30 @@ void AHeadset::BeginPlay()
 {
 	Super::BeginPlay();
 	
+}
+
+void AHeadset::NotifyActorBeginOverlap(AActor * OtherActor)
+{
+	Super::NotifyActorBeginOverlap(OtherActor);
+
+	ASoldierCharacter* SoldierCharacter = Cast<ASoldierCharacter>(OtherActor);
+	if (SoldierCharacter)
+	{
+		SoldierCharacter->bHeadsetPickUp = true;
+		SphereComp->ToggleActive();
+	}
+}
+
+void AHeadset::NotifyActorEndOverlap(AActor * OtherActor)
+{
+	Super::NotifyActorEndOverlap(OtherActor);
+
+	ASoldierCharacter* SoldierCharacter = Cast<ASoldierCharacter>(OtherActor);
+	if (SoldierCharacter)
+	{
+		SoldierCharacter->bHeadsetPickUp = false;
+
+	}
 }
 
 // Called every frame

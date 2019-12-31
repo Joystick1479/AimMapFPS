@@ -28,6 +28,8 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	USphereComponent* SphereComp;
 
+	void NotifyActorBeginOverlap(AActor* OtherActor);
+	void NotifyActorEndOverlap(AActor* OtherActor);
 
 public:	
 	// Called every frame

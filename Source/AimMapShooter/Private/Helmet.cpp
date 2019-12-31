@@ -2,6 +2,7 @@
 
 #include "Components/StaticMeshComponent.h"
 #include "Components/SphereComponent.h"
+#include "SoldierCharacter.h"
 #include "Helmet.h"
 
 // Sets default values
@@ -25,6 +26,30 @@ void AHelmet::BeginPlay()
 {
 	Super::BeginPlay();
 	
+}
+
+void AHelmet::NotifyActorBeginOverlap(AActor * OtherActor)
+{
+	Super::NotifyActorBeginOverlap(OtherActor);
+
+	ASoldierCharacter* SoldierCharacter = Cast<ASoldierCharacter>(OtherActor);
+	if (SoldierCharacter)
+	{
+		SoldierCharacter->bHelmetPickUp = true;
+		SphereComp->ToggleActive();
+	}
+}
+
+void AHelmet::NotifyActorEndOverlap(AActor * OtherActor)
+{
+	Super::NotifyActorEndOverlap(OtherActor);
+
+	ASoldierCharacter* SoldierCharacter = Cast<ASoldierCharacter>(OtherActor);
+	if (SoldierCharacter)
+	{
+		SoldierCharacter->bHelmetPickUp = false;
+
+	}
 }
 
 // Called every frame

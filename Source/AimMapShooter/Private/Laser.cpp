@@ -40,6 +40,30 @@ void ALaser::BeginPlay()
 	
 }
 
+void ALaser::NotifyActorBeginOverlap(AActor * OtherActor)
+{
+	Super::NotifyActorBeginOverlap(OtherActor);
+
+	ASoldierCharacter* SoldierCharacter = Cast<ASoldierCharacter>(OtherActor);
+	if (SoldierCharacter)
+	{
+		SoldierCharacter->bLaserPickUp = true;
+		SphereComp->ToggleActive();
+	}
+}
+
+void ALaser::NotifyActorEndOverlap(AActor * OtherActor)
+{
+	Super::NotifyActorEndOverlap(OtherActor);
+
+	ASoldierCharacter* SoldierCharacter = Cast<ASoldierCharacter>(OtherActor);
+	if (SoldierCharacter)
+	{
+		SoldierCharacter->bLaserPickUp = false;
+
+	}
+}
+
 // Called every frame
 void ALaser::Tick(float DeltaTime)
 {

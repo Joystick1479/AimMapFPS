@@ -42,6 +42,9 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	void NotifyActorBeginOverlap(AActor* OtherActor);
+	void NotifyActorEndOverlap(AActor* OtherActor);
+
 	UPROPERTY(EditDefaultsOnly, Category = "Laser")
 	float LengthOfLaser;
 

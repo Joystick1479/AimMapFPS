@@ -153,42 +153,42 @@ void ASoldierCharacter::LineTraceItem()
 		//	{
 		//		bHoloPickUp = false;
 		//	}
-			if (GetWorld()->LineTraceSingleByChannel(Hit, start_trace, end_trace, COLLISION_GRIP, TraceParams) && (HoldingWeaponState == EHoldingWeapon::A4 && isGripAttached == false))
-			{
-				DrawDebugLine(GetWorld(), start_trace, end_trace, FColor::Blue, false, 1.0f, 0, 1.0f);
-				bGripPickUp = true;
-			}
-			else
-			{
-				bGripPickUp = false;
-			}
-			if (GetWorld()->LineTraceSingleByChannel(Hit, start_trace, end_trace, COLLISION_HELMET, TraceParams) && isHelmetAttached == false)
-			{
-				DrawDebugLine(GetWorld(), start_trace, end_trace, FColor::Blue, false, 1.0f, 0, 1.0f);
-				bHelmetPickUp = true;
-			}
-			else
-			{
-				bHelmetPickUp = false;
-			}
-			if (GetWorld()->LineTraceSingleByChannel(Hit, start_trace, end_trace, COLLISION_HEADSET, TraceParams) && isHeadsetAttached == false)
-			{
-				DrawDebugLine(GetWorld(), start_trace, end_trace, FColor::Black, false, 1.0f, 0, 1.0f);
-				bHeadsetPickUp = true;
-			}
-			else
-			{
-				bHeadsetPickUp = false;
-			}
-			if (GetWorld()->LineTraceSingleByChannel(Hit, start_trace, end_trace, COLLISION_LASER, TraceParams) && isLaserAttached == false && HoldingWeaponState == EHoldingWeapon::A4)
-			{
-				DrawDebugLine(GetWorld(), start_trace, end_trace, FColor::Orange, false, 1.0f, 0, 1.0f);
-				bLaserPickUp = true;
-			}
-			else
-			{
-				bLaserPickUp = false;
-			}
+		//	if (GetWorld()->LineTraceSingleByChannel(Hit, start_trace, end_trace, COLLISION_GRIP, TraceParams) && (HoldingWeaponState == EHoldingWeapon::A4 && isGripAttached == false))
+		//	{
+		//		DrawDebugLine(GetWorld(), start_trace, end_trace, FColor::Blue, false, 1.0f, 0, 1.0f);
+		//		bGripPickUp = true;
+		//	}
+		//	else
+		//	{
+		//		bGripPickUp = false;
+		//	}
+		//	if (GetWorld()->LineTraceSingleByChannel(Hit, start_trace, end_trace, COLLISION_HELMET, TraceParams) && isHelmetAttached == false)
+		//	{
+		//		DrawDebugLine(GetWorld(), start_trace, end_trace, FColor::Blue, false, 1.0f, 0, 1.0f);
+		//		bHelmetPickUp = true;
+		//	}
+		//	else
+		//	{
+		//		bHelmetPickUp = false;
+		//	}
+		//	if (GetWorld()->LineTraceSingleByChannel(Hit, start_trace, end_trace, COLLISION_HEADSET, TraceParams) && isHeadsetAttached == false)
+		//	{
+		//		DrawDebugLine(GetWorld(), start_trace, end_trace, FColor::Black, false, 1.0f, 0, 1.0f);
+		//		bHeadsetPickUp = true;
+		//	}
+		//	else
+		//	{
+		//		bHeadsetPickUp = false;
+		//	}
+		//	if (GetWorld()->LineTraceSingleByChannel(Hit, start_trace, end_trace, COLLISION_LASER, TraceParams) && isLaserAttached == false && HoldingWeaponState == EHoldingWeapon::A4)
+		//	{
+		//		DrawDebugLine(GetWorld(), start_trace, end_trace, FColor::Orange, false, 1.0f, 0, 1.0f);
+		//		bLaserPickUp = true;
+		//	}
+		//	else
+		//	{
+		//		bLaserPickUp = false;
+		//	}
 		
 
 		
@@ -496,7 +496,6 @@ void ASoldierCharacter::PickUp()
 				AutomaticRifle->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocket);
 			}
 			UGameplayStatics::PlaySoundAtLocation(this, RiflePickUp, GetActorLocation());
-			bRiflePickedUp = true;
 		}
 
 		if (bHoloPickUp == true && HoldingWeaponState == EHoldingWeapon::A4 && HoloEquipState == EHoloAttachment::None)
@@ -517,9 +516,10 @@ void ASoldierCharacter::PickUp()
 			}
 			UGameplayStatics::PlaySoundAtLocation(this, ItemsPickUp, GetActorLocation());
 		}
-		if (bGripPickUp == true && HoldingWeaponState == EHoldingWeapon::A4)
+		if (bGripPickUp == true && HoldingWeaponState == EHoldingWeapon::A4 && GripEquipState == EGripAttachment::None)
 		{
 			HoldingAttachmentState = EHoldingAttachment::Grip;
+			GripEquipState = EGripAttachment::Equipped;
 
 			FActorSpawnParameters SpawnParams;
 			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
@@ -534,8 +534,10 @@ void ASoldierCharacter::PickUp()
 			}
 			UGameplayStatics::PlaySoundAtLocation(this, ItemsPickUp, GetActorLocation());
 		}
-		if (bHelmetPickUp == true)
+		if (bHelmetPickUp == true && HelmetEquipState==EHelmetAttachment::None)
 		{
+			HelmetEquipState = EHelmetAttachment::Equipped;
+
 			FActorSpawnParameters SpawnParams;
 			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
@@ -548,8 +550,10 @@ void ASoldierCharacter::PickUp()
 			}
 			UGameplayStatics::PlaySoundAtLocation(this, ItemsPickUp, GetActorLocation());
 		}
-		if (bHeadsetPickUp == true)
+		if (bHeadsetPickUp == true && HeadsetEquipState == EHeadsetAttachment::None)
 		{
+			HeadsetEquipState = EHeadsetAttachment::Equipped;
+
 			FActorSpawnParameters SpawnParams;
 			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
@@ -562,8 +566,10 @@ void ASoldierCharacter::PickUp()
 			}
 			UGameplayStatics::PlaySoundAtLocation(this, ItemsPickUp, GetActorLocation());
 		}
-		if (bLaserPickUp == true)
+		if (bLaserPickUp == true && LaserEquipState == ELaserAttachment::None)
 		{
+			LaserEquipState = ELaserAttachment::Equipped;
+
 			FActorSpawnParameters SpawnParams;
 			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
@@ -943,6 +949,11 @@ void ASoldierCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	DOREPLIFETIME(ASoldierCharacter, wAmmoCountvar);
 	DOREPLIFETIME(ASoldierCharacter, bRiflePickUp);
 	DOREPLIFETIME(ASoldierCharacter, bHoloPickUp);
+	DOREPLIFETIME(ASoldierCharacter, bGripPickUp);
+	DOREPLIFETIME(ASoldierCharacter, bHeadsetPickUp);
+	DOREPLIFETIME(ASoldierCharacter, bLaserPickUp);
+	DOREPLIFETIME(ASoldierCharacter, bHelmetPickUp);
+
 
 	
 }

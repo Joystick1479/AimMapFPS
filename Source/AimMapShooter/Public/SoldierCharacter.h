@@ -60,8 +60,39 @@ namespace EHoldingAttachment
 		Grip,
 	};
 }
-
 namespace EHoloAttachment
+{
+	enum Type
+	{
+		None,
+		Equipped,
+	};
+}
+namespace EGripAttachment
+{
+	enum Type
+	{
+		None,
+		Equipped,
+	};
+}
+namespace EHeadsetAttachment
+{
+	enum Type
+	{
+		None,
+		Equipped,
+	};
+}
+namespace ELaserAttachment
+{
+	enum Type
+	{
+		None,
+		Equipped,
+	};
+}
+namespace EHelmetAttachment
 {
 	enum Type
 	{
@@ -92,7 +123,15 @@ protected:
 	ELaserState::Type LaserState;
 
 	EHoloAttachment::Type HoloEquipState;
+
+	EGripAttachment::Type GripEquipState;
+
+	EHeadsetAttachment::Type HeadsetEquipState;
+
+	ELaserAttachment::Type LaserEquipState;
 	
+	EHelmetAttachment::Type HelmetEquipState;
+
 	UPROPERTY(Replicated)
 	AAutomaticRifle* AutomaticRifle;
 
@@ -308,19 +347,18 @@ public:
 	UPROPERTY(BlueprintReadOnly, Replicated, Category = "Player")
 	bool bHoloPickUp;
 
-	UPROPERTY(BlueprintReadOnly, Category = "Player")
+	UPROPERTY(BlueprintReadOnly, Replicated, Category = "Player")
 	bool bGripPickUp;
 
-	UPROPERTY(BlueprintReadOnly, Category = "Player")
+	UPROPERTY(BlueprintReadOnly, Replicated, Category = "Player")
 	bool bHelmetPickUp;
 
-	UPROPERTY(BlueprintReadOnly, Category = "Player")
+	UPROPERTY(BlueprintReadOnly, Replicated, Category = "Player")
 	bool bHeadsetPickUp;
 
-	UPROPERTY(BlueprintReadOnly, Category = "Player")
+	UPROPERTY(BlueprintReadOnly, Replicated, Category = "Player")
 	bool bLaserPickUp;
 
-	bool bRiflePickedUp;
 
 	UPROPERTY(EditDefaultsOnly, Replicated,Category = "Player")
 	TSubclassOf<UUserWidget> wPickUp;
