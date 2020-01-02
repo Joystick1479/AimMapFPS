@@ -42,6 +42,7 @@ ASoldierCharacter::ASoldierCharacter()
 	CameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComp"));
 	CameraComp->AttachToComponent(SpringArm, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 
+
 	CameraSprintComp = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraSprintComp"));
 	CameraSprintComp->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, HeadSocket);
 
@@ -49,8 +50,6 @@ ASoldierCharacter::ASoldierCharacter()
 	HealthComp = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComp"));
 
 	AudioComp = CreateDefaultSubobject<UAudioComponent>(TEXT("AudioComp"));
-
-
 
 
 	ZoomingTime = 0.2f;
