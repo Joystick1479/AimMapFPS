@@ -4,19 +4,23 @@
 
 #include "CoreMinimal.h"
 #include "Engine/GameInstance.h"
+#include "UI/MainMenuInterface.h"
 #include "AimMapGameInstance.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class AIMMAPSHOOTER_API UAimMapGameInstance : public UGameInstance
+class AIMMAPSHOOTER_API UAimMapGameInstance : public UGameInstance, public IMainMenuInterface
 {
 	GENERATED_BODY()
 
 	UAimMapGameInstance(const FObjectInitializer & ObjectInitializer);
 
 	virtual void Init();
+
+	UFUNCTION(BlueprintCallable)
+	void LoadMenu();
 
 	UFUNCTION(exec)
 	void Host();
@@ -26,5 +30,10 @@ class AIMMAPSHOOTER_API UAimMapGameInstance : public UGameInstance
 
 	UFUNCTION(exec)
 	void Reset();
+
+private:
+	TSubclassOf<class UUserWidget> MenuClass;
+
+	class UMyUserWidget* Menu;
 	
 };
