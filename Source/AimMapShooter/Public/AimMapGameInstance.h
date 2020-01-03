@@ -20,7 +20,7 @@ class AIMMAPSHOOTER_API UAimMapGameInstance : public UGameInstance, public IMain
 	virtual void Init();
 
 	UFUNCTION(BlueprintCallable)
-	void LoadMenu();
+	void LoadMenuWidget();
 
 	UFUNCTION(BlueprintCallable)
 	void InGameLoadMenu();
