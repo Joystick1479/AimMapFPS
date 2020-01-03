@@ -22,17 +22,24 @@ class AIMMAPSHOOTER_API UAimMapGameInstance : public UGameInstance, public IMain
 	UFUNCTION(BlueprintCallable)
 	void LoadMenu();
 
-	UFUNCTION(exec)
-	void Host();
+	UFUNCTION(BlueprintCallable)
+	void InGameLoadMenu();
 
 	UFUNCTION(exec)
-	void Join(const FString& Address);
+	void Host() override;
+
+	UFUNCTION(exec)
+	void Join(const FString& Address) override;
 
 	UFUNCTION(exec)
 	void Reset();
 
+	virtual void LoadMainMenu() override;
+
 private:
 	TSubclassOf<class UUserWidget> MenuClass;
+
+	TSubclassOf<class UUserWidget> InGameMenuClass;
 
 	class UMyUserWidget* Menu;
 	

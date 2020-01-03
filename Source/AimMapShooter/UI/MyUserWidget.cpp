@@ -24,6 +24,9 @@ bool UMyUserWidget::Initialize()
 	if (!ensure(ConfirmJoinButton != nullptr)) return false;
 	ConfirmJoinButton->OnClicked.AddDynamic(this, &UMyUserWidget::JoinServer);
 
+	if (!ensure(QuitButton != nullptr)) return false;
+	QuitButton->OnClicked.AddDynamic(this, &UMyUserWidget::QuitPressed);
+
 	return true;
 }
 
@@ -62,40 +65,17 @@ void UMyUserWidget::OpenMainMenu()
 	MenuSwitcher->SetActiveWidget(MainMenu);
 }
 
-void UMyUserWidget::SetMenuInterface(IMainMenuInterface* MenuInterface)
+void UMyUserWidget::QuitPressed()
 {
-	this->MenuInterface = MenuInterface;
-}
-
-void UMyUserWidget::Setup()
-{
-	this->AddToViewport();
-	
 	UWorld* World = GetWorld();
 	if (!ensure(World != nullptr)) return;
 
 	APlayerController* PC = World->GetFirstPlayerController();
 	if (!ensure(PC != nullptr)) return;
 
-	FInputModeUIOnly InputModeData;
-	InputModeData.SetWidgetToFocus(this->TakeWidget());
-	InputModeData.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
-	PC->SetInputMode(InputModeData);
-	PC->bShowMouseCursor = true;
-}
-
-void UMyUserWidget::TearDown()
-{
-	this->RemoveFromViewport();
-
-	UWorld* World = GetWorld();
-	if (!ensure(World != nullptr)) return;
-
-	APlayerController* PC = World->GetFirstPlayerController();
-	if (!ensure(PC != nullptr)) return;
-
-	FInputModeGameOnly InputModeData;
-	PC->SetInputMode(InputModeData);
-	PC->bShowMouseCursor = false;
+	PC->ConsoleCommand("quit");
 
 }
+
+
+

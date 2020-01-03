@@ -7,6 +7,7 @@
 #include "UObject//ConstructorHelpers.h"
 #include "Blueprint/UserWidget.h"
 #include "UI/MyUserWidget.h"
+#include "UI/MenuWidget.h"
 
 UAimMapGameInstance::UAimMapGameInstance(const FObjectInitializer & ObjectInitializer)
 {
@@ -14,6 +15,11 @@ UAimMapGameInstance::UAimMapGameInstance(const FObjectInitializer & ObjectInitia
 	if (!ensure(MenuBPClass.Class != nullptr)) return;
 
 	MenuClass = MenuBPClass.Class;
+
+	ConstructorHelpers::FClassFinder<UUserWidget> InGameMenuBPClass(TEXT("/Game/UI/MainMenu/WBP_InGameMenu"));
+	if (!ensure(InGameMenuBPClass.Class != nullptr)) return;
+
+	InGameMenuClass = InGameMenuBPClass.Class;
 }
 
 void UAimMapGameInstance::Init()
@@ -28,6 +34,17 @@ void UAimMapGameInstance::LoadMenu()
 	Menu = CreateWidget<UMyUserWidget>(this, MenuClass);
 	
 	Menu->Setup();
+	Menu->SetMenuInterface(this);
+
+}
+void UAimMapGameInstance::InGameLoadMenu()
+{
+	if (!ensure(InGameMenuClass != nullptr)) return;
+
+	UMenuWidget* Menu = CreateWidget<UMenuWidget>(this, InGameMenuClass);
+
+	Menu->Setup();
+
 	Menu->SetMenuInterface(this);
 
 }
@@ -72,4 +89,12 @@ void UAimMapGameInstance::Reset()
 	UWorld* World = GetWorld();
 	if (!ensure(World != nullptr)) return;
 	World->ServerTravel("/Game/FirstPersonBP/Maps/Map");
+}
+
+void UAimMapGameInstance::LoadMainMenu()
+{
+	APlayerController* PC = GetFirstLocalPlayerController();
+	if (!ensure(PC != nullptr)) return;
+
+	PC->ClientTravel("/Game/UI/MainMenu/MainMenu", ETravelType::TRAVEL_Absolute);
 }

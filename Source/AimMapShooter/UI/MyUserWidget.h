@@ -4,22 +4,16 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "MainMenuInterface.h"
+#include "MenuWidget.h"
 #include "MyUserWidget.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class AIMMAPSHOOTER_API UMyUserWidget : public UUserWidget
+class AIMMAPSHOOTER_API UMyUserWidget : public UMenuWidget
 {
 	GENERATED_BODY()
-public:
-
-	void SetMenuInterface(IMainMenuInterface* MenuInterface);
-
-	void Setup();
-	void TearDown();
 
 protected:
 	virtual bool Initialize();
@@ -31,6 +25,9 @@ private:
 
 	UPROPERTY(meta = (BindWidget))
 	class UButton* JoinButton;
+
+	UPROPERTY(meta = (BindWidget))
+	class UButton* QuitButton;
 
 	UPROPERTY(meta = (BindWidget))
 	class UButton* ConfirmJoinButton;
@@ -62,5 +59,7 @@ private:
 	UFUNCTION()
 	void OpenMainMenu();
 
-	IMainMenuInterface* MenuInterface;
+	UFUNCTION()
+	void QuitPressed();
+
 };
