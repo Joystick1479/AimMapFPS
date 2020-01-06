@@ -17,6 +17,9 @@ class AIMMAPSHOOTER_API UServerRow : public UUserWidget
 public:
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* ServerName;
+
+	UPROPERTY(BlueprintReadOnly)
+	bool Selected = false;
 	
 	void Setup(class UMyUserWidget* Parent, uint32 Index);
 private:

@@ -77,6 +77,19 @@ void UMyUserWidget::SetServerList(TArray<FString> ServerNames)
 void UMyUserWidget::SelectIndex(uint32 Index)
 {
 	SelectedIndex = Index;
+	UpdateChildren();
+}
+
+void UMyUserWidget::UpdateChildren()
+{
+	for (int32 i = 0; i < ServerList->GetChildrenCount(); ++i)
+	{
+		auto Row = Cast<UServerRow>(ServerList->GetChildAt(i));
+		if (Row != nullptr)
+		{
+			Row->Selected = (SelectedIndex.IsSet() && SelectedIndex.GetValue() == i);
+		}
+	}
 }
 
 void UMyUserWidget::JoinServer()
@@ -124,6 +137,8 @@ void UMyUserWidget::QuitPressed()
 	PC->ConsoleCommand("quit");
 
 }
+
+
 
 
 
