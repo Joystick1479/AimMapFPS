@@ -8,6 +8,7 @@
 #include "Components/EditableTextBox.h"
 #include "UObject/ConstructorHelpers.h"
 #include "ServerRow.h"
+#include "Components/TextBlock.h"
 
 UMyUserWidget::UMyUserWidget(const FObjectInitializer & ObjectInitializer)
 {
@@ -16,6 +17,8 @@ UMyUserWidget::UMyUserWidget(const FObjectInitializer & ObjectInitializer)
 
 	ServerRowClass = ServerRowBPClass.Class;
 }
+
+
 
 bool UMyUserWidget::Initialize()
 {
@@ -49,20 +52,44 @@ void UMyUserWidget::HostServer()
 	}
 }
 
-void UMyUserWidget::JoinServer()
+void UMyUserWidget::SetServerList(TArray<FString> ServerNames)
 {
-	if (MenuInterface != nullptr)
-	{
-		//if (!ensure(IPAddressfield != nullptr)) return ;
-		//const FString& Address = IPAddressfield->GetText().ToTtring();
-		//Menuinterface->Join(Address);
-		UWorld* World = this->GetWorld();
-		if (!ensure(World != nullptr)) return;
+	UWorld* World = this->GetWorld();
+	if (!ensure(World != nullptr)) return;
 
+	ServerList->ClearChildren();
+
+	uint32 i = 0;
+	for (const FString& ServerName : ServerNames)
+	{
 		UServerRow* Row = CreateWidget<UServerRow>(World, ServerRowClass);
 		if (!ensure(Row != nullptr)) return;
 
+		Row->ServerName->SetText(FText::FromString(ServerName));
+		Row->Setup(this, i);
+		++i;
+
 		ServerList->AddChild(Row);
+	}
+	
+}
+
+void UMyUserWidget::SelectIndex(uint32 Index)
+{
+	SelectedIndex = Index;
+}
+
+void UMyUserWidget::JoinServer()
+{
+	if (SelectedIndex.IsSet() && MenuInterface != nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Selected index %d"), SelectedIndex.GetValue());
+		MenuInterface->Join(SelectedIndex.GetValue());
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Selected index not set"));
+
 	}
 }
 
@@ -72,6 +99,10 @@ void UMyUserWidget::OpenJoinMenu()
 	if (!ensure(JoinMenu != nullptr)) return;
 
 	MenuSwitcher->SetActiveWidget(JoinMenu);
+	if (MenuInterface != nullptr)
+	{
+		MenuInterface->RefreshServerList();
+	}
 }
 
 void UMyUserWidget::OpenMainMenu()

@@ -10,7 +10,6 @@
 #include "UI/MenuWidget.h"
 #include "OnlineSubsystem.h"
 #include "OnlineSessionSettings.h"
-#include "OnlineSessionInterface.h"
 
 const static FName  SESSION_NAME = TEXT("My session game");
 
@@ -42,14 +41,8 @@ void UAimMapGameInstance::Init()
 			SessionInterface->OnCreateSessionCompleteDelegates.AddUObject(this, &UAimMapGameInstance::OnCreateSessionComplete);
 			SessionInterface->OnDestroySessionCompleteDelegates.AddUObject(this, &UAimMapGameInstance::OnDestroySessionComplete);
 			SessionInterface->OnFindSessionsCompleteDelegates.AddUObject(this, &UAimMapGameInstance::OnFindSessionsComplete);
+			SessionInterface->OnJoinSessionCompleteDelegates.AddUObject(this, &UAimMapGameInstance::OnJoinSessionComplete);
 
-			SessionSearch = MakeShareable(new FOnlineSessionSearch());
-			if (SessionSearch.IsValid())
-			{
-				SessionSearch->bIsLanQuery = true;
-				UE_LOG(LogTemp, Warning, TEXT("Starting find session"));
-				SessionInterface->FindSessions(0, SessionSearch.ToSharedRef());
-			}
 		}
 	}
 	else
@@ -94,13 +87,41 @@ void UAimMapGameInstance::Host()
 		}
 	}
 }
-void UAimMapGameInstance::Join(const FString& Address)
+void UAimMapGameInstance::Join(uint32 Index)
 {
+	if (!SessionInterface.IsValid()) return;
+
+	if (!SessionSearch.IsValid()) return;
+
 	if (Menu != nullptr)
 	{
 		Menu->TearDown();
 	}
 
+	SessionInterface->JoinSession(0, SESSION_NAME, SessionSearch->SearchResults[Index]);
+
+	//UEngine* Engine = GetEngine();
+	//if (!ensure(Engine != nullptr)) return;
+
+	//Engine->AddOnScreenDebugMessage(0, 2, FColor::Green, FString::Printf(TEXT("Joining %s"), *Address));
+
+	//APlayerController* PC = GetFirstLocalPlayerController();
+	//if (!ensure(PC != nullptr)) return;
+
+	//PC->ClientTravel(Address, ETravelType::TRAVEL_Absolute);
+
+}
+
+void UAimMapGameInstance::OnJoinSessionComplete(FName SessionName, EOnJoinSessionCompleteResult::Type Result)
+{
+	if (!SessionInterface.IsValid()) return;
+
+	FString Address;
+	if (!SessionInterface->GetResolvedConnectString(SessionName, Address))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Could not connect string."));
+		return;
+	}
 	UEngine* Engine = GetEngine();
 	if (!ensure(Engine != nullptr)) return;
 
@@ -110,7 +131,6 @@ void UAimMapGameInstance::Join(const FString& Address)
 	if (!ensure(PC != nullptr)) return;
 
 	PC->ClientTravel(Address, ETravelType::TRAVEL_Absolute);
-
 }
 
 void UAimMapGameInstance::Reset()
@@ -159,17 +179,35 @@ void UAimMapGameInstance::OnDestroySessionComplete(FName SessionName, bool Succe
 	}
 }
 
+void UAimMapGameInstance::RefreshServerList()
+{
+	SessionSearch = MakeShareable(new FOnlineSessionSearch());
+	if (SessionSearch.IsValid())
+	{
+		SessionSearch->bIsLanQuery = true;
+		UE_LOG(LogTemp, Warning, TEXT("Starting find session"));
+		SessionInterface->FindSessions(0, SessionSearch.ToSharedRef());
+	}
+}
+
 void UAimMapGameInstance::OnFindSessionsComplete(bool Success)
 {
-	if (Success && SessionSearch.IsValid())
+	if (Success && SessionSearch.IsValid() && Menu!=nullptr)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Finished find session"));
+
+		TArray<FString> ServerNames;
 		for (const FOnlineSessionSearchResult& SearchResult : SessionSearch->SearchResults)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Found session named : %s"), *SearchResult.GetSessionIdStr());
+			ServerNames.Add(SearchResult.GetSessionIdStr());
 		}
+
+		Menu->SetServerList(ServerNames);
 	}
 }
+
+
 
 void UAimMapGameInstance::CreateSession()
 {

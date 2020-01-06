@@ -6,6 +6,7 @@
 #include "Engine/GameInstance.h"
 #include "UI/MainMenuInterface.h"
 #include "OnlineSubsystem.h"
+#include "OnlineSessionInterface.h"
 #include "AimMapGameInstance.generated.h"
 
 /**
@@ -30,12 +31,14 @@ class AIMMAPSHOOTER_API UAimMapGameInstance : public UGameInstance, public IMain
 	void Host() override;
 
 	UFUNCTION(exec)
-	void Join(const FString& Address) override;
+	void Join(uint32 Index) override;
 
 	UFUNCTION(exec)
 	void Reset();
 
 	virtual void LoadMainMenu() override;
+
+	void RefreshServerList() override;
 
 private:
 	TSubclassOf<class UUserWidget> MenuClass;
@@ -50,6 +53,7 @@ private:
 	void OnCreateSessionComplete(FName SessionName, bool Success);
 	void OnDestroySessionComplete(FName SessionName, bool Success);
 	void OnFindSessionsComplete(bool Success);
+	void OnJoinSessionComplete(FName SessionName, EOnJoinSessionCompleteResult::Type Result);
 
 
 	void CreateSession();
