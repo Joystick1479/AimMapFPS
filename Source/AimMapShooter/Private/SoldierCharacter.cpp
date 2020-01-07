@@ -94,30 +94,9 @@ void ASoldierCharacter::BeginPlay()
 	
 	HealthComp->OnHealthChanged.AddDynamic(this, &ASoldierCharacter::OnHealthChanged);
 
-	///***Creating hud displaying***////
-	if (IsLocallyControlled())
-	{
-		APlayerController* PC = Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
-		if (PC)
-		{
-			if (wAmmoCount)
-			{
-				wAmmoCountvar = CreateWidget<UUserWidget>(PC, wAmmoCount);
-				if (wAmmoCountvar)
-				{
-					wAmmoCountvar->AddToViewport();
-				}
-			}
-			if (wHealthIndicator)
-			{
-				wHealthIndicatorvar = CreateWidget<UUserWidget>(PC, wHealthIndicator);
-				if (wHealthIndicatorvar)
-				{
-					wHealthIndicatorvar->AddToViewport();
-				}
-			}
-		}
-	}
+	///* Creating hud *//
+	StartingHud();
+
 	SpringArm->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, HeadSocket);
 	CameraComp->AttachToComponent(SpringArm, FAttachmentTransformRules::KeepRelativeTransform);
 	CameraComp->AttachToComponent(SpringArm, FAttachmentTransformRules::KeepRelativeTransform);
@@ -238,11 +217,27 @@ void ASoldierCharacter::OnDeath()
 	this->Destroy();
 	UE_LOG(LogTemp, Warning, TEXT("DEAD"));
 
-	APlayerController* PC = Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
-	if (PC)
+	if (IsLocallyControlled())
 	{
-		this->EnableInput(PC);
+		APlayerController* PC = Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
+		if (PC)
+		{
+			this->EnableInput(PC);
+
+			if (wAmmoCountvar)
+			{
+				wAmmoCountvar = CreateWidget<UUserWidget>(PC, wAmmoCount);
+				wAmmoCountvar->RemoveFromParent();
+			}
+			if (wHealthIndicatorvar)
+			{
+				wHealthIndicatorvar = CreateWidget<UUserWidget>(PC, wHealthIndicator);
+				wHealthIndicatorvar->RemoveFromParent();
+			}
+		}
 	}
+	
+	
 }
 // Called to bind functionality to input
 void ASoldierCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -595,6 +590,39 @@ void ASoldierCharacter::PickUp()
 		}
 	
 }
+
+void ASoldierCharacter::StartingHud()
+{
+	//if (Role < ROLE_Authority)
+	//{
+	//	ServerStartingHud();
+	//	//return;
+	//}
+	if (IsLocallyControlled())
+	{
+		APlayerController* PC = Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
+		
+		if (PC)
+		{
+			if (wAmmoCount)
+			{
+				wAmmoCountvar = CreateWidget<UUserWidget>(PC, wAmmoCount);
+				if (wAmmoCountvar)
+				{
+					wAmmoCountvar->AddToViewport();
+				}
+			}
+			if (wHealthIndicator)
+			{
+				wHealthIndicatorvar = CreateWidget<UUserWidget>(PC, wHealthIndicator);
+				if (wHealthIndicatorvar)
+				{
+					wHealthIndicatorvar->AddToViewport();
+				}
+			}
+		}
+	}
+}
 	
 void ASoldierCharacter::ShowingPickUpHud()
 {
@@ -925,6 +953,14 @@ void ASoldierCharacter::ServerShowingPickUpHud_Implementation()
 	ShowingPickUpHud();
 }
 bool ASoldierCharacter::ServerShowingPickUpHud_Validate()
+{
+	return true;
+}
+void ASoldierCharacter::ServerStartingHud_Implementation()
+{
+	StartingHud();
+}
+bool ASoldierCharacter::ServerStartingHud_Validate()
 {
 	return true;
 }

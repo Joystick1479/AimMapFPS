@@ -15,15 +15,7 @@ void AAimMapGameModeBase::PostLogin(APlayerController * NewPlayer)
 
 	if (NumberOfPlayers > 1)
 	{
-		GetWorldTimerManager().SetTimer(GameStartTimer, this, &AAimMapGameModeBase::StartGame, 5);
-	}
-
-	UWorld* World = GetWorld();
-	ASoldierCharacter* SoldierChar = Cast<ASoldierCharacter>(World->GetFirstPlayerController());
-	if (SoldierChar && SoldierChar->bDied ==true)
-	{
-		ResetLevel();
-		//GetWorldTimerManager().SetTimer(GameStartTimer, this, &AAimMapGameModeBase::RestartGame, 5);
+		GetWorldTimerManager().SetTimer(GameStartTimer, this, &AAimMapGameModeBase::StartGame, 3);
 	}
 }
 
@@ -52,7 +44,7 @@ void AAimMapGameModeBase::RestartGame()
 	if (!ensure(World != nullptr)) return;
 
 	bUseSeamlessTravel = true;
-	World->ServerTravel("/Game/FirstPersonBP/Maps/Lobby?listen");
+	World->ServerTravel("/Game/FirstPersonBP/Maps/Map?listen");
 }
 
 void AAimMapGameModeBase::Tick(float DeltaTime)

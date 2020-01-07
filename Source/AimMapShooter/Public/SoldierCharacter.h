@@ -182,9 +182,14 @@ protected:
 
 	/////*** DISPLAYING HUD ****////
 	void ShowingPickUpHud();
+	void StartingHud();
+
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerLineTraceItem();
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerStartingHud();
 
 	void LineTraceItem();
 
