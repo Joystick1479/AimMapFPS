@@ -26,7 +26,13 @@ bool UMyUserWidget::Initialize()
 	if (!Success) return false;
 
 	if (!ensure(HostButton != nullptr)) return false;
-	HostButton->OnClicked.AddDynamic(this, &UMyUserWidget::HostServer);
+	HostButton->OnClicked.AddDynamic(this, &UMyUserWidget::OpenHostMenu);
+
+	if (!ensure(CancelHostMenuButton != nullptr)) return false;
+	CancelHostMenuButton->OnClicked.AddDynamic(this, &UMyUserWidget::OpenMainMenu);
+
+	if (!ensure(ConfirmHostMenuButton != nullptr)) return false;
+	ConfirmHostMenuButton->OnClicked.AddDynamic(this, &UMyUserWidget::HostServer);
 
 	if (!ensure(JoinButton!= nullptr)) return false;
 	JoinButton->OnClicked.AddDynamic(this, &UMyUserWidget::OpenJoinMenu);
@@ -48,11 +54,12 @@ void UMyUserWidget::HostServer()
 	UE_LOG(LogTemp, Warning, TEXT("Hosting")); 
 	if (MenuInterface != nullptr)
 	{
-		MenuInterface->Host();
+		FString ServerName = ServerHostName->Text.ToString();
+		MenuInterface->Host(ServerName);
 	}
 }
 
-void UMyUserWidget::SetServerList(TArray<FString> ServerNames)
+void UMyUserWidget::SetServerList(TArray<FServerData> ServerNames)
 {
 	UWorld* World = this->GetWorld();
 	if (!ensure(World != nullptr)) return;
@@ -60,12 +67,17 @@ void UMyUserWidget::SetServerList(TArray<FString> ServerNames)
 	ServerList->ClearChildren();
 
 	uint32 i = 0;
-	for (const FString& ServerName : ServerNames)
+	for (const FServerData& ServerData : ServerNames)
 	{
 		UServerRow* Row = CreateWidget<UServerRow>(World, ServerRowClass);
 		if (!ensure(Row != nullptr)) return;
 
-		Row->ServerName->SetText(FText::FromString(ServerName));
+		Row->ServerName->SetText(FText::FromString(ServerData.Name));
+		Row->HostUser->SetText(FText::FromString(ServerData.HostUsername));
+		FString FractionText = FString::Printf(TEXT("%d/%d"), ServerData.CurrentPlayers, ServerData.MaxPlayers);
+		Row->ConnectionFraction->SetText(FText::FromString(FractionText));
+
+
 		Row->Setup(this, i);
 		++i;
 
@@ -104,6 +116,11 @@ void UMyUserWidget::JoinServer()
 		UE_LOG(LogTemp, Warning, TEXT("Selected index not set"));
 
 	}
+}
+
+void UMyUserWidget::OpenHostMenu()
+{
+	MenuSwitcher->SetActiveWidget(HostMenu);
 }
 
 void UMyUserWidget::OpenJoinMenu()

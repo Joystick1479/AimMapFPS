@@ -298,6 +298,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "Sounds")
 	UAudioComponent* AudioComp;
 	
+	class UStaticMeshComponent* MeshComp;
 
 public:	
 	/// Variable for sprinting ///

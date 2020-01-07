@@ -4,6 +4,7 @@
 #include "AutomaticRifle.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Components/StaticMeshComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
@@ -22,6 +23,7 @@
 #include "Blueprint/WidgetBlueprintLibrary.h" 
 #include "Sound/SoundCue.h" 
 #include "Components/AudioComponent.h"
+#include "Engine/EngineTypes.h"
 
 
 // Sets default values
@@ -36,15 +38,19 @@ ASoldierCharacter::ASoldierCharacter()
 	HelmetSocket = "HelmetSocket";
 	HeadsetSocket = "HeadsetSocket";
 
+	RootComponent = this->GetRootComponent();
+
 	SpringArm = CreateDefaultSubobject <USpringArmComponent>(TEXT("SpringArm"));
-	SpringArm->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, HeadSocket);
+	//SpringArm->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, HeadSocket);
+	SpringArm->SetupAttachment(GetMesh(), HeadSocket);
 
 	CameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComp"));
-	CameraComp->AttachToComponent(SpringArm, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-
+//	CameraComp->AttachToComponent(SpringArm, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+	CameraComp->SetupAttachment(SpringArm);
+	/*CameraComp->SetupAttachment(SpringArm);*/
 
 	CameraSprintComp = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraSprintComp"));
-	CameraSprintComp->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, HeadSocket);
+//	CameraSprintComp->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, HeadSocket);
 
 
 	HealthComp = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComp"));
@@ -111,6 +117,10 @@ void ASoldierCharacter::BeginPlay()
 			}
 		}
 	}
+	SpringArm->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, HeadSocket);
+	CameraComp->AttachToComponent(SpringArm, FAttachmentTransformRules::KeepRelativeTransform);
+	CameraComp->AttachToComponent(SpringArm, FAttachmentTransformRules::KeepRelativeTransform);
+	CameraSprintComp->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, HeadSocket);
 }
 
 void ASoldierCharacter::LineTraceItem()

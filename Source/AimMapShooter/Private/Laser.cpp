@@ -1,11 +1,11 @@
 // Fill out your copyright notice in the Description page of Project Settings.
+#include "Laser.h"
 
 #include "Components/StaticMeshComponent.h"
 #include "Components/SphereComponent.h"
 #include "SoldierCharacter.h"
 #include "AutomaticRifle.h"
 #include "DrawDebugHelpers.h"
-#include "Laser.h"
 
 // Sets default values
 ALaser::ALaser()

@@ -28,7 +28,7 @@ class AIMMAPSHOOTER_API UAimMapGameInstance : public UGameInstance, public IMain
 	void InGameLoadMenu();
 
 	UFUNCTION(exec)
-	void Host() override;
+	void Host(FString ServerName) override;
 
 	UFUNCTION(exec)
 	void Join(uint32 Index) override;
@@ -55,6 +55,7 @@ private:
 	void OnFindSessionsComplete(bool Success);
 	void OnJoinSessionComplete(FName SessionName, EOnJoinSessionCompleteResult::Type Result);
 
+	FString DesiredServerName;
 
 	void CreateSession();
 
