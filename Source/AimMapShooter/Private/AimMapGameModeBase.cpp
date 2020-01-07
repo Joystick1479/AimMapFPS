@@ -45,7 +45,8 @@ void AAimMapGameModeBase::StartGame()
 
 void AAimMapGameModeBase::RestartGame()
 {
-	//ResetLevel();
+
+	ResetLevel();
 
 	UWorld* World = GetWorld();
 	if (!ensure(World != nullptr)) return;

@@ -24,6 +24,7 @@
 #include "Sound/SoundCue.h" 
 #include "Components/AudioComponent.h"
 #include "Engine/EngineTypes.h"
+#include "GameFramework/Controller.h"
 
 
 // Sets default values
@@ -96,7 +97,7 @@ void ASoldierCharacter::BeginPlay()
 	///***Creating hud displaying***////
 	if (IsLocallyControlled())
 	{
-		APlayerController* PC = GetWorld()->GetFirstPlayerController();
+		APlayerController* PC = Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
 		if (PC)
 		{
 			if (wAmmoCount)
