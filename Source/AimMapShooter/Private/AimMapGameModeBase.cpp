@@ -3,6 +3,10 @@
 
 #include "AimMapGameModeBase.h"
 
+#include "TimerManager.h"
+
+#include "SoldierCharacter.h"
+
 void AAimMapGameModeBase::PostLogin(APlayerController * NewPlayer)
 {
 	Super::PostLogin(NewPlayer);
@@ -11,11 +15,15 @@ void AAimMapGameModeBase::PostLogin(APlayerController * NewPlayer)
 
 	if (NumberOfPlayers > 1)
 	{
-		UWorld* World = GetWorld();
-		if (!ensure(World != nullptr)) return;
+		GetWorldTimerManager().SetTimer(GameStartTimer, this, &AAimMapGameModeBase::StartGame, 5);
+	}
 
-		bUseSeamlessTravel = true;
-		World->ServerTravel("/Game/FirstPersonBP/Maps/Map?listen");
+	UWorld* World = GetWorld();
+	ASoldierCharacter* SoldierChar = Cast<ASoldierCharacter>(World->GetFirstPlayerController());
+	if (SoldierChar && SoldierChar->bDied ==true)
+	{
+		ResetLevel();
+		//GetWorldTimerManager().SetTimer(GameStartTimer, this, &AAimMapGameModeBase::RestartGame, 5);
 	}
 }
 
@@ -25,3 +33,30 @@ void AAimMapGameModeBase::Logout(AController * Exiting)
 
 	--NumberOfPlayers;
 }
+
+void AAimMapGameModeBase::StartGame()
+{
+	UWorld* World = GetWorld();
+	if (!ensure(World != nullptr)) return;
+
+	bUseSeamlessTravel = true;
+	World->ServerTravel("/Game/FirstPersonBP/Maps/Map?listen");
+}
+
+void AAimMapGameModeBase::RestartGame()
+{
+	//ResetLevel();
+
+	UWorld* World = GetWorld();
+	if (!ensure(World != nullptr)) return;
+
+	bUseSeamlessTravel = true;
+	World->ServerTravel("/Game/FirstPersonBP/Maps/Lobby?listen");
+}
+
+void AAimMapGameModeBase::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+}
+

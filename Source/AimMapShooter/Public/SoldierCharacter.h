@@ -273,8 +273,7 @@ protected:
 	float MaxUseDistance;
 
 
-	UPROPERTY(Replicated,BlueprintReadOnly, Category = "Player")
-	bool bDied;
+
 
 	UFUNCTION()
 	void OnHealthChanged(UHealthComponent* OwningHealthComp, float Health, float HealthDelta, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
@@ -304,6 +303,8 @@ public:
 	/// Variable for sprinting ///
 	float MaxWalkSpeed;
 
+	UPROPERTY(Replicated, BlueprintReadOnly, Category = "Player")
+	bool bDied;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Camera")
 	UCameraComponent* CameraComp;

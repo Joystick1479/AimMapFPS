@@ -209,7 +209,7 @@ void ASoldierCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	LineTraceItem();
+//	LineTraceItem();
 	ShowingPickUpHud();
 
 	if (AutomaticRifle)
@@ -597,10 +597,10 @@ void ASoldierCharacter::PickUp()
 	
 void ASoldierCharacter::ShowingPickUpHud()
 {
-	if (Role < ROLE_Authority)
-	{
-		ServerShowingPickUpHud();
-	}
+	//if (Role < ROLE_Authority)
+	//{
+	//	ServerShowingPickUpHud();
+	//}
 	if (IsLocallyControlled())
 	{
 		APlayerController* PC = GetWorld()->GetFirstPlayerController();
@@ -949,9 +949,12 @@ void ASoldierCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	DOREPLIFETIME(ASoldierCharacter, TimerHandle_Vault);
 	DOREPLIFETIME(ASoldierCharacter, bDied);
 	DOREPLIFETIME(ASoldierCharacter, IsCrouching);
-	DOREPLIFETIME(ASoldierCharacter, bRemoveHud);
-	DOREPLIFETIME(ASoldierCharacter, wPickUpvar);
-	DOREPLIFETIME(ASoldierCharacter, wPickUp);
+
+	//NIEPOTRZEBNA REPLIKACJA HUDA //
+	/*DOREPLIFETIME(ASoldierCharacter, bRemoveHud);*/
+	//DOREPLIFETIME(ASoldierCharacter, wPickUpvar);
+	//DOREPLIFETIME(ASoldierCharacter, wPickUp);
+
 	DOREPLIFETIME(ASoldierCharacter, wHealthIndicator);
 	DOREPLIFETIME(ASoldierCharacter, wHealthIndicatorvar);
 	DOREPLIFETIME(ASoldierCharacter, wAmmoCount);
