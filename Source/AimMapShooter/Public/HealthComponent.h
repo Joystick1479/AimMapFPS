@@ -23,8 +23,6 @@ protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
-	UPROPERTY(ReplicatedUsing=OnRep_Health,EditAnywhere, BlueprintReadWrite, Category = "HealthComponent")
-	float Health;
 
 	UFUNCTION()
 	void OnRep_Health(float OldHealth);
@@ -39,6 +37,9 @@ protected:
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
+	UPROPERTY(ReplicatedUsing = OnRep_Health, EditAnywhere, BlueprintReadWrite, Category = "HealthComponent")
+	float Health;
 
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 	FOnHealthChangedSignature OnHealthChanged;

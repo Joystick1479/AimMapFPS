@@ -383,6 +383,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, Replicated, Category = "Player")
 	TSubclassOf<UUserWidget> wHealthIndicator;
 
+	UPROPERTY(EditDefaultsOnly, Category = "widget")
+	TSubclassOf<UUserWidget> WidgetClass;
+
 	UPROPERTY(Replicated)
 	UUserWidget* wHealthIndicatorvar;
 

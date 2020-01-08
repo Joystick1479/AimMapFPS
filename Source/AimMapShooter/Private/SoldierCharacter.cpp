@@ -98,6 +98,11 @@ void ASoldierCharacter::BeginPlay()
 	///* Creating hud *//
 	StartingHud();
 
+	if (HealthComp)
+	{
+		HealthComp->Health = 100;
+	}
+
 	SpringArm->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, HeadSocket);
 	CameraComp->AttachToComponent(SpringArm, FAttachmentTransformRules::KeepRelativeTransform);
 	CameraComp->AttachToComponent(SpringArm, FAttachmentTransformRules::KeepRelativeTransform);
@@ -210,13 +215,24 @@ void ASoldierCharacter::Tick(float DeltaTime)
 			}
 			FTimerHandle DeathTimer;
 			GetWorldTimerManager().SetTimer(DeathTimer, this, &ASoldierCharacter::OnDeath, 2.5f, false);
+
+			//**REMOVING HUD FROM VIEWPORT **//
+			TArray<UUserWidget*> HealthWidgets;
+			UWidgetBlueprintLibrary::GetAllWidgetsOfClass(this, HealthWidgets, WidgetClass, true);
+
+			if (HealthWidgets.Num() > 0)
+			{
+				UUserWidget* NewWidget = HealthWidgets[0];
+				NewWidget->RemoveFromParent();
+			}
 	}
 
 }
 void ASoldierCharacter::OnDeath()
 {
-	this->Destroy();
 	UE_LOG(LogTemp, Warning, TEXT("DEAD"));
+
+	this->Destroy();
 
 	if (IsLocallyControlled())
 	{
@@ -224,22 +240,11 @@ void ASoldierCharacter::OnDeath()
 		if (PC)
 		{
 			this->EnableInput(PC);
-
-			if (wAmmoCountvar)
-			{
-				wAmmoCountvar = CreateWidget<UUserWidget>(PC, wAmmoCount);
-				wAmmoCountvar->RemoveFromParent();
-			}
-			if (wHealthIndicatorvar)
-			{
-				wHealthIndicatorvar = CreateWidget<UUserWidget>(PC, wHealthIndicator);
-				wHealthIndicatorvar->RemoveFromParent();
-			}
+			
 		}
 	}
-	
-	
 }
+
 // Called to bind functionality to input
 void ASoldierCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
@@ -858,7 +863,7 @@ void ASoldierCharacter::OnHealthChanged(UHealthComponent * OwningHealthComp, flo
 		bDied = true;
 
 	}
-	if (Health == 40.0f && bDied == false)
+	if (Health <= 40.0f && bDied == false)
 	{
 		AudioComp->Play();
 	
