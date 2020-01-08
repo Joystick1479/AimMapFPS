@@ -57,6 +57,7 @@ ASoldierCharacter::ASoldierCharacter()
 	HealthComp = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComp"));
 
 	AudioComp = CreateDefaultSubobject<UAudioComponent>(TEXT("AudioComp"));
+	AudioComp->SetupAttachment(GetMesh());
 
 
 	ZoomingTime = 0.2f;
