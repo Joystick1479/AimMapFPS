@@ -195,9 +195,6 @@ void ASoldierCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-//	LineTraceItem();
-	ShowingPickUpHud();
-
 	if (AutomaticRifle)
 	{
 		SoldierCurrentAmmoInClip = AutomaticRifle->CurrentAmmoInClip;
@@ -205,28 +202,12 @@ void ASoldierCharacter::Tick(float DeltaTime)
 		SoldierCurrentClips = AutomaticRifle->CurrentAmountOfClips;
 	}
 
-	///***IF DEAD, DESTROY ACTOR AFTER 2 seconds ***///
-	if (bDied == true)
-	{
-			APlayerController* PC = Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
-			if (PC)
-			{
-				this->DisableInput(PC);
-			}
-			FTimerHandle DeathTimer;
-			GetWorldTimerManager().SetTimer(DeathTimer, this, &ASoldierCharacter::OnDeath, 2.5f, false);
+	///***SHOWING/HIDING PICKUP HUD UI////
+	ShowingPickUpHud();
 
-			//**REMOVING HUD FROM VIEWPORT **//
-			TArray<UUserWidget*> HealthWidgets;
-			UWidgetBlueprintLibrary::GetAllWidgetsOfClass(this, HealthWidgets, WidgetClass, true);
+	ClearingHudAfterDeath();
 
-			if (HealthWidgets.Num() > 0)
-			{
-				UUserWidget* NewWidget = HealthWidgets[0];
-				NewWidget->RemoveFromParent();
-			}
-	}
-
+	DyingAudioTrigger();
 }
 void ASoldierCharacter::OnDeath()
 {
@@ -240,7 +221,6 @@ void ASoldierCharacter::OnDeath()
 		if (PC)
 		{
 			this->EnableInput(PC);
-			
 		}
 	}
 }
@@ -629,6 +609,41 @@ void ASoldierCharacter::StartingHud()
 		}
 	}
 }
+
+void ASoldierCharacter::DyingAudioTrigger()
+{
+	///** PLAYING/STOPPING SOUND WHEN LOW HEALTH/DEAD**//
+
+	if (bDied == true)
+	{
+		AudioComp->Stop();
+	}
+}
+
+void ASoldierCharacter::ClearingHudAfterDeath()
+{
+	///***IF DEAD, DESTROY ACTOR AFTER 2 seconds ***///
+	if (bDied == true)
+	{
+		APlayerController* PC = Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
+		if (PC)
+		{
+			this->DisableInput(PC);
+		}
+		FTimerHandle DeathTimer;
+		GetWorldTimerManager().SetTimer(DeathTimer, this, &ASoldierCharacter::OnDeath, 2.5f, false);
+
+		//**REMOVING HUD FROM VIEWPORT **//
+		TArray<UUserWidget*> HealthWidgets;
+		UWidgetBlueprintLibrary::GetAllWidgetsOfClass(this, HealthWidgets, WidgetClass, true);
+
+		if (HealthWidgets.Num() > 0)
+		{
+			UUserWidget* NewWidget = HealthWidgets[0];
+			NewWidget->RemoveFromParent();
+		}
+	}
+}
 	
 void ASoldierCharacter::ShowingPickUpHud()
 {
@@ -653,6 +668,14 @@ void ASoldierCharacter::ShowingPickUpHud()
 					else
 					{
 						bRemoveHud = true;
+						TArray<UUserWidget*> PickupWidgets;
+						UWidgetBlueprintLibrary::GetAllWidgetsOfClass(this, PickupWidgets, PickUpTestWidgetClass, true);
+
+						if (PickupWidgets.Num() > 0)
+						{
+							UUserWidget* NewPickupWidget = PickupWidgets[0];
+							NewPickupWidget->RemoveFromParent();
+						}
 					}
 				}
 			}
@@ -861,16 +884,10 @@ void ASoldierCharacter::OnHealthChanged(UHealthComponent * OwningHealthComp, flo
 	if (Health <= 0.0f && !bDied)
 	{
 		bDied = true;
-
 	}
-	if (Health <= 40.0f && bDied == false)
+	if (HealthComp->Health <= 40.0f && bDied == false)
 	{
 		AudioComp->Play();
-	
-	}
-	if (bDied == true)
-	{
-		AudioComp->Stop();
 	}
 }
 

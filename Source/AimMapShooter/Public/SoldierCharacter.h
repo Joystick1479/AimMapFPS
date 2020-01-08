@@ -184,6 +184,10 @@ protected:
 	void ShowingPickUpHud();
 	void StartingHud();
 
+	///**STOP PLAY LOW HEALTH/DIE AUDIO **//
+	void DyingAudioTrigger();
+
+	void ClearingHudAfterDeath();
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerLineTraceItem();
@@ -388,6 +392,10 @@ public:
 
 	UPROPERTY(Replicated)
 	UUserWidget* wHealthIndicatorvar;
+
+	UPROPERTY(EditDefaultsOnly, Category = "widget")
+	TSubclassOf<UUserWidget> PickUpTestWidgetClass;
+
 
 	UPROPERTY(BlueprintReadOnly, Replicated,Category = "Player")
 	bool bRemoveHud;
