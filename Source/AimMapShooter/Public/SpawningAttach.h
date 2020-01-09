@@ -11,6 +11,7 @@ class AHeadset;
 class AGrip;
 class AHoloScope;
 class ALaser;
+class UParticleSystem;
 
 UCLASS()
 class AIMMAPSHOOTER_API ASpawningAttach : public AActor
@@ -56,6 +57,10 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Player")
 	TSubclassOf<AGrip> GripClass;
+
+private:
+	UPROPERTY(EditDefaultsOnly, Category = "ParticlesEffects")
+	UParticleSystem* ParticleSystem;
 
 public:	
 	// Called every frame

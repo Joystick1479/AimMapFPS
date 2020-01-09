@@ -66,7 +66,8 @@ ASoldierCharacter::ASoldierCharacter()
 	IsReloading = false;
 
 	CharacterState = ECharacterState::Idle;
-	HoldingWeaponState = EHoldingWeapon::None;
+	//HoldingWeaponState = EHoldingWeapon::None;
+	HoldingWeaponState = EHoldingWeapon::A4;
 	HoldingAttachmentState = EHoldingAttachment::None;
 	LaserState = ELaserState::Idle;
 	MaxUseDistance = 400;
@@ -90,8 +91,16 @@ void ASoldierCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	///**Getting weapon on begin play *//
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	AutomaticRifle = GetWorld()->SpawnActor<AAutomaticRifle>(StarterWeaponClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
+	if (AutomaticRifle)
+	{
+		AutomaticRifle->SetOwner(this);
+		AutomaticRifle->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocket);
+	}
+	UGameplayStatics::PlaySoundAtLocation(this, RiflePickUp, GetActorLocation());
 	
 	HealthComp->OnHealthChanged.AddDynamic(this, &ASoldierCharacter::OnHealthChanged);
 
@@ -472,7 +481,7 @@ void ASoldierCharacter::PickUp()
 			ServerPickUpItem();
 			//return;
 		}
-		if (bRiflePickUp == true && HoldingWeaponState==EHoldingWeapon::None)
+		/*if (bRiflePickUp == true && HoldingWeaponState==EHoldingWeapon::None)
 		{
 
 			HoldingWeaponState = EHoldingWeapon::A4;
@@ -487,7 +496,7 @@ void ASoldierCharacter::PickUp()
 				AutomaticRifle->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocket);
 			}
 			UGameplayStatics::PlaySoundAtLocation(this, RiflePickUp, GetActorLocation());
-		}
+		}*/
 
 		if (bHoloPickUp == true && HoldingWeaponState == EHoldingWeapon::A4 && HoloEquipState == EHoloAttachment::None)
 		{

@@ -2,11 +2,15 @@
 
 
 #include "SpawningAttach.h"
+
 #include "HoloScope.h"
 #include "Helmet.h"
 #include "Headset.h"
 #include "Grip.h"
 #include "Laser.h"
+
+#include "Particles/ParticleSystem.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 ASpawningAttach::ASpawningAttach()
@@ -16,12 +20,16 @@ ASpawningAttach::ASpawningAttach()
 
 	SetReplicates(true);
 
+
 }
 
 // Called when the game starts or when spawned
 void ASpawningAttach::BeginPlay()
 {
 	Super::BeginPlay();
+
+	UGameplayStatics::SpawnEmitterAtLocation(this, ParticleSystem, GetActorLocation());
+
 	Actors.Push(Holo);
 	Actors.Push(Headset);
 	Actors.Push(Helmet);

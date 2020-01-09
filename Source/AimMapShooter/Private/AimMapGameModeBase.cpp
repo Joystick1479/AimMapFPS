@@ -32,7 +32,8 @@ void AAimMapGameModeBase::StartGame()
 	if (!ensure(World != nullptr)) return;
 
 	bUseSeamlessTravel = true;
-	World->ServerTravel("/Game/FirstPersonBP/Maps/Map?listen");
+	//World->ServerTravel("/Game/FirstPersonBP/Maps/Map?listen");
+	World->ServerTravel("/Game/AbandonedFactoryBuildings/Maps/Warehouse_01_day/Main_Warehouse_01?listen");
 }
 
 void AAimMapGameModeBase::RestartGame()
