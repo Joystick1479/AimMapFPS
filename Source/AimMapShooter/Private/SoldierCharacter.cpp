@@ -217,6 +217,7 @@ void ASoldierCharacter::Tick(float DeltaTime)
 	ClearingHudAfterDeath();
 
 	DyingAudioTrigger();
+
 }
 void ASoldierCharacter::OnDeath()
 {
@@ -716,12 +717,11 @@ void ASoldierCharacter::EndCrouch()
 void ASoldierCharacter::ZoomIn()
 {
 	UCharacterMovementComponent* MoveComp = this->FindComponentByClass<UCharacterMovementComponent>();
-	if (MoveComp)
+	if (MoveComp && !IsSprinting)
 	{
-		///***Checking for character speed*////
-		FVector Velocity = MoveComp->GetLastUpdateVelocity();
-		float Velocity2 = Velocity.Size();
-		if (Velocity2 < 1)
+		MoveComp->MaxWalkSpeed = 78.0f;
+
+		if (!IsSprinting)
 		{
 			if (Role < ROLE_Authority)
 			{
@@ -744,11 +744,14 @@ void ASoldierCharacter::ZoomIn()
 			}
 		}
 	}
-	
-
 }
 void ASoldierCharacter::ZoomOut()
 {
+	UCharacterMovementComponent* MoveComp = this->FindComponentByClass<UCharacterMovementComponent>();
+	if (MoveComp)
+	{
+		MoveComp->MaxWalkSpeed = 149.0f;
+	}
 	if (Role < ROLE_Authority)
 	{
 		ServerZoomOut();
@@ -822,6 +825,7 @@ void ASoldierCharacter::SprintOn()
 
 void ASoldierCharacter::SprintOff()
 {
+
 	if (Role < ROLE_Authority)
 	{
 		ServerSprintOff();
