@@ -21,14 +21,6 @@ class UUserWidget;
 class USoundCue;
 class UAudioComponent;
 
-namespace ELaserState
-{
-	enum Type
-	{
-		Idle,
-		Start
-	};
-}
 
 namespace ECharacterState
 {
@@ -120,17 +112,15 @@ protected:
 
 	EHoldingAttachment::Type HoldingAttachmentState;
 
-	ELaserState::Type LaserState;
-
 	EHoloAttachment::Type HoloEquipState;
 
 	EGripAttachment::Type GripEquipState;
 
 	EHeadsetAttachment::Type HeadsetEquipState;
-
-	ELaserAttachment::Type LaserEquipState;
 	
 	EHelmetAttachment::Type HelmetEquipState;
+
+	ELaserAttachment::Type LaserEquipState;
 
 	UPROPERTY(Replicated)
 	AAutomaticRifle* AutomaticRifle;

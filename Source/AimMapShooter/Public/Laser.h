@@ -11,6 +11,7 @@ class UStaticMeshComponent;
 class USphereComponent;
 class ASoldierCharacter;
 class AAutomaticRifle;
+class UPointLightComponent;
 
 UCLASS()
 class AIMMAPSHOOTER_API ALaser : public AActor
@@ -32,10 +33,10 @@ public:
 
 	ASoldierCharacter* SoldierChar;
 
-
 	void StartLaser();
 
-
+	UPROPERTY(VisibleAnywhere, Category = "Components")
+	UPointLightComponent* PointLight;
 
 	
 protected:
@@ -53,6 +54,11 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Laser")
 	double ThickOfLaser;
+
+
+
+	//UPROPERTY(EditDefaultsOnly, Category = "Player")
+	//TSubclassOf<PointLight> PointLightClass;
 
 
 public:	

@@ -3,9 +3,13 @@
 
 #include "Components/StaticMeshComponent.h"
 #include "Components/SphereComponent.h"
+
 #include "SoldierCharacter.h"
 #include "AutomaticRifle.h"
+
 #include "DrawDebugHelpers.h"
+
+#include "Components/PointLightComponent.h"
 
 // Sets default values
 ALaser::ALaser()
@@ -22,10 +26,13 @@ ALaser::ALaser()
 	SphereComp = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
 	SphereComp->SetupAttachment(MeshComp);
 
+	PointLight = CreateDefaultSubobject<UPointLightComponent>(TEXT("PointLightComp"));
+	PointLight->SetupAttachment(MeshComp);
+
 	LaserSocket = "LaserSocket";
 
 	LengthOfLaser = 5;
-	ThickOfLaser = 0.1;
+	ThickOfLaser = 0.05;
 
 	SetReplicates(true);
 	
@@ -97,6 +104,13 @@ void ALaser::StartLaser()
 				float LaserLentgh = Laser.Size() / LengthOfLaser;
 				FVector Last = FVector(LaserLentgh, ThickOfLaser, ThickOfLaser);
 				MeshComp2->SetWorldScale3D(Last);
+
+
+				FVector LaserImpact = Hit.ImpactPoint;
+				FVector LaserForwardVector = PointLight->GetForwardVector();
+				FVector LastLaserImpact = LaserImpact - LaserForwardVector;
+				PointLight->SetWorldLocation(LastLaserImpact);
+			
 			}
 		}
 	

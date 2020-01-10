@@ -69,7 +69,7 @@ ASoldierCharacter::ASoldierCharacter()
 	//HoldingWeaponState = EHoldingWeapon::None;
 	HoldingWeaponState = EHoldingWeapon::A4;
 	HoldingAttachmentState = EHoldingAttachment::None;
-	LaserState = ELaserState::Idle;
+	LaserEquipState = ELaserAttachment::None;
 	MaxUseDistance = 400;
 
 	bRiflePickUp = false;
@@ -451,18 +451,11 @@ void ASoldierCharacter::ResetVaultTimer()
 
 void ASoldierCharacter::TurnOnLaser()
 {
-	if (Laser && LaserState == ELaserState::Start)
+	if (Laser)
 	{
-		Laser->MeshComp2->SetVisibility(false);
-		LaserState = ELaserState::Idle;
+		Laser->MeshComp2->ToggleVisibility();
+		Laser->PointLight->ToggleVisibility();
 	}
-	else 
-	{
-		Laser->StartLaser();
-		Laser->MeshComp2->SetVisibility(true);
-		LaserState = ELaserState::Start;
-	}
-	
 }
 
 void ASoldierCharacter::ServerPickUpItem_Implementation()
