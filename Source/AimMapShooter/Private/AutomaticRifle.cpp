@@ -200,22 +200,27 @@ void AAutomaticRifle::Fire()
 					float ActualDamage = BaseDamage;
 					if (SurfaceType == SURFACE_HEAD)
 					{
+						UGameplayStatics::PlaySoundAtLocation(GetWorld(),HeadshotSound, GetActorLocation());
 						ActualDamage *= 4.0f;
 					}
 					if (SurfaceType == SURFACE_CHEST)
 					{
+						UGameplayStatics::PlaySoundAtLocation(GetWorld(), HitSound, GetActorLocation());
 						ActualDamage *= 2.0f;
 					}
 					if (SurfaceType == SURFACE_LEG)
 					{
+						UGameplayStatics::PlaySoundAtLocation(GetWorld(), HitSound, GetActorLocation());
 						ActualDamage *= 0.5f;
 					}
 					if (SurfaceType == SURFACE_ARM)
 					{
+						UGameplayStatics::PlaySoundAtLocation(GetWorld(), HitSound, GetActorLocation());
 						ActualDamage *= 1.5f;
 					}
 					if (SurfaceType == SURFACE_HELMET)
 					{
+						UGameplayStatics::PlaySoundAtLocation(GetWorld(), HeadshotSound, GetActorLocation());
 						ActualDamage *= 1.5f;
 					}
 					UGameplayStatics::ApplyPointDamage(HitActor, ActualDamage, ShotDirection, Hit, MyOwner->GetInstigatorController(), MyOwner, DamageType);

@@ -28,7 +28,6 @@ void ASpawningAttach::BeginPlay()
 {
 	Super::BeginPlay();
 
-	UGameplayStatics::SpawnEmitterAtLocation(this, ParticleSystem, GetActorLocation());
 
 	Actors.Push(Holo);
 	Actors.Push(Headset);
@@ -58,22 +57,30 @@ void ASpawningAttach::SpawnRandom()
 	case 1:
 		UE_LOG(LogTemp, Warning, TEXT("HoloSpawn"));
 		Holo = GetWorld()->SpawnActor<AHoloScope>(HoloClass, GetActorLocation(), GetActorRotation(), SpawnParams);
+		UGameplayStatics::SpawnEmitterAtLocation(this, ParticleSystem, GetActorLocation());
 		break;
 	case 2:
 		UE_LOG(LogTemp, Warning, TEXT("Headset"));
 		Helmet = GetWorld()->SpawnActor<AHelmet>(HelmetClass, GetActorLocation(), GetActorRotation(), SpawnParams);
+		UGameplayStatics::SpawnEmitterAtLocation(this, ParticleSystem, GetActorLocation());
 		break;
 	case 3:
 		UE_LOG(LogTemp, Warning, TEXT("Helmet"));
 		Headset = GetWorld()->SpawnActor<AHeadset>(HeadsetClass, GetActorLocation(), GetActorRotation(), SpawnParams);
+		UGameplayStatics::SpawnEmitterAtLocation(this, ParticleSystem, GetActorLocation());
 		break;
 	case 4:
 		UE_LOG(LogTemp, Warning, TEXT("Grip"));
 		Laser = GetWorld()->SpawnActor<ALaser>(LaserClass, GetActorLocation(), GetActorRotation(), SpawnParams);
+		UGameplayStatics::SpawnEmitterAtLocation(this, ParticleSystem, GetActorLocation());
 		break;
 	case 5:
 		UE_LOG(LogTemp, Warning, TEXT("Laser"));
 		Grip = GetWorld()->SpawnActor<AGrip>(GripClass, GetActorLocation(), GetActorRotation(), SpawnParams);
+		UGameplayStatics::SpawnEmitterAtLocation(this, ParticleSystem, GetActorLocation());
+		break;
+	case 0:
+		UE_LOG(LogTemp, Warning, TEXT("NoAttachment, destroy particle"));
 		break;
 	}
 
