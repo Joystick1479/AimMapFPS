@@ -299,6 +299,9 @@ protected:
 	class UStaticMeshComponent* MeshComp;
 
 public:	
+	UPROPERTY(BlueprintReadWrite, Replicated)
+	FString PlayerName;
+
 	/// Variable for sprinting ///
 	float MaxWalkSpeed;
 

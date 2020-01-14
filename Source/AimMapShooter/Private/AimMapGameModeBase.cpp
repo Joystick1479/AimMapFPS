@@ -12,10 +12,25 @@ void AAimMapGameModeBase::PostLogin(APlayerController * NewPlayer)
 	Super::PostLogin(NewPlayer);
 
 	++NumberOfPlayers;
+	
+	NewPlayer->SetName(Name);
+	if (NewPlayer->GetName() == "PlayerController_0")
+	{
+		NewPlayer->SetName("Blue");
+	}
+	else
+	{
+		NewPlayer->SetName("Red");
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("Name is: %s"), *NewPlayer->GetName());
+	UE_LOG(LogTemp, Warning, TEXT("TeamName is: %s"), *TeamName);
+
+
 
 	if (NumberOfPlayers > 1)
 	{
-		GetWorldTimerManager().SetTimer(GameStartTimer, this, &AAimMapGameModeBase::StartGame, 3);
+		//GetWorldTimerManager().SetTimer(GameStartTimer, this, &AAimMapGameModeBase::StartGame, 7);
 	}
 }
 

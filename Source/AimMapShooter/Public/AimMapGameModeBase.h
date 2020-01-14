@@ -14,14 +14,18 @@ class AIMMAPSHOOTER_API AAimMapGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
 public:
-
+	UFUNCTION(BlueprintCallable)
 	void PostLogin(APlayerController* NewPlayer) override;
 
 	void Logout(AController* Exiting) override;
+	
+	UPROPERTY(BlueprintReadWrite)
+	FString TeamName;
 
 private:
 
 	uint32 NumberOfPlayers = 0;
+	FString Name;
 
 	void StartGame();
 
