@@ -6,6 +6,9 @@
 #include "GameFramework/Character.h"
 #include "PayloadCharacter.generated.h"
 
+class ABlueEndgame;
+class ARedEndgame;
+
 UCLASS()
 class AIMMAPSHOOTER_API APayloadCharacter : public ACharacter
 {
@@ -32,9 +35,24 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "Mesh")
 	class UPhysicsConstraintComponent* PhysicsComp;
 
+	UPROPERTY(EditDefaultsOnly, Category = "EndTarget")
+	TSubclassOf<ABlueEndgame> BlueEndgameClass;
+
+	UPROPERTY(EditDefaultsOnly, Category = "EndTarget")
+	TSubclassOf<ARedEndgame> RedEndgameClass;
+
+	void NotifyActorBeginOverlap(AActor* OtherActor);
+	void NotifyActorEndOverlap(AActor* OtherActor);
+
+	//TArray<ABlueEndgame*> BlueEndGames;
+
+
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
