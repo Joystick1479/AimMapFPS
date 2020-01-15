@@ -48,6 +48,10 @@ void AHelmet::NotifyActorEndOverlap(AActor * OtherActor)
 	if (SoldierCharacter)
 	{
 		SoldierCharacter->bHelmetPickUp = false;
+		if (SoldierCharacter->isHelmetAttached == true)
+		{
+			this->Destroy();
+		}
 
 	}
 }

@@ -50,6 +50,11 @@ void AGrip::NotifyActorEndOverlap(AActor * OtherActor)
 	{
 		SoldierCharacter->bGripPickUp = false;
 
+		if (SoldierCharacter->isGripAttached == true)
+		{
+			this->Destroy();
+		}
+
 	}
 }
 

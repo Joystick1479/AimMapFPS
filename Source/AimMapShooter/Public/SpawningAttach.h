@@ -31,6 +31,7 @@ protected:
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerSpawnRandom();
 
+
 	TArray<AActor*> Actors;
 
 	AHoloScope* Holo;

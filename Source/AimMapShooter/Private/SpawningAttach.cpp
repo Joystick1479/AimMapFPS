@@ -8,6 +8,7 @@
 #include "Headset.h"
 #include "Grip.h"
 #include "Laser.h"
+#include "SoldierCharacter.h"
 
 #include "Particles/ParticleSystem.h"
 #include "Kismet/GameplayStatics.h"
@@ -100,6 +101,6 @@ bool ASpawningAttach::ServerSpawnRandom_Validate()
 void ASpawningAttach::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+	
 }
 

@@ -24,7 +24,7 @@ AHoloScope::AHoloScope()
 void AHoloScope::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 }
 
 void AHoloScope::NotifyActorBeginOverlap(AActor * OtherActor)
@@ -36,6 +36,7 @@ void AHoloScope::NotifyActorBeginOverlap(AActor * OtherActor)
 	{
 		SoldierCharacter->bHoloPickUp = true;
 		SphereComp->ToggleActive();
+
 	}
 }
 
@@ -47,6 +48,11 @@ void AHoloScope::NotifyActorEndOverlap(AActor * OtherActor)
 	if (SoldierCharacter)
 	{
 		SoldierCharacter->bHoloPickUp = false;
+
+		if (SoldierCharacter->isHoloAttached == true)
+		{
+			this->Destroy();
+		}
 	}
 }
 

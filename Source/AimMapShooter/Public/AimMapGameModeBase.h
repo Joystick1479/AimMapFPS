@@ -18,6 +18,7 @@ public:
 	void PostLogin(APlayerController* NewPlayer) override;
 
 	void Logout(AController* Exiting) override;
+
 	
 	UPROPERTY(BlueprintReadWrite)
 	FString TeamName;

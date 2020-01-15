@@ -47,7 +47,10 @@ void AHeadset::NotifyActorEndOverlap(AActor * OtherActor)
 	if (SoldierCharacter)
 	{
 		SoldierCharacter->bHeadsetPickUp = false;
-
+		if (SoldierCharacter->isHeadsetAttached == true)
+		{
+			this->Destroy();
+		}
 	}
 }
 
