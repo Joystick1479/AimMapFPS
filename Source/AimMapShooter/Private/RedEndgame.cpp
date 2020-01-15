@@ -3,11 +3,17 @@
 
 #include "RedEndgame.h"
 
+#include "Components/SphereComponent.h"
+
+#include "PayloadCharacter.h"
+
 // Sets default values
 ARedEndgame::ARedEndgame()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+
+	SphereComp = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
 
 }
 
@@ -16,6 +22,26 @@ void ARedEndgame::BeginPlay()
 {
 	Super::BeginPlay();
 	
+}
+
+void ARedEndgame::NotifyActorBeginOverlap(AActor * OtherActor)
+{
+	Super::NotifyActorBeginOverlap(OtherActor);
+
+	APayloadCharacter* Payload = Cast<APayloadCharacter>(OtherActor);
+	if (Payload)
+	{
+		RedWins = true;
+	}
+}
+
+void ARedEndgame::NotifyActorEndOverlap(AActor * OtherActor)
+{
+	APayloadCharacter* Payload = Cast<APayloadCharacter>(OtherActor);
+	if (Payload)
+	{
+		RedWins = false;
+	}
 }
 
 // Called every frame

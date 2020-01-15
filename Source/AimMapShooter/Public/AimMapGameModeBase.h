@@ -22,7 +22,6 @@ public:
 	UPROPERTY(BlueprintReadWrite)
 	FString TeamName;
 
-
 private:
 
 	uint32 NumberOfPlayers = 0;
@@ -34,6 +33,8 @@ private:
 
 	UFUNCTION(BlueprintCallable)
 	void RestartGame();
+
+	void CheckIfGameOver();
 
 	virtual void Tick(float DeltaTime) override;
 

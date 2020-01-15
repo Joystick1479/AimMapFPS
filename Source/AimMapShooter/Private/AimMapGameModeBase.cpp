@@ -6,6 +6,8 @@
 #include "TimerManager.h"
 
 #include "SoldierCharacter.h"
+#include "RedEndgame.h"
+#include "BlueEndGame.h"
 
 void AAimMapGameModeBase::PostLogin(APlayerController * NewPlayer)
 {
@@ -30,7 +32,7 @@ void AAimMapGameModeBase::PostLogin(APlayerController * NewPlayer)
 
 	if (NumberOfPlayers > 1)
 	{
-		//GetWorldTimerManager().SetTimer(GameStartTimer, this, &AAimMapGameModeBase::StartGame, 7);
+		GetWorldTimerManager().SetTimer(GameStartTimer, this, &AAimMapGameModeBase::StartGame, 3);
 	}
 }
 
@@ -60,12 +62,41 @@ void AAimMapGameModeBase::RestartGame()
 	if (!ensure(World != nullptr)) return;
 
 	bUseSeamlessTravel = true;
-	World->ServerTravel("/Game/FirstPersonBP/Maps/Map?listen");
+	World->ServerTravel("/Game/AbandonedFactoryBuildings/Maps/Warehouse_01_day/Main_Warehouse_01?listen");
+}
+
+void AAimMapGameModeBase::CheckIfGameOver()
+{
+	///MADE IN BLUEPRINTS FOR NOW///
+
+	/*UWorld* World = GetWorld();
+	if (!ensure(World != nullptr)) return;
+	ARedEndgame* RedEnd = Cast<ARedEndgame>(GetOwner());
+	if (RedEnd)
+	{
+		if (RedEnd->RedWins == true)
+		{
+			RestartGame();
+			UE_LOG(LogTemp, Warning, TEXT("Red wins, true"));
+		}
+	}
+
+	ABlueEndgame* BlueEnd = Cast<ABlueEndgame>(GetOwner());
+	if (BlueEnd)
+	{
+		if (BlueEnd->BlueWins == true)
+		{
+			RestartGame();
+			UE_LOG(LogTemp, Warning, TEXT("Blue wins, true"));
+		}
+	}*/
+
 }
 
 void AAimMapGameModeBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
 
 }
 

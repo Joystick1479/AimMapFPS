@@ -19,7 +19,15 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	UPROPERTY(VisibleAnywhere, Category = "Components")
+	class USphereComponent* SphereComp;
+
 public:	
+	void NotifyActorBeginOverlap(AActor* OtherActor);
+	void NotifyActorEndOverlap(AActor* OtherActor);
+
+	UPROPERTY(BlueprintReadOnly, Category = "GameMode")
+	bool RedWins;
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
