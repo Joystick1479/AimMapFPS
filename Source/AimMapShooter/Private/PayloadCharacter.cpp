@@ -18,6 +18,7 @@
 #include "SoldierCharacter.h"
 #include "BlueEndgame.h"
 #include "RedEndgame.h"
+#include "AimMapGameModeBase.h"
 
 // Sets default values
 APayloadCharacter::APayloadCharacter()
@@ -67,14 +68,15 @@ void APayloadCharacter::NotifyActorBeginOverlap(AActor * OtherActor)
 	if (SoldierCharacter)
 	{
 
-		APlayerController* PC = Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
+		APlayerController* PC = Cast<APlayerController>(SoldierCharacter->GetController());
 		if (PC)
 		{
 				///CHECKING IF CONTROLLED PLAYER IS HOSTING ///
-				FString CheckName = UKismetSystemLibrary::GetObjectName(PC);
 				FString FindName = "PlayerController_0";
-				UE_LOG(LogTemp, Warning, TEXT("Test"));
-				if (0 == 0)
+				FString ProbaNazwy = UKismetSystemLibrary::GetObjectName(PC);
+				UE_LOG(LogTemp, Warning, TEXT("Checkingname is : %s"), *ProbaNazwy);
+				
+				if ( FindName == ProbaNazwy)
 				{
 					TArray<AActor*> BlueEndGame;
 					UGameplayStatics::GetAllActorsOfClass(this, BlueEndgameClass, BlueEndGame);
@@ -93,7 +95,8 @@ void APayloadCharacter::NotifyActorBeginOverlap(AActor * OtherActor)
 					if (RedEndGame.Num() > 0)
 					{
 						FVector RedLocation = RedEndGame[0]->GetActorLocation();
-						UNavigationSystem::SimpleMoveToLocation(GetController(), RedLocation);
+						UE_LOG(LogTemp, Warning, TEXT("Vector is : %s"), *RedLocation.ToString());
+						UAIBlueprintHelperLibrary::SimpleMoveToLocation(GetController(), RedLocation);
 					}
 				}
 		}

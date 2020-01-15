@@ -22,6 +22,7 @@ public:
 	UPROPERTY(BlueprintReadWrite)
 	FString TeamName;
 
+
 private:
 
 	uint32 NumberOfPlayers = 0;
