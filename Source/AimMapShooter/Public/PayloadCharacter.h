@@ -8,6 +8,7 @@
 
 class ABlueEndgame;
 class ARedEndgame;
+class ASoldierCharacter;
 
 UCLASS()
 class AIMMAPSHOOTER_API APayloadCharacter : public ACharacter
@@ -41,22 +42,46 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "EndTarget")
 	TSubclassOf<ARedEndgame> RedEndgameClass;
 
+
+	UPROPERTY(EditDefaultsOnly, Category = "EndTarget")
+	TSubclassOf<ASoldierCharacter> SoldierCharacterClass;
+
 	void NotifyActorBeginOverlap(AActor* OtherActor);
 	void NotifyActorEndOverlap(AActor* OtherActor);
 
 	//TArray<ABlueEndgame*> BlueEndGames;
 
-	FTimerHandle TimerHandle;
+	FTimerHandle BlueTimerHandle;
+	FTimerHandle RedTimerHandle;
 
-	void PhysicsTurn();
+	UFUNCTION(BlueprintCallable)
+	void RedMove();
+
+	UFUNCTION(BlueprintCallable)
+	void BlueMove();
 
 	UPROPERTY(BlueprintReadOnly)
 	FString FindName;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Replicated)
+	int32 ForceToPush;
+
+	float Acceleration;
+
+	void PayloadMove(float DeltaTime);
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerPayloadMove(float DeltaTime);
 
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	UPROPERTY(BlueprintReadWrite, Replicated)
+	bool ShouldPush;
+
+	UPROPERTY(BlueprintReadWrite, Replicated)
+	FVector Translation;
 
 
 	// Called to bind functionality to input
