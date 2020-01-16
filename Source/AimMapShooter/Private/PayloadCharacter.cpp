@@ -12,6 +12,10 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "Kismet/GameplayStatics.h"
 
+#include "TimerManager.h"
+
+#include "Math/Quat.h"
+
 #include "Blueprint/AIBlueprintHelperLibrary.h"
 #include "NavigationSystem.h"
 
@@ -38,6 +42,7 @@ APayloadCharacter::APayloadCharacter()
 		PhysicsComp->SetupAttachment(CapsuleComp);
 	}
 
+	FString FindName = "PlayerController_0";
 }
 
 // Called when the game starts or when spawned
@@ -93,10 +98,13 @@ void APayloadCharacter::NotifyActorBeginOverlap(AActor * OtherActor)
 					TArray<AActor*> RedEndGame;
 					UGameplayStatics::GetAllActorsOfClass(this, RedEndgameClass, RedEndGame);
 					if (RedEndGame.Num() > 0)
-					{
-						FVector RedLocation = RedEndGame[0]->GetActorLocation();
-						UE_LOG(LogTemp, Warning, TEXT("Vector is : %s"), *RedLocation.ToString());
-						UAIBlueprintHelperLibrary::SimpleMoveToLocation(GetController(), RedLocation);
+					{	
+						/*					FVector RedLocation = RedEndGame[0]->GetActorLocation();
+											UE_LOG(LogTemp, Warning, TEXT("Vector is : %s"), *RedLocation.ToString());
+											UAIBlueprintHelperLibrary::SimpleMoveToLocation(GetController(), RedLocation);*/
+
+						GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &APayloadCharacter::PhysicsTurn, 5.1f);
+						
 					}
 				}
 		}
@@ -113,5 +121,20 @@ void APayloadCharacter::NotifyActorEndOverlap(AActor * OtherActor)
 		{
 			CharMovement->StopActiveMovement();
 		}
+	}
+}
+
+void APayloadCharacter::PhysicsTurn()
+{
+	TArray<AActor*> RedEndGame;
+	UGameplayStatics::GetAllActorsOfClass(this, RedEndgameClass, RedEndGame);
+	if (RedEndGame.Num() > 0)
+	{
+		FVector RedLocation = RedEndGame[0]->GetActorLocation();
+		UE_LOG(LogTemp, Warning, TEXT("Vector is : %s"), *RedLocation.ToString());
+		UAIBlueprintHelperLibrary::SimpleMoveToLocation(GetController(), RedLocation);
+
+		//GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &APayloadCharacter::PhysicsTurn, 3.0f);
+
 	}
 }

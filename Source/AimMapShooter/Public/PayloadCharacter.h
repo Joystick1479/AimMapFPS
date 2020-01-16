@@ -46,7 +46,12 @@ protected:
 
 	//TArray<ABlueEndgame*> BlueEndGames;
 
+	FTimerHandle TimerHandle;
 
+	void PhysicsTurn();
+
+	UPROPERTY(BlueprintReadOnly)
+	FString FindName;
 
 public:	
 	// Called every frame
