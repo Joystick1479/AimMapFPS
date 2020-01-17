@@ -9,6 +9,8 @@
 #include "RedEndgame.h"
 #include "BlueEndGame.h"
 
+#include "Kismet/GameplayStatics.h"
+
 void AAimMapGameModeBase::PostLogin(APlayerController * NewPlayer)
 {
 	Super::PostLogin(NewPlayer);
@@ -69,34 +71,90 @@ void AAimMapGameModeBase::CheckIfGameOver()
 {
 	///MADE IN BLUEPRINTS FOR NOW///
 
-	/*UWorld* World = GetWorld();
-	if (!ensure(World != nullptr)) return;
-	ARedEndgame* RedEnd = Cast<ARedEndgame>(GetOwner());
-	if (RedEnd)
+	//UWorld* World = GetWorld();
+	//if (!ensure(World != nullptr)) return;
+	//ARedEndgame* RedEnd = Cast<ARedEndgame>(GetOwner());
+	//if (RedEnd)
+	//{
+	//	if (RedEnd->RedWins == true)
+	//	{
+	//		RestartGame();
+	//		UE_LOG(LogTemp, Warning, TEXT("Red wins, true"));
+	//	}
+	//}
+
+	//ABlueEndgame* BlueEnd = Cast<ABlueEndgame>(GetOwner());
+	//if (BlueEnd)
+	//{
+	//	if (BlueEnd->BlueWins == true)
+	//	{
+	//		RestartGame();
+	//		UE_LOG(LogTemp, Warning, TEXT("Blue wins, true"));
+	//	}
+	//}
+
+	TArray<AActor*> RedEndGame;
+	UGameplayStatics::GetAllActorsOfClass(this, RedEndgameClass, RedEndGame);
+	
+	for (int i = 0; i < RedEndGame.Num(); i ++)
 	{
-		if (RedEnd->RedWins == true)
+		ARedEndgame*New = Cast<ARedEndgame>(RedEndGame[i]);
+		if (New)
 		{
-			RestartGame();
-			UE_LOG(LogTemp, Warning, TEXT("Red wins, true"));
+			if (New->RedWins == true)
+			{
+				RestartGame();
+				UE_LOG(LogTemp, Warning, TEXT("RED IS WINNER"));
+
+			}
 		}
 	}
+	TArray<AActor*> BlueEndGame;
+	UGameplayStatics::GetAllActorsOfClass(this, BlueEndgameClass, BlueEndGame);
 
-	ABlueEndgame* BlueEnd = Cast<ABlueEndgame>(GetOwner());
-	if (BlueEnd)
+	for (int i = 0; i < BlueEndGame.Num(); i++)
 	{
-		if (BlueEnd->BlueWins == true)
+		ABlueEndgame*New2 = Cast<ABlueEndgame>(BlueEndGame[i]);
+		if (New2)
 		{
-			RestartGame();
-			UE_LOG(LogTemp, Warning, TEXT("Blue wins, true"));
-		}
-	}*/
+			if (New2->BlueWins == true)
+			{
+				
+				RestartGame();
+				UE_LOG(LogTemp, Warning, TEXT("BLUE IS WINNER"));
 
+			}
+		}
+	}
+	
+
+}
+
+void AAimMapGameModeBase::WinnerIs()
+{
+	ABlueEndgame* BlueWinner = Cast<ABlueEndgame>(GetOwner());
+	if (BlueWinner)
+	{
+		if (BlueWinner->BlueWins == true)
+		{
+			BlueIsWinner = true;
+			UE_LOG(LogTemp, Warning, TEXT("BLUE IS WINNER"));
+		}
+	}
+	ARedEndgame* RedWinner = Cast<ARedEndgame>(GetOwner());
+	if (RedWinner)
+	{
+		if (RedWinner->RedWins == true)
+		{
+			RedIsWinner = true;
+			UE_LOG(LogTemp, Warning, TEXT("RED IS WINNER"));
+		}
+	}
 }
 
 void AAimMapGameModeBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-
+	CheckIfGameOver();
 }
 

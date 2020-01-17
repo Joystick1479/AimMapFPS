@@ -54,12 +54,6 @@ protected:
 	FTimerHandle BlueTimerHandle;
 	FTimerHandle RedTimerHandle;
 
-	UFUNCTION(BlueprintCallable)
-	void RedMove();
-
-	UFUNCTION(BlueprintCallable)
-	void BlueMove();
-
 	UPROPERTY(BlueprintReadOnly)
 	FString FindName;
 

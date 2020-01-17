@@ -6,6 +6,9 @@
 #include "GameFramework/GameModeBase.h"
 #include "AimMapGameModeBase.generated.h"
 
+class ARedEndgame;
+class ABlueEndgame;
+
 /**
  * 
  */
@@ -36,6 +39,18 @@ private:
 	void RestartGame();
 
 	void CheckIfGameOver();
+
+	void WinnerIs();
+
+	bool BlueIsWinner;
+	bool RedIsWinner;
+
+
+	UPROPERTY(EditDefaultsOnly, Category = "EndTarget")
+	TSubclassOf<ABlueEndgame> BlueEndgameClass;
+
+	UPROPERTY(EditDefaultsOnly, Category = "EndTarget")
+	TSubclassOf<ARedEndgame> RedEndgameClass;
 
 	virtual void Tick(float DeltaTime) override;
 

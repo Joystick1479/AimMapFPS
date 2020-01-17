@@ -53,9 +53,6 @@ void APayloadCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	TArray<AActor*> Characters;
-	UGameplayStatics::GetAllActorsOfClass(this, SoldierCharacterClass, Characters);
-	UE_LOG(LogTemp, Warning, TEXT("Numer : %i"), Characters.Num());
 }
 
 // Called every frame
@@ -74,14 +71,13 @@ void APayloadCharacter::PayloadMove(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (Role < ROLE_Authority)
-	{
-		ServerPayloadMove(DeltaTime);
-	}
+	//if (Role < ROLE_Authority)
+	//{
+	//	ServerPayloadMove(DeltaTime);
+	//}
 
 	TArray<AActor*> Characters;
 	UGameplayStatics::GetAllActorsOfClass(this, SoldierCharacterClass, Characters);
-	UE_LOG(LogTemp, Warning, TEXT("Numer : %i"), Characters.Num());
 	if (Characters.Num() > 1)
 	{
 
@@ -127,142 +123,14 @@ void APayloadCharacter::NotifyActorBeginOverlap(AActor * OtherActor)
 {
 	Super::NotifyActorBeginOverlap(OtherActor);
 
-	ASoldierCharacter* SoldierCharacter = Cast<ASoldierCharacter>(OtherActor);
-	if (SoldierCharacter)
-	{
-		APlayerController* PC = Cast<APlayerController>(SoldierCharacter->GetController());
-		if (PC)
-		{
-			FString FindName = "PlayerController_0";
-			FString ProbaNazwy = UKismetSystemLibrary::GetObjectName(PC);
-
-			if (FindName == ProbaNazwy)
-			{
-				//ShouldPush = true;
-
-				//ForceToPush = 50;
-
-			}
-			else if ( FindName != ProbaNazwy)
-			{
-				//ShouldPush = true;
-
-				//ForceToPush = -50;
-				
-			}
-
-		}
-	}
-
-	//UCharacterMovementComponent* CharMovement = this->FindComponentByClass<UCharacterMovementComponent>();
-	//if (CharMovement)
-	//{
-	//	CharMovement->Activate();
-	//}
-
-	//ASoldierCharacter* SoldierCharacter = Cast<ASoldierCharacter>(OtherActor);
-	//if (SoldierCharacter)
-	//{
-
-	//	APlayerController* PC = Cast<APlayerController>(SoldierCharacter->GetController());
-	//	if (PC)
-	//	{
-	//			///CHECKING IF CONTROLLED PLAYER IS HOSTING ///
-	//			FString FindName = "PlayerController_0";
-	//			FString ProbaNazwy = UKismetSystemLibrary::GetObjectName(PC);
-	//			UE_LOG(LogTemp, Warning, TEXT("Checkingname is : %s"), *ProbaNazwy);
-	//			
-	//			if ( FindName == ProbaNazwy)
-	//			{
-	//				TArray<AActor*> BlueEndGame;
-	//				UGameplayStatics::GetAllActorsOfClass(this, BlueEndgameClass, BlueEndGame);
-
-	//				if (BlueEndGame.Num() > 0)
-	//				{
-	//					//FVector BlueLocation = BlueEndGame[0]->GetActorLocation();
-	//					//UE_LOG(LogTemp, Warning, TEXT("Vector is : %s"), *BlueLocation.ToString());
-	//					//UAIBlueprintHelperLibrary::SimpleMoveToLocation(GetController(), BlueLocation);
-	//					FRotator Rotation = FRotator(0.0f, 0.0f, 0.0f);
-	//					FQuat Quater = Rotation.Quaternion();
-	//					this->SetActorRotation(Quater);
-	//					GetWorld()->GetTimerManager().SetTimer(BlueTimerHandle, this, &APayloadCharacter::BlueMove, 1.5f);
-
-	//				}
-	//			}
-	//			else
-	//			{
-	//				TArray<AActor*> RedEndGame;
-	//				UGameplayStatics::GetAllActorsOfClass(this, RedEndgameClass, RedEndGame);
-	//				if (RedEndGame.Num() > 0)
-	//				{	
-	//					/*					FVector RedLocation = RedEndGame[0]->GetActorLocation();
-	//										UE_LOG(LogTemp, Warning, TEXT("Vector is : %s"), *RedLocation.ToString());
-	//										UAIBlueprintHelperLibrary::SimpleMoveToLocation(GetController(), RedLocation);*/
-	//					FRotator Rotation2 = FRotator(0.0f, 180.0f, 0.0f);
-	//					FQuat Quater2 = Rotation2.Quaternion();
-	//					this->SetActorRotation(Quater2);
-
-	//					GetWorld()->GetTimerManager().SetTimer(RedTimerHandle, this, &APayloadCharacter::RedMove, 1.5f);
-	//					
-	//				}
-	//			}
-	//	}
-	//}
-
-
 }
 void APayloadCharacter::NotifyActorEndOverlap(AActor * OtherActor)
 {
-
-	/*ASoldierCharacter* SoldierCharacter = Cast<ASoldierCharacter>(OtherActor);
-	if (SoldierCharacter)
-	{
-		UCharacterMovementComponent* CharMovement = this->FindComponentByClass<UCharacterMovementComponent>();
-		if (CharMovement)
-		{
-			CharMovement->Deactivate();
-
-		}
-		GetWorld()->GetTimerManager().ClearTimer(RedTimerHandle);
-		GetWorld()->GetTimerManager().ClearTimer(BlueTimerHandle);
-		
-
-	}*/
 	ASoldierCharacter* SoldierCharacter = Cast<ASoldierCharacter>(OtherActor);
 	if (SoldierCharacter)
 	{
 		ShouldPush = false;
 		
-	}
-}
-
-void APayloadCharacter::RedMove()
-{
-	TArray<AActor*> RedEndGame;
-	UGameplayStatics::GetAllActorsOfClass(this, RedEndgameClass, RedEndGame);
-	if (RedEndGame.Num() > 0)
-	{
-		FVector RedLocation = RedEndGame[0]->GetActorLocation();
-		UE_LOG(LogTemp, Warning, TEXT("Vector is : %s"), *RedLocation.ToString());
-		UAIBlueprintHelperLibrary::SimpleMoveToLocation(GetController(), RedLocation);
-
-		//GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &APayloadCharacter::PhysicsTurn, 3.0f);
-
-	}
-}
-
-void APayloadCharacter::BlueMove()
-{
-	TArray<AActor*> BlueEndGame;
-	UGameplayStatics::GetAllActorsOfClass(this, BlueEndgameClass, BlueEndGame);
-	if (BlueEndGame.Num() > 0)
-	{
-		FVector BlueLocation = BlueEndGame[0]->GetActorLocation();
-		UE_LOG(LogTemp, Warning, TEXT("Vector is : %s"), *BlueLocation.ToString());
-		UAIBlueprintHelperLibrary::SimpleMoveToLocation(GetController(), BlueLocation);
-
-		//GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &APayloadCharacter::PhysicsTurn, 3.0f);
-
 	}
 }
 

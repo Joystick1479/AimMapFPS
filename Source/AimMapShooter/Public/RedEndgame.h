@@ -26,8 +26,9 @@ public:
 	void NotifyActorBeginOverlap(AActor* OtherActor);
 	void NotifyActorEndOverlap(AActor* OtherActor);
 
-	UPROPERTY(BlueprintReadOnly, Category = "GameMode")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "GameMode")
 	bool RedWins;
+
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
