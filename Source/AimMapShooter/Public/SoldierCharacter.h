@@ -20,6 +20,7 @@ class UCapsuleComponent;
 class UUserWidget;
 class USoundCue;
 class UAudioComponent;
+class APayloadCharacter;
 
 
 namespace ECharacterState
@@ -295,6 +296,20 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, Category = "Sounds")
 	UAudioComponent* AudioComp;
+
+
+	UPROPERTY(EditDefaultsOnly, Category = "Sounds")
+	USoundCue* EscortVehicle;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Sounds")
+	USoundCue* DefendObjective;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Payload")
+	TSubclassOf<APayloadCharacter> PayloadCharacterClass;
+
+	void DefendObjectiveSound();
+
+	void NotifyActorBeginOverlap(AActor * OtherActor);
 	
 	class UStaticMeshComponent* MeshComp;
 

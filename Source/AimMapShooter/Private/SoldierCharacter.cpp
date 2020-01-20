@@ -25,6 +25,7 @@
 #include "Components/AudioComponent.h"
 #include "Engine/EngineTypes.h"
 #include "GameFramework/Controller.h"
+#include "PayloadCharacter.h"
 
 
 // Sets default values
@@ -217,6 +218,8 @@ void ASoldierCharacter::Tick(float DeltaTime)
 	ClearingHudAfterDeath();
 
 	DyingAudioTrigger();
+
+	DefendObjectiveSound();
 
 }
 void ASoldierCharacter::OnDeath()
@@ -880,6 +883,39 @@ void ASoldierCharacter::FireMode()
 		else
 		{
 			IsSingleFire = false;
+		}
+	}
+}
+
+void ASoldierCharacter::DefendObjectiveSound()
+{
+	TArray<AActor*> Payload;
+	UGameplayStatics::GetAllActorsOfClass(this, PayloadCharacterClass, Payload);
+	for (int i = 0; i < Payload.Num(); i++)
+	{
+		APayloadCharacter* PayloadChar = Cast<APayloadCharacter>(Payload[i]);
+		if (PayloadChar)
+		{
+			if (this->IsOverlappingActor(PayloadChar) == false)
+			{
+				if (PayloadChar->ShouldPush == true)
+				{
+					UGameplayStatics::PlaySound2D(this, DefendObjective);
+				}
+			}
+
+		}
+	}
+}
+
+void ASoldierCharacter::NotifyActorBeginOverlap(AActor * OtherActor)
+{
+	APayloadCharacter* Payload = Cast<APayloadCharacter>(OtherActor);
+	if (Payload)
+	{
+		if (IsLocallyControlled())
+		{
+			UGameplayStatics::PlaySound2D(this, EscortVehicle);
 		}
 	}
 }
