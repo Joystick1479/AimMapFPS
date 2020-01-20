@@ -71,34 +71,88 @@ void APayloadCharacter::PayloadMove(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	///*** IF GAME OVER, STOP THE PAYLOAD ***///
+
+	//ABlueEndgame* BlueEnd = Cast<ABlueEndgame>(GetOwner());
+	//if (BlueEnd)
+	//{
+	//	if (BlueEnd->BlueWins == true)
+	//	{
+	//		ShouldPush = false;
+	//	}
+	//}
+	//ARedEndgame* RedEnd = Cast<ARedEndgame>(GetOwner());
+	//if (BlueEnd)
+	//{
+	//	if (RedEnd->RedWins == true)
+	//	{
+	//		ShouldPush = false;
+	//	}
+	//}
+
+
+	
+
+
 	//if (Role < ROLE_Authority)
 	//{
 	//	ServerPayloadMove(DeltaTime);
 	//}
+
+	//**MOVING PAYLOAD**//
 
 	TArray<AActor*> Characters;
 	UGameplayStatics::GetAllActorsOfClass(this, SoldierCharacterClass, Characters);
 	if (Characters.Num() > 1)
 	{
 
-		AActor* Dupa = Characters[0];
-		AActor* Dupa2 = Characters[1];
-		if (Dupa && Dupa2)
+		AActor* FirstCharacter = Characters[0];
+		AActor* SecondCharacter = Characters[1];
+		if (FirstCharacter && SecondCharacter)
 		{
-			if (this->IsOverlappingActor(Dupa) && this->IsOverlappingActor(Dupa2))
+			if (this->IsOverlappingActor(FirstCharacter) && this->IsOverlappingActor(SecondCharacter))
 			{
 				ForceToPush = 0;
 				ShouldPush = false;
 			}
-			else if (this->IsOverlappingActor(Dupa))
+			else if (this->IsOverlappingActor(FirstCharacter))
 			{
 				ForceToPush = 50;
 				ShouldPush = true;
 			}
-			else if (this->IsOverlappingActor(Dupa2))
+			else if (this->IsOverlappingActor(SecondCharacter))
 			{
 				ForceToPush = -50;
 				ShouldPush = true;
+			}
+		}
+	}
+
+	TArray<AActor*> RedEndGame;
+	UGameplayStatics::GetAllActorsOfClass(this, RedEndgameClass, RedEndGame);
+
+	for (int i = 0; i < RedEndGame.Num(); i++)
+	{
+		ARedEndgame* RedObjective = Cast<ARedEndgame>(RedEndGame[i]);
+		if (RedObjective)
+		{
+			if (RedObjective->RedWins == true)
+			{
+				ShouldPush = false;
+			}
+		}
+	}
+	TArray<AActor*> BlueEndGame;
+	UGameplayStatics::GetAllActorsOfClass(this, BlueEndgameClass, BlueEndGame);
+
+	for (int i = 0; i < BlueEndGame.Num(); i++)
+	{
+		ABlueEndgame* BlueObjective = Cast<ABlueEndgame>(BlueEndGame[i]);
+		if (BlueObjective)
+		{
+			if (BlueObjective->BlueWins == true)
+			{
+				ShouldPush = false;
 			}
 		}
 	}
@@ -110,6 +164,7 @@ void APayloadCharacter::PayloadMove(float DeltaTime)
 		AddActorWorldOffset(Translation);
 	}
 
+	
 
 }
 
@@ -123,6 +178,7 @@ void APayloadCharacter::NotifyActorBeginOverlap(AActor * OtherActor)
 {
 	Super::NotifyActorBeginOverlap(OtherActor);
 
+	
 }
 void APayloadCharacter::NotifyActorEndOverlap(AActor * OtherActor)
 {
@@ -130,7 +186,6 @@ void APayloadCharacter::NotifyActorEndOverlap(AActor * OtherActor)
 	if (SoldierCharacter)
 	{
 		ShouldPush = false;
-		
 	}
 }
 

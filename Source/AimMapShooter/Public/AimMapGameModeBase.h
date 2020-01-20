@@ -8,6 +8,7 @@
 
 class ARedEndgame;
 class ABlueEndgame;
+class ASoldierCharacter;
 
 /**
  * 
@@ -34,20 +35,28 @@ private:
 	void StartGame();
 
 	FTimerHandle GameStartTimer;
+	FTimerHandle GameOverTimer;
+	FTimerHandle RespawnDeadPlayer;
 
 	UFUNCTION(BlueprintCallable)
 	void RestartGame();
 
 	void CheckIfGameOver();
 
-	void WinnerIs();
+	void CheckIfRespawn();
+	void RespawningPlayer();
+
 
 	bool BlueIsWinner;
 	bool RedIsWinner;
 
+	ASoldierCharacter* Soldiero;
 
 	UPROPERTY(EditDefaultsOnly, Category = "EndTarget")
 	TSubclassOf<ABlueEndgame> BlueEndgameClass;
+
+	UPROPERTY(EditDefaultsOnly, Category = "EndTarget")
+	TSubclassOf<ASoldierCharacter> SoldierCharClass;
 
 	UPROPERTY(EditDefaultsOnly, Category = "EndTarget")
 	TSubclassOf<ARedEndgame> RedEndgameClass;
