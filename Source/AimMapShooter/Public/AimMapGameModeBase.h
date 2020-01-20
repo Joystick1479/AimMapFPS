@@ -18,6 +18,8 @@ class AIMMAPSHOOTER_API AAimMapGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
 public:
+	
+
 	UFUNCTION(BlueprintCallable)
 	void PostLogin(APlayerController* NewPlayer) override;
 
@@ -26,6 +28,14 @@ public:
 	
 	UPROPERTY(BlueprintReadWrite)
 	FString TeamName;
+
+	UFUNCTION(BlueprintCallable)
+	void RestartGame();
+
+	UFUNCTION(BlueprintCallable)
+	void CheckIfGameOver();
+
+
 
 private:
 
@@ -38,10 +48,9 @@ private:
 	FTimerHandle GameOverTimer;
 	FTimerHandle RespawnDeadPlayer;
 
-	UFUNCTION(BlueprintCallable)
-	void RestartGame();
 
-	void CheckIfGameOver();
+
+
 
 	void CheckIfRespawn();
 	void RespawningPlayer();

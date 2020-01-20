@@ -64,15 +64,16 @@ void AAimMapGameModeBase::StartGame()
 
 void AAimMapGameModeBase::RestartGame()
 {
-	GetWorldTimerManager().ClearTimer(GameOverTimer);
+	UE_LOG(LogTemp, Warning, TEXT("Dzialaniby"));
 
 	ResetLevel();
 
 	UWorld* World = GetWorld();
 	if (!ensure(World != nullptr)) return;
 
-	bUseSeamlessTravel = true;
+	bUseSeamlessTravel = false;
 	World->ServerTravel("/Game/AbandonedFactoryBuildings/Maps/Warehouse_01_day/Main_Warehouse_01?listen");
+
 }
 
 void AAimMapGameModeBase::CheckIfGameOver()
@@ -89,8 +90,10 @@ void AAimMapGameModeBase::CheckIfGameOver()
 		{
 			if (New->RedWins == true)
 			{
-				GetWorldTimerManager().SetTimer(GameOverTimer, this, &AAimMapGameModeBase::RestartGame, 5.0f);
+				FTimerHandle RestartHandle;
+				GetWorldTimerManager().SetTimer(RestartHandle, this, &AAimMapGameModeBase::RestartGame, 5.0f);
 				UE_LOG(LogTemp, Warning, TEXT("RED IS WINNER"));
+				
 			}
 		}
 	}
@@ -104,11 +107,11 @@ void AAimMapGameModeBase::CheckIfGameOver()
 		{
 			if (New2->BlueWins == true)
 			{
-				GetWorldTimerManager().SetTimer(GameOverTimer, this, &AAimMapGameModeBase::RestartGame, 5.0f);
+				FTimerHandle RestartHandle2;
+				GetWorldTimerManager().SetTimer(RestartHandle2, this, &AAimMapGameModeBase::RestartGame, 5.0f);
 				UE_LOG(LogTemp, Warning, TEXT("BLUE IS WINNER"));
 			}
 		}
-		
 	}
 }
 void AAimMapGameModeBase::RespawningPlayer()

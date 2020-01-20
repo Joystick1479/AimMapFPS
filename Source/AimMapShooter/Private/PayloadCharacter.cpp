@@ -157,14 +157,12 @@ void APayloadCharacter::PayloadMove(float DeltaTime)
 		}
 	}
 
-
+	/// PUSH LOGIC ///
 	if (ShouldPush == true)
 	{
 		FVector Translation = GetActorForwardVector() * ForceToPush * DeltaTime;
 		AddActorWorldOffset(Translation);
 	}
-
-	
 
 }
 
