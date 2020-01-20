@@ -903,7 +903,6 @@ void ASoldierCharacter::DefendObjectiveSound()
 					UGameplayStatics::PlaySound2D(this, DefendObjective);
 				}
 			}
-
 		}
 	}
 }

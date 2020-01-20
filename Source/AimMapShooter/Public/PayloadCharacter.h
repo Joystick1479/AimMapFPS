@@ -67,6 +67,9 @@ protected:
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerPayloadMove(float DeltaTime);
 
+	UPROPERTY(VisibleAnywhere, Category = "Sounds")
+	class UAudioComponent* AudioComp;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

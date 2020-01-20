@@ -5,6 +5,7 @@
 
 #include "Components/StaticMeshComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Components/AudioComponent.h"
 
 #include "GameFramework/CharacterMovementComponent.h"
 #include "PhysicsEngine/PhysicsConstraintComponent.h"
@@ -44,6 +45,7 @@ APayloadCharacter::APayloadCharacter()
 		PhysicsComp->SetupAttachment(CapsuleComp);
 	}
 
+	AudioComp = CreateDefaultSubobject<UAudioComponent>(TEXT("AudioComp"));
 	SetReplicates(true);
 
 }
@@ -61,10 +63,8 @@ void APayloadCharacter::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 
-
 	PayloadMove(DeltaTime);
 
-	
 }
 
 void APayloadCharacter::PayloadMove(float DeltaTime)
@@ -112,6 +112,7 @@ void APayloadCharacter::PayloadMove(float DeltaTime)
 		{
 			if (this->IsOverlappingActor(FirstCharacter) && this->IsOverlappingActor(SecondCharacter))
 			{
+				AudioComp->Deactivate();
 				ForceToPush = 0;
 				ShouldPush = false;
 
@@ -120,14 +121,17 @@ void APayloadCharacter::PayloadMove(float DeltaTime)
 			}
 			else if (this->IsOverlappingActor(FirstCharacter))
 			{
+				AudioComp->Activate();
 				ForceToPush = 50;
 				ShouldPush = true;
+
 
 				OnePlayerPushing = true;
 				ContestedPushing = false;
 			}
 			else if (this->IsOverlappingActor(SecondCharacter))
 			{
+				AudioComp->Activate();
 				ForceToPush = -50;
 				ShouldPush = true;
 
@@ -136,6 +140,7 @@ void APayloadCharacter::PayloadMove(float DeltaTime)
 			}
 			else
 			{
+				AudioComp->Deactivate();
 				OnePlayerPushing = false;
 				ContestedPushing = false;
 			}
