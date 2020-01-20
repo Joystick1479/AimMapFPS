@@ -114,16 +114,30 @@ void APayloadCharacter::PayloadMove(float DeltaTime)
 			{
 				ForceToPush = 0;
 				ShouldPush = false;
+
+				OnePlayerPushing = false;
+				ContestedPushing = true;
 			}
 			else if (this->IsOverlappingActor(FirstCharacter))
 			{
 				ForceToPush = 50;
 				ShouldPush = true;
+
+				OnePlayerPushing = true;
+				ContestedPushing = false;
 			}
 			else if (this->IsOverlappingActor(SecondCharacter))
 			{
 				ForceToPush = -50;
 				ShouldPush = true;
+
+				OnePlayerPushing = true;
+				ContestedPushing = false;
+			}
+			else
+			{
+				OnePlayerPushing = false;
+				ContestedPushing = false;
 			}
 		}
 	}
@@ -203,6 +217,8 @@ void APayloadCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	DOREPLIFETIME(APayloadCharacter, ShouldPush);
 	DOREPLIFETIME(APayloadCharacter, ForceToPush);
 	DOREPLIFETIME(APayloadCharacter, Translation);
+	DOREPLIFETIME(APayloadCharacter, OnePlayerPushing);
+	DOREPLIFETIME(APayloadCharacter, ContestedPushing);
 
 
 }

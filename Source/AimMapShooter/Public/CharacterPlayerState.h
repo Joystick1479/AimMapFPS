@@ -7,6 +7,7 @@
 #include "CharacterPlayerState.generated.h"
 
 class UUserWidget;
+class APayloadCharacter;
 
 /**
  * 
@@ -22,6 +23,15 @@ protected:
 private:
 	void StartingHud();
 
+	void PayloadStatus();
+
+	virtual void Tick(float DeltaTime) override;
+
+
+	UPROPERTY(EditDefaultsOnly, Category = "Player")
+	TSubclassOf<APayloadCharacter> PayloadCharacterClass;
+
+
 	UPROPERTY(EditDefaultsOnly, Category = "Player")
 	TSubclassOf<UUserWidget> wAmmoCount;
 
@@ -31,7 +41,24 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Player")
 	TSubclassOf<UUserWidget> wHealthIndicator;
 	
-
 	UPROPERTY()
 	UUserWidget* wHealthIndicatorvar;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Player")
+	TSubclassOf<UUserWidget> wPayloadObjective;
+
+	UPROPERTY()
+	UUserWidget* wPayloadObjectivesvar;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Player")
+	TSubclassOf<UUserWidget> wPayloadPushing;
+
+	UPROPERTY()
+	UUserWidget* wPayloadPushingvar;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Player")
+	TSubclassOf<UUserWidget> wPayloadContested;
+
+	UPROPERTY()
+	UUserWidget* wPayloadContestedvar;
 };

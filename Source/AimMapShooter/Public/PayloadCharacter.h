@@ -73,6 +73,12 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, Replicated)
 	bool ShouldPush;
+	
+	UPROPERTY(BlueprintReadOnly, Replicated)
+	bool OnePlayerPushing;
+
+	UPROPERTY(BlueprintReadOnly, Replicated)
+	bool ContestedPushing;
 
 	UPROPERTY(BlueprintReadWrite, Replicated)
 	FVector Translation;
