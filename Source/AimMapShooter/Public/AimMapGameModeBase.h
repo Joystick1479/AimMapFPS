@@ -48,11 +48,7 @@ private:
 	FTimerHandle GameOverTimer;
 	FTimerHandle RespawnDeadPlayer;
 
-
-
-
-
-	void CheckIfRespawn();
+	UFUNCTION(BlueprintCallable)
 	void RespawningPlayer();
 
 

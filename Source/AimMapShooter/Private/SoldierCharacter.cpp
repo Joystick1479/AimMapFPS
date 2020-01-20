@@ -105,7 +105,7 @@ void ASoldierCharacter::BeginPlay()
 	HealthComp->OnHealthChanged.AddDynamic(this, &ASoldierCharacter::OnHealthChanged);
 
 	///* Creating hud *//
-	StartingHud();
+//	StartingHud();
 
 	if (HealthComp)
 	{

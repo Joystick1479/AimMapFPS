@@ -64,14 +64,12 @@ void AAimMapGameModeBase::StartGame()
 
 void AAimMapGameModeBase::RestartGame()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Dzialaniby"));
-
-	ResetLevel();
+	//ResetLevel();
 
 	UWorld* World = GetWorld();
 	if (!ensure(World != nullptr)) return;
 
-	bUseSeamlessTravel = false;
+	bUseSeamlessTravel = true;
 	World->ServerTravel("/Game/AbandonedFactoryBuildings/Maps/Warehouse_01_day/Main_Warehouse_01?listen");
 
 }
@@ -119,7 +117,7 @@ void AAimMapGameModeBase::RespawningPlayer()
 	for (TActorIterator<ASoldierCharacter> Itr(GetWorld()); Itr; ++Itr)
 	{
 		ASoldierCharacter* Soldier = *Itr;
-		if (Soldier)
+		if (Soldier->bDied == true)
 		{
 			APlayerController* PC = Cast<APlayerController>(Soldier->GetController());
 			{
@@ -130,31 +128,14 @@ void AAimMapGameModeBase::RespawningPlayer()
 }
 
 
-void AAimMapGameModeBase::CheckIfRespawn()
-{
-	for (TActorIterator<ASoldierCharacter> Itr(GetWorld()); Itr; ++Itr)
-	{
-		ASoldierCharacter* Soldier = *Itr;
-		if (Itr)
-		{
-			AController* Contrl = Itr->GetController();
-			if (Contrl)
-			{
-				if (Itr->bDied == true)
-				{
-					GetWorldTimerManager().SetTimer(GameOverTimer, this, &AAimMapGameModeBase::RespawningPlayer, 5.0f);
-				}
-			}
-		}
-	}
-}
+
 
 void AAimMapGameModeBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
 	CheckIfGameOver();
-	CheckIfRespawn();
+	//RespawningPlayer();
 	
 }
 
