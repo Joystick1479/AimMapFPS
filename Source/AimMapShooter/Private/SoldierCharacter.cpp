@@ -710,15 +710,15 @@ void ASoldierCharacter::BeginCrouch()
 	{
 		ServerBeginCrouch();
 	}
-	UCharacterMovementComponent* MoveComp = this->FindComponentByClass<UCharacterMovementComponent>();
-	if (MoveComp)
-	{
-		if (MoveComp->GetLastUpdateVelocity().Size() < 10)
-		{
+	//UCharacterMovementComponent* MoveComp = this->FindComponentByClass<UCharacterMovementComponent>();
+	//if (MoveComp)
+	//{
+	//	if (MoveComp->GetLastUpdateVelocity().Size() < 10)
+	//	{
 			IsCrouching = true;
 			Crouch();
-		}
-	}
+	//	}
+//	}
 
 }
 void ASoldierCharacter::EndCrouch()
