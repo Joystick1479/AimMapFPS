@@ -221,6 +221,12 @@ void ASoldierCharacter::Tick(float DeltaTime)
 
 	DefendObjectiveSound();
 
+
+	UCharacterMovementComponent* MoveComp = this->FindComponentByClass<UCharacterMovementComponent>();
+	if (MoveComp)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Velocity is: %f"), MoveComp->GetLastUpdateVelocity().Size());
+	}
 }
 void ASoldierCharacter::OnDeath()
 {
@@ -704,8 +710,16 @@ void ASoldierCharacter::BeginCrouch()
 	{
 		ServerBeginCrouch();
 	}
-	IsCrouching = true;
-	Crouch();
+	UCharacterMovementComponent* MoveComp = this->FindComponentByClass<UCharacterMovementComponent>();
+	if (MoveComp)
+	{
+		if (MoveComp->GetLastUpdateVelocity().Size() < 10)
+		{
+			IsCrouching = true;
+			Crouch();
+		}
+	}
+
 }
 void ASoldierCharacter::EndCrouch()
 {
@@ -722,7 +736,8 @@ void ASoldierCharacter::ZoomIn()
 	UCharacterMovementComponent* MoveComp = this->FindComponentByClass<UCharacterMovementComponent>();
 	if (MoveComp && !IsSprinting)
 	{
-		MoveComp->MaxWalkSpeed = 78.0f;
+		//MoveComp->MaxWalkSpeed = 78.0f;
+		MoveComp->MaxWalkSpeed = 250.0f;
 
 		if (!IsSprinting)
 		{
@@ -753,7 +768,7 @@ void ASoldierCharacter::ZoomOut()
 	UCharacterMovementComponent* MoveComp = this->FindComponentByClass<UCharacterMovementComponent>();
 	if (MoveComp)
 	{
-		MoveComp->MaxWalkSpeed = 149.0f;
+		MoveComp->MaxWalkSpeed = 300.0f;
 	}
 	if (Role < ROLE_Authority)
 	{
@@ -821,7 +836,8 @@ void ASoldierCharacter::SprintOn()
 		UCharacterMovementComponent* MoveComp = this->FindComponentByClass<UCharacterMovementComponent>();
 		if (MoveComp)
 		{
-			MoveComp->MaxWalkSpeed = 270.0f;
+			//MoveComp->MaxWalkSpeed = 270.0f;
+			MoveComp->MaxWalkSpeed = 400.0f;
 		}
 	}
 	
@@ -840,7 +856,8 @@ void ASoldierCharacter::SprintOff()
 	UCharacterMovementComponent* MoveComp = this->FindComponentByClass<UCharacterMovementComponent>();
 	if (MoveComp)
 	{
-		MoveComp->MaxWalkSpeed = 149.0f;
+		//MoveComp->MaxWalkSpeed = 149.0f;
+		MoveComp->MaxWalkSpeed = 300.0f;
 	}
 	//CameraComp->ToggleActive();
 	//CameraSprintComp->ToggleActive();
