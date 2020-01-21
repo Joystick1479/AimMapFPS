@@ -815,13 +815,16 @@ void ASoldierCharacter::SprintOn()
 	{
 		ServerSprintOn();
 	}
-
-	IsSprinting = true;
-	UCharacterMovementComponent* MoveComp = this->FindComponentByClass<UCharacterMovementComponent>();
-	if (MoveComp)
+	if (IsZooming != true)
 	{
-		MoveComp->MaxWalkSpeed = 270.0f;
+		IsSprinting = true;
+		UCharacterMovementComponent* MoveComp = this->FindComponentByClass<UCharacterMovementComponent>();
+		if (MoveComp)
+		{
+			MoveComp->MaxWalkSpeed = 270.0f;
+		}
 	}
+	
 	//CameraComp->ToggleActive();
 	//CameraSprintComp->ToggleActive();
 }
