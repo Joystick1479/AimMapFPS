@@ -43,17 +43,10 @@ ASoldierCharacter::ASoldierCharacter()
 	RootComponent = this->GetRootComponent();
 
 	SpringArm = CreateDefaultSubobject <USpringArmComponent>(TEXT("SpringArm"));
-	//SpringArm->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, HeadSocket);
 	SpringArm->SetupAttachment(GetMesh(), HeadSocket);
 
 	CameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComp"));
-//	CameraComp->AttachToComponent(SpringArm, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 	CameraComp->SetupAttachment(SpringArm);
-	/*CameraComp->SetupAttachment(SpringArm);*/
-
-	CameraSprintComp = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraSprintComp"));
-//	CameraSprintComp->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, HeadSocket);
-
 
 	HealthComp = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComp"));
 
@@ -116,7 +109,6 @@ void ASoldierCharacter::BeginPlay()
 	SpringArm->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, HeadSocket);
 	CameraComp->AttachToComponent(SpringArm, FAttachmentTransformRules::KeepRelativeTransform);
 	CameraComp->AttachToComponent(SpringArm, FAttachmentTransformRules::KeepRelativeTransform);
-	CameraSprintComp->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, HeadSocket);
 }
 
 void ASoldierCharacter::LineTraceItem()
@@ -301,7 +293,7 @@ void ASoldierCharacter::Vault()
 		{
 			WallLocation = Hit.ImpactPoint;
 			WallNormal = Hit.Normal;
-			DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::Green, false, 1.0f, 0, 1.0f);
+			//DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::Green, false, 1.0f, 0, 1.0f);
 			isAbleToVault = true;
 
 			///// CHECKING IF OBJECT IS HIGH ENOUGH ////
@@ -314,7 +306,7 @@ void ASoldierCharacter::Vault()
 
 			if (GetWorld()->LineTraceSingleByChannel(Hit2, StartLocation2, EndLocation2, COLLISION_TRACE, CollisionParams) && isAbleToVault == true)
 			{
-				DrawDebugLine(GetWorld(), StartLocation2, EndLocation2, FColor::Blue, false, 1.0f, 0, 1.0f);
+			//	DrawDebugLine(GetWorld(), StartLocation2, EndLocation2, FColor::Blue, false, 1.0f, 0, 1.0f);
 				WallHight = Hit2.ImpactPoint;
 				float Test = (WallHight - WallLocation).Z;
 				if (Test < MaxHeightForVault)
@@ -346,7 +338,7 @@ void ASoldierCharacter::Vault()
 		FVector EndLocation3 = StartLocation3 - FVector(0, 0, 300);
 		if (GetWorld()->LineTraceSingleByChannel(Hit, StartLocation3, EndLocation3, COLLISION_TRACE, CollisionParams) && isAbleToVault == true)
 		{
-			DrawDebugLine(GetWorld(), StartLocation3, EndLocation3, FColor::Yellow, false, 1.0f, 0, 1.0f);
+			//DrawDebugLine(GetWorld(), StartLocation3, EndLocation3, FColor::Yellow, false, 1.0f, 0, 1.0f);
 			NextWallHight = Hit3.ImpactPoint;
 			isAllowClimbing = true;
 		}

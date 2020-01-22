@@ -326,9 +326,6 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Camera")
 	UCameraComponent* CameraComp;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Camera")
-	UCameraComponent* CameraSprintComp;
-
 	void TurnOnLaser();
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Camera")

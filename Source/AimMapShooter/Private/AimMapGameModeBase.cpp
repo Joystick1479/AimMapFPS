@@ -41,7 +41,7 @@ void AAimMapGameModeBase::PostLogin(APlayerController * NewPlayer)
 
 	if (NumberOfPlayers > 1)
 	{
-		GetWorldTimerManager().SetTimer(GameStartTimer, this, &AAimMapGameModeBase::StartGame, 3);
+		GetWorldTimerManager().SetTimer(GameStartTimer, this, &AAimMapGameModeBase::StartGame, 10);
 	}
 }
 
