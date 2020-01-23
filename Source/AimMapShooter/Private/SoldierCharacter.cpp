@@ -272,6 +272,8 @@ void ASoldierCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
 	PlayerInputComponent->BindAction("Vault", IE_Pressed, this, &ASoldierCharacter::Vault);
 
+	PlayerInputComponent->BindAction("Inspect", IE_Pressed, this, &ASoldierCharacter::WeaponInspectionOn);
+
 
 }
 void ASoldierCharacter::Vault()
@@ -726,7 +728,7 @@ void ASoldierCharacter::EndCrouch()
 void ASoldierCharacter::ZoomIn()
 {
 	UCharacterMovementComponent* MoveComp = this->FindComponentByClass<UCharacterMovementComponent>();
-	if (MoveComp && !IsSprinting)
+	if (MoveComp && !IsSprinting &&!IsInspecting)
 	{
 		//MoveComp->MaxWalkSpeed = 78.0f;
 		MoveComp->MaxWalkSpeed = 250.0f;
@@ -897,6 +899,19 @@ void ASoldierCharacter::FireMode()
 			IsSingleFire = false;
 		}
 	}
+}
+
+void ASoldierCharacter::WeaponInspectionOn()
+{
+	if (IsInspecting != true)
+	{
+		IsInspecting = true;
+		GetWorld()->GetTimerManager().SetTimer(InspectionTimer, this, &ASoldierCharacter::WeaponInspectionOff, 3.704f);
+	}
+}
+void ASoldierCharacter::WeaponInspectionOff()
+{
+	IsInspecting = false;
 }
 
 void ASoldierCharacter::DefendObjectiveSound()

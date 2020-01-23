@@ -269,6 +269,13 @@ protected:
 
 	void OnDeath();
 
+	void WeaponInspectionOn();
+	void WeaponInspectionOff();
+	FTimerHandle InspectionTimer;
+
+	UPROPERTY(BlueprintReadOnly)
+	bool IsInspecting;
+
 	UPROPERTY(EditDefaultsOnly, Category = "LineTrace")
 	float MaxUseDistance;
 
