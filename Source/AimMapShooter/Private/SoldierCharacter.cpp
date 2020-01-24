@@ -455,6 +455,10 @@ void ASoldierCharacter::ResetVaultTimer()
 
 void ASoldierCharacter::TurnOnLaser()
 {
+	if (Role < ROLE_Authority)
+	{
+		ServerTurnOnLaser();
+	}
 	if (Laser)
 	{
 		Laser->MeshComp2->ToggleVisibility();
@@ -1052,6 +1056,14 @@ void ASoldierCharacter::ServerStartingHud_Implementation()
 	StartingHud();
 }
 bool ASoldierCharacter::ServerStartingHud_Validate()
+{
+	return true;
+}
+void ASoldierCharacter::ServerTurnOnLaser_Implementation()
+{
+	TurnOnLaser();
+}
+bool ASoldierCharacter::ServerTurnOnLaser_Validate()
 {
 	return true;
 }

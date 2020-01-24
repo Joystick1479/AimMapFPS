@@ -171,6 +171,9 @@ protected:
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerShowingPickUpHud();
 
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerTurnOnLaser();
+
 	/////*** DISPLAYING HUD ****////
 	void ShowingPickUpHud();
 	void StartingHud();
