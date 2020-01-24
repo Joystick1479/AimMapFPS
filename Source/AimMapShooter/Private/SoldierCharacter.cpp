@@ -1095,6 +1095,7 @@ void ASoldierCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	DOREPLIFETIME(ASoldierCharacter, bHelmetPickUp);
 
 	DOREPLIFETIME(ASoldierCharacter, PlayerName);
+	DOREPLIFETIME(ASoldierCharacter, CameraComp);
 
 
 

@@ -330,7 +330,7 @@ public:
 	UPROPERTY(Replicated, BlueprintReadOnly, Category = "Player")
 	bool bDied;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Camera")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated, Category = "Camera")
 	UCameraComponent* CameraComp;
 
 	void TurnOnLaser();
