@@ -174,6 +174,12 @@ protected:
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerTurnOnLaser();
 
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerReloadingSound();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastReloadingSound();
+
 	/////*** DISPLAYING HUD ****////
 	void ShowingPickUpHud();
 	void StartingHud();
@@ -306,6 +312,10 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, Category = "Sounds")
 	UAudioComponent* AudioComp;
+
+
+	UPROPERTY(VisibleAnywhere, Category = "Sounds")
+	UAudioComponent* AudioCompReload;
 
 
 	UPROPERTY(EditDefaultsOnly, Category = "Sounds")

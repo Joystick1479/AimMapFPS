@@ -53,6 +53,9 @@ ASoldierCharacter::ASoldierCharacter()
 	AudioComp = CreateDefaultSubobject<UAudioComponent>(TEXT("AudioComp"));
 	AudioComp->SetupAttachment(GetMesh());
 
+	AudioCompReload = CreateDefaultSubobject<UAudioComponent>(TEXT("AudioCompReload"));
+	AudioCompReload->SetupAttachment(GetMesh());
+
 
 	ZoomingTime = 0.2f;
 
@@ -874,6 +877,8 @@ void ASoldierCharacter::Reload()
 			CharacterState = ECharacterState::Reloading;
 			IsReloading = true;
 			AutomaticRifle->StartReload();
+			AudioCompReload->Activate(true);
+			ServerReloadingSound();
 			GetWorldTimerManager().SetTimer(ReloadTimer, this, &ASoldierCharacter::StopReload, 2.167f, false);
 		}
 	}
@@ -885,6 +890,7 @@ void ASoldierCharacter::StopReload()
 	{
 		CharacterState = ECharacterState::Idle;
 		IsReloading = false;
+		AudioCompReload->Deactivate();
 		GetWorldTimerManager().ClearTimer(ReloadTimer);
 	}
 }
@@ -1066,6 +1072,18 @@ void ASoldierCharacter::ServerTurnOnLaser_Implementation()
 bool ASoldierCharacter::ServerTurnOnLaser_Validate()
 {
 	return true;
+}
+void ASoldierCharacter::ServerReloadingSound_Implementation()
+{
+	MulticastReloadingSound();
+}
+bool ASoldierCharacter::ServerReloadingSound_Validate()
+{
+	return true;
+}
+void ASoldierCharacter::MulticastReloadingSound_Implementation()
+{
+	AudioCompReload->Activate(true);
 }
 void ASoldierCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {

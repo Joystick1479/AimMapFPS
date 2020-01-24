@@ -9,6 +9,7 @@
 #include "Particles/ParticleSystemComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Sound/SoundCue.h"
+#include "Components/AudioComponent.h"
 #include "Components/SphereComponent.h"
 #include "AimMapShooter.h"
 #include "PhysicalMaterials/PhysicalMaterial.h"
@@ -34,7 +35,6 @@ AAutomaticRifle::AAutomaticRifle()
 
 	SphereComp = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
 	SphereComp->SetupAttachment(SkelMeshComp);
-	
 
 	MuzzleSocket = "MuzzleSocket";
 	LineSocket = "LineSocket";
@@ -372,21 +372,22 @@ void AAutomaticRifle::StartReload()
 		ServerStartReload();
 		//return;
 	}
+
 	if (ReloadingState == EReloadingState::None && CurrentAmountOfClips>0)
 	{
 		ReloadingState = EReloadingState::Reloading;
 		CurrentState = EWeaponState::Reloading;
 
-		UGameplayStatics::PlaySoundAtLocation(GetWorld(), ReloadSound, GetActorLocation());
+		//UGameplayStatics::PlaySoundAtLocation(GetWorld(), ReloadSound, GetActorLocation());
 
 		GetWorldTimerManager().SetTimer(TimerHandle_ReloadWeapon, this, &AAutomaticRifle::ReloadWeapon, 2.5f, false);
 	}
 
 }
 
+
 void AAutomaticRifle::StopReload()
 {
-
 	GetWorldTimerManager().ClearTimer(TimerHandle_ReloadWeapon);
 }
 

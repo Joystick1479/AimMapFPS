@@ -108,9 +108,11 @@ public:
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerStartReload();
 
+	UFUNCTION(BlueprintCallable)
 	void StartReload();
 	void StopReload();
 	void ReloadWeapon();
+
 
 
 	FName MuzzleSocket;
@@ -151,8 +153,6 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
 	USphereComponent* SphereComp;
-
-
 
 	//Start location of holographic sight//
 	FName LineSocket;
