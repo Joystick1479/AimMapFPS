@@ -18,6 +18,7 @@ void ACharacterPlayerState::BeginPlay()
 
 void ACharacterPlayerState::StartingHud()
 {
+	UE_LOG(LogTemp, Warning, TEXT("Player State begin play"));
 		APlayerController* PC = Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
 		if (PC)
 		{

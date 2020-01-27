@@ -289,8 +289,6 @@ protected:
 	float MaxUseDistance;
 
 
-
-
 	UFUNCTION()
 	void OnHealthChanged(UHealthComponent* OwningHealthComp, float Health, float HealthDelta, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
 

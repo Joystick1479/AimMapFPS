@@ -27,7 +27,7 @@ protected:
 	UFUNCTION()
 	void OnRep_Health(float OldHealth);
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HealthComponent")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated, Category = "HealthComponent")
 	float DefaultHealth;
 
 

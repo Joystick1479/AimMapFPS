@@ -104,9 +104,6 @@ void ASoldierCharacter::BeginPlay()
 	
 	HealthComp->OnHealthChanged.AddDynamic(this, &ASoldierCharacter::OnHealthChanged);
 
-	///* Creating hud *//
-	//	StartingHud();
-
 	if (HealthComp)
 	{
 		HealthComp->Health = 100;
@@ -219,12 +216,6 @@ void ASoldierCharacter::Tick(float DeltaTime)
 
 	DefendObjectiveSound();
 
-
-	UCharacterMovementComponent* MoveComp = this->FindComponentByClass<UCharacterMovementComponent>();
-	if (MoveComp)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Velocity is: %f"), MoveComp->GetLastUpdateVelocity().Size());
-	}
 }
 void ASoldierCharacter::OnDeath()
 {
@@ -600,10 +591,10 @@ void ASoldierCharacter::StartingHud()
 	//	ServerStartingHud();
 	//	//return;
 	//}
-	if (IsLocallyControlled())
+	/*if (IsLocallyControlled())
 	{
 		APlayerController* PC = Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
-		
+
 		if (PC)
 		{
 			if (wAmmoCount)
@@ -623,7 +614,7 @@ void ASoldierCharacter::StartingHud()
 				}
 			}
 		}
-	}
+	}*/
 }
 
 void ASoldierCharacter::DyingAudioTrigger()
@@ -648,16 +639,6 @@ void ASoldierCharacter::ClearingHudAfterDeath()
 		}
 		FTimerHandle DeathTimer;
 		GetWorldTimerManager().SetTimer(DeathTimer, this, &ASoldierCharacter::OnDeath, 2.5f, false);
-
-		//**REMOVING HUD FROM VIEWPORT **//
-		TArray<UUserWidget*> HealthWidgets;
-		UWidgetBlueprintLibrary::GetAllWidgetsOfClass(this, HealthWidgets, WidgetClass, true);
-
-		if (HealthWidgets.Num() > 0)
-		{
-			UUserWidget* NewWidget = HealthWidgets[0];
-			NewWidget->RemoveFromParent();
-		}
 	}
 }
 	
@@ -1088,6 +1069,7 @@ void ASoldierCharacter::MulticastReloadingSound_Implementation()
 {
 	AudioCompReload->Activate(true);
 }
+
 void ASoldierCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	//This function tells us how we want to replicate things//
