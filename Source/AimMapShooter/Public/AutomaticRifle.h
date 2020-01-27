@@ -102,6 +102,7 @@ public:
 
 	void Fire();
 	///////****MUTLIPLAYER REPLICATION*****////
+
 	UFUNCTION(Server,Reliable, WithValidation)
 	void ServerFire();
 

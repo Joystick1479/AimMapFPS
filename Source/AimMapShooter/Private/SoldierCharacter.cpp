@@ -89,20 +89,23 @@ void ASoldierCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	///**Getting weapon on begin play *//
-	FActorSpawnParameters SpawnParams;
-	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	AutomaticRifle = GetWorld()->SpawnActor<AAutomaticRifle>(StarterWeaponClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
-	if (AutomaticRifle)
+	if (Role == ROLE_Authority)
 	{
-		AutomaticRifle->SetOwner(this);
-		AutomaticRifle->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocket);
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		AutomaticRifle = GetWorld()->SpawnActor<AAutomaticRifle>(StarterWeaponClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
+		if (AutomaticRifle)
+		{
+			AutomaticRifle->SetOwner(this);
+			AutomaticRifle->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocket);
+		}
 	}
-	UGameplayStatics::PlaySoundAtLocation(this, RiflePickUp, GetActorLocation());
+	//UGameplayStatics::PlaySoundAtLocation(this, RiflePickUp, GetActorLocation());
 	
 	HealthComp->OnHealthChanged.AddDynamic(this, &ASoldierCharacter::OnHealthChanged);
 
 	///* Creating hud *//
-//	StartingHud();
+	//	StartingHud();
 
 	if (HealthComp)
 	{

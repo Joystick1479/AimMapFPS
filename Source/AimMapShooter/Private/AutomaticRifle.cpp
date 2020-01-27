@@ -151,7 +151,6 @@ void AAutomaticRifle::OnRep_HitScanTrace()
 {
 	// Play cosmetic FX//
 	PlayFireEffects(HitScanTrace.TraceTo);
-
 	PlayImpactEffects(HitScanTrace.TraceTo);
 }
 
@@ -161,6 +160,10 @@ void AAutomaticRifle::Fire()
 	{
 		ServerFire();
 	}
+	//if (Role == ROLE_Authority)
+	//{
+	//	MulticastFire();
+	//}
 	if (CurrentAmmoInClip > 0 && CurrentState != EWeaponState::Reloading)
 	{
 		CurrentState = EWeaponState::Firing;
@@ -226,10 +229,12 @@ void AAutomaticRifle::Fire()
 					UGameplayStatics::ApplyPointDamage(HitActor, ActualDamage, ShotDirection, Hit, MyOwner->GetInstigatorController(), MyOwner, DamageType);
 				}
 				UseAmmo();
-				PlayFireEffects(EndLocation);
+			//	PlayFireEffects(EndLocation);
+				PlayFireEffects(Hit.ImpactPoint);
+
 				if (Role == ROLE_Authority)
 				{
-					HitScanTrace.TraceTo = EndLocation;
+					HitScanTrace.TraceTo = Hit.ImpactPoint;
 				}
 			}
 		}
@@ -295,10 +300,12 @@ void AAutomaticRifle::Fire()
 
 				}
 				UseAmmo();
-				PlayFireEffects(EndLocation);
+				//PlayFireEffects(EndLocation);
+				PlayFireEffects(Hit.ImpactPoint);
+
 				if (Role == ROLE_Authority)
 				{
-					HitScanTrace.TraceTo = EndLocation;
+					HitScanTrace.TraceTo = Hit.ImpactPoint;
 				}
 			}
 		}
@@ -384,7 +391,6 @@ void AAutomaticRifle::StartReload()
 	}
 
 }
-
 
 void AAutomaticRifle::StopReload()
 {
