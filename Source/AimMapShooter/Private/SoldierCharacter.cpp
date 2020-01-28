@@ -621,10 +621,14 @@ void ASoldierCharacter::DyingAudioTrigger()
 {
 	///** PLAYING/STOPPING SOUND WHEN LOW HEALTH/DEAD**//
 
-	if (bDied == true)
+	if (IsLocallyControlled())
 	{
-		AudioComp->Stop();
+		if (bDied == true)
+		{
+			AudioComp->DestroyComponent();
+		}
 	}
+
 }
 
 void ASoldierCharacter::ClearingHudAfterDeath()
