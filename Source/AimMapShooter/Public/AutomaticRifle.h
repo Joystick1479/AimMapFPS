@@ -62,8 +62,6 @@ struct FWeaponData
 	UPROPERTY(EditDefaultsOnly, Category = "Ammo")
 	int32 InitialClips;
 
-	UPROPERTY(EditDefaultsOnly, Category = WeaponStat)
-	float TimeBetweenShots;
 
 	UPROPERTY(EditDefaultsOnly, Category = WeaponStat)
 	float TimeBetweenReload;
@@ -73,7 +71,6 @@ struct FWeaponData
 		MaxAmmo = 100;
 		AmmoPerClip = 20;
 		InitialClips = 2;
-		TimeBetweenShots = 0.2f;
 		TimeBetweenReload = 2.0f;
 	}
 };
@@ -134,6 +131,9 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, Category = "Ammo")
 	int32 CurrentAmountOfClips;
+
+	UPROPERTY(EditDefaultsOnly, Category = WeaponStat)
+	float TimeBetweenShots;
 
 protected:
 	// Called when the game starts or when spawned

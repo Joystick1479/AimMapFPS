@@ -60,7 +60,7 @@ AAutomaticRifle::AAutomaticRifle()
 	NetUpdateFrequency = 66.0f;
 	MinNetUpdateFrequency = 33.0f;
 	
-
+	float  TestShots = 60 / RateOfFire;
 
 }
 
@@ -85,7 +85,7 @@ void AAutomaticRifle::BeginPlay()
 		CurrentAmountOfClips = WeaponConfig.InitialClips;
 	}
 
-	WeaponConfig.TimeBetweenShots = 60 / RateOfFire;
+	TimeBetweenShots = 60 / RateOfFire;
 	
 }
 
@@ -120,10 +120,10 @@ void AAutomaticRifle::Tick(float DeltaTime)
 //}
 void AAutomaticRifle::StartFire()
 {
+	float FirstDelay = FMath::Max(LastFireTime + TimeBetweenShots - GetWorld()->TimeSeconds,0.0f);
+	GetWorldTimerManager().SetTimer(TimerHandle_TimeBetweenShots, this, &AAutomaticRifle::Fire, TimeBetweenShots, true, FirstDelay);
 
-	float FirstDelay = FMath::Max(LastFireTime + WeaponConfig.TimeBetweenShots - GetWorld()->TimeSeconds, 0.0f);
-	GetWorldTimerManager().SetTimer(TimerHandle_TimeBetweenShots, this, &AAutomaticRifle::Fire, WeaponConfig.TimeBetweenShots, true, FirstDelay);
-	Fire();
+
 }
 
 void AAutomaticRifle::StopFire()
