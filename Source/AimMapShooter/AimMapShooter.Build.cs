@@ -8,7 +8,7 @@ public class AimMapShooter : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore","UMG","Slate","SlateCore", "OnlineSubsystem", "OnlineSubsystemSteam","NavigationSystem","AIModule" });
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore","UMG","Slate","SlateCore", "OnlineSubsystem", "OnlineSubsystemSteam","NavigationSystem","AIModule","Paper2D" });
 
 
         PrivateDependencyModuleNames.AddRange(new string[] {  });

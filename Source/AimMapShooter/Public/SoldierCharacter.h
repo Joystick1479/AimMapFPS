@@ -331,6 +331,9 @@ protected:
 	
 	class UStaticMeshComponent* MeshComp;
 
+	UPROPERTY(VisibleAnywhere, Category = "Minimapa")
+	class	UPaperSpriteComponent* PaperSpriteComp;
+
 public:	
 	UPROPERTY(BlueprintReadWrite, Replicated)
 	FString PlayerName;
