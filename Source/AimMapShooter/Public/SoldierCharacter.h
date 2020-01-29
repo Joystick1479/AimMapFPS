@@ -22,6 +22,7 @@ class USoundCue;
 class UAudioComponent;
 class APayloadCharacter;
 
+class UMinimapComponent;
 
 namespace ECharacterState
 {
@@ -103,9 +104,21 @@ public:
 	// Sets default values for this character's properties
 	ASoldierCharacter();
 
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	UMinimapComponent* Minimap;
+
+	UPROPERTY(VisibleAnywhere, Category = "Minimap")
+	USpringArmComponent* SpringArmRender2;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Minimap")
+	class UPaperSpriteComponent* PaperSpriteComp;
+
+	UPROPERTY(VisibleAnywhere, Category = "Minimap")
+	class USceneCaptureComponent2D* SceneCapture;
 
 	ECharacterState::Type CharacterState;
 
@@ -331,8 +344,6 @@ protected:
 	
 	class UStaticMeshComponent* MeshComp;
 
-	UPROPERTY(VisibleAnywhere, Category = "Minimapa")
-	class	UPaperSpriteComponent* PaperSpriteComp;
 
 public:	
 	UPROPERTY(BlueprintReadWrite, Replicated)

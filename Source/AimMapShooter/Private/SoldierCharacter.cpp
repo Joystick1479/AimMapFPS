@@ -5,6 +5,8 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/StaticMeshComponent.h"
+#include "Components/SceneCaptureComponent2D.h"
+#include "MinimapComponent.h"
 #include "PaperSpriteComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
@@ -57,6 +59,12 @@ ASoldierCharacter::ASoldierCharacter()
 	AudioCompReload = CreateDefaultSubobject<UAudioComponent>(TEXT("AudioCompReload"));
 	AudioCompReload->SetupAttachment(GetMesh());
 
+	SpringArmRender2 = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmRender2"));
+	PaperSpriteComp = CreateDefaultSubobject<UPaperSpriteComponent>(TEXT("PaperSpriteComp"));
+	SceneCapture = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("SceneCaptureComp"));
+
+
+
 
 
 	ZoomingTime = 0.2f;
@@ -85,10 +93,27 @@ ASoldierCharacter::ASoldierCharacter()
 }
 
 
+
 // Called when the game starts or when spawned
 void ASoldierCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+	if (IsLocallyControlled())
+	{
+		if (SpringArmRender2)
+		{
+			SpringArmRender2->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform);
+		}
+		if (PaperSpriteComp)
+		{
+			PaperSpriteComp->AttachToComponent(SpringArmRender2, FAttachmentTransformRules::KeepRelativeTransform);
+		}
+		if (SceneCapture)
+		{
+			SceneCapture->AttachToComponent(SpringArmRender2, FAttachmentTransformRules::KeepRelativeTransform);
+		}
+	}
 
 	///**Getting weapon on begin play *//
 	if (Role == ROLE_Authority)
