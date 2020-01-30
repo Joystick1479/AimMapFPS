@@ -109,13 +109,9 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	UMinimapComponent* Minimap;
 
 	UPROPERTY(VisibleAnywhere, Category = "Minimap")
 	USpringArmComponent* SpringArmRender2;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Minimap")
-	class UPaperSpriteComponent* PaperSpriteComp;
 
 	UPROPERTY(VisibleAnywhere, Category = "Minimap")
 	class USceneCaptureComponent2D* SceneCapture;

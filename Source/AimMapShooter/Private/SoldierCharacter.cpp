@@ -6,7 +6,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/SceneCaptureComponent2D.h"
-#include "MinimapComponent.h"
+#include "SpriteComponent.h"
 #include "PaperSpriteComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
@@ -59,12 +59,9 @@ ASoldierCharacter::ASoldierCharacter()
 	AudioCompReload = CreateDefaultSubobject<UAudioComponent>(TEXT("AudioCompReload"));
 	AudioCompReload->SetupAttachment(GetMesh());
 
+	// MINIMAP //
 	SpringArmRender2 = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmRender2"));
-	PaperSpriteComp = CreateDefaultSubobject<UPaperSpriteComponent>(TEXT("PaperSpriteComp"));
 	SceneCapture = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("SceneCaptureComp"));
-
-
-
 
 
 	ZoomingTime = 0.2f;
@@ -99,15 +96,20 @@ void ASoldierCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	/// MINIMAP ///
 	if (IsLocallyControlled())
 	{
 		if (SpringArmRender2)
 		{
 			SpringArmRender2->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform);
 		}
-		if (PaperSpriteComp)
+		UPaperSpriteComponent* SpriteComp = this->FindComponentByClass<UPaperSpriteComponent>();
+		if (SpriteComp)
 		{
-			PaperSpriteComp->AttachToComponent(SpringArmRender2, FAttachmentTransformRules::KeepRelativeTransform);
+			FRotator Rotator = FRotator(0, 90.0f, 0);
+			FVector Vector = FVector(0, 45.0f, 0);
+			SpriteComp->SetRelativeRotation(Rotator);
+			SpriteComp->SetRelativeLocation(Vector);
 		}
 		if (SceneCapture)
 		{
