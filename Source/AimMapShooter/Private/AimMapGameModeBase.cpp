@@ -9,6 +9,8 @@
 #include "RedEndgame.h"
 #include "BlueEndGame.h"
 
+#include "Sound/SoundCue.h"
+
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
 

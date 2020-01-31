@@ -9,6 +9,8 @@
 class ARedEndgame;
 class ABlueEndgame;
 class ASoldierCharacter;
+class UUserWidget;
+class USoundCue;
 
 /**
  * 
@@ -65,6 +67,14 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "EndTarget")
 	TSubclassOf<ARedEndgame> RedEndgameClass;
+
+
+	UPROPERTY(EditDefaultsOnly, Category = "GameOver")
+	TSubclassOf<UUserWidget> GameOverWidget;
+
+	UPROPERTY()
+	UUserWidget* wGameOverWidget;
+
 
 	virtual void Tick(float DeltaTime) override;
 

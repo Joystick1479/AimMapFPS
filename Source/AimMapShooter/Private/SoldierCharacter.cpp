@@ -29,7 +29,9 @@
 #include "Engine/EngineTypes.h"
 #include "GameFramework/Controller.h"
 #include "PayloadCharacter.h"
-
+#include "RedEndgame.h"
+#include "BlueEndgame.h"
+#include "Sound/SoundCue.h"
 
 // Sets default values
 ASoldierCharacter::ASoldierCharacter()
@@ -244,6 +246,8 @@ void ASoldierCharacter::Tick(float DeltaTime)
 	DyingAudioTrigger();
 
 	DefendObjectiveSound();
+
+	GameOverSound();
 
 }
 void ASoldierCharacter::OnDeath()
@@ -955,6 +959,48 @@ void ASoldierCharacter::DefendObjectiveSound()
 				if (PayloadChar->ShouldPush == true)
 				{
 					UGameplayStatics::PlaySound2D(this, DefendObjective);
+				}
+			}
+		}
+	}
+}
+void ASoldierCharacter::GameOverSound()
+{
+	TArray<AActor*> HostEndGame;
+	UGameplayStatics::GetAllActorsOfClass(this, HostEndgameClass, HostEndGame);
+
+	for (int i = 0; i < HostEndGame.Num(); i++)
+	{
+		ABlueEndgame*New = Cast<ABlueEndgame>(HostEndGame[i]);
+		if (New)
+		{
+			if (New->BlueWins == true)
+			{
+				if (bStopSound == false)
+				{
+					bStopSound = true;
+					UGameplayStatics::PlaySound2D(this, GameOverAudio);
+					UE_LOG(LogTemp, Warning, TEXT("Tescik"));
+				}
+			}
+		}
+	}
+
+	TArray<AActor*> ClientEndGame;
+	UGameplayStatics::GetAllActorsOfClass(this, ClientEndgameClass, ClientEndGame);
+
+	for (int i = 0; i < ClientEndGame.Num(); i++)
+	{
+		ARedEndgame*New = Cast<ARedEndgame>(ClientEndGame[i]);
+		if (New)
+		{
+			if (New->RedWins == true)
+			{
+				if (bStopSound == false)
+				{
+					bStopSound = true;
+					UGameplayStatics::PlaySound2D(this, GameOverAudio);
+					UE_LOG(LogTemp, Warning, TEXT("Tescik"));
 				}
 			}
 		}

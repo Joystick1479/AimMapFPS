@@ -21,6 +21,8 @@ class UUserWidget;
 class USoundCue;
 class UAudioComponent;
 class APayloadCharacter;
+class ARedEndgame;
+class ABlueEndgame;
 
 class UMinimapComponent;
 
@@ -331,10 +333,23 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Sounds")
 	USoundCue* DefendObjective;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Sounds")
+	USoundCue* GameOverAudio;
+
+	bool bStopSound;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Payload")
 	TSubclassOf<APayloadCharacter> PayloadCharacterClass;
 
+	UPROPERTY(EditDefaultsOnly, Category = "EndTarget")
+	TSubclassOf<ARedEndgame> ClientEndgameClass;
+
+	UPROPERTY(EditDefaultsOnly, Category = "EndTarget")
+	TSubclassOf<ABlueEndgame> HostEndgameClass;
+
 	void DefendObjectiveSound();
+
+	void GameOverSound();
 
 	void NotifyActorBeginOverlap(AActor * OtherActor);
 	
