@@ -131,7 +131,6 @@ void ASoldierCharacter::BeginPlay()
 			AutomaticRifle->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocket);
 		}
 	}
-	//UGameplayStatics::PlaySoundAtLocation(this, RiflePickUp, GetActorLocation());
 	
 	HealthComp->OnHealthChanged.AddDynamic(this, &ASoldierCharacter::OnHealthChanged);
 
