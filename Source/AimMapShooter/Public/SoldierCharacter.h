@@ -388,7 +388,7 @@ public:
 	void ServerSpawnGrenade();
 
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Grenade")
 	class USceneComponent* GrenadeStartLocation;
 
 	UPROPERTY(BlueprintReadWrite, Replicated)

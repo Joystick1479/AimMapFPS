@@ -40,9 +40,9 @@ void AFlashGrenade::BeginPlay()
 	//	ASoldierCharacter*New = Cast<ASoldierCharacter>(Character[i]);
 	//	if (New)
 	//	{
-			FVector Impulse = MeshComp->GetForwardVector() * 750;
-			FVector Impulse2 = UKismetMathLibrary::RandomUnitVector() * 500;
-			ThrowinGrenade(Impulse,Impulse2);
+		FVector Impulse = MeshComp->GetForwardVector() * 750;
+		FVector Impulse2 = UKismetMathLibrary::RandomUnitVector() * 500;
+		ThrowinGrenade(Impulse,Impulse2);
 	//	}
 	//}
 	//
@@ -71,7 +71,7 @@ void AFlashGrenade::SpawnExplosionDecal()
 {
 	ExplosionSound();
 
-	FRotator DecalRotation = FRotator(0, 90, 0);
+	FRotator DecalRotation = FRotator(90, 0, 0);
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	GrenadeDecal = GetWorld()->SpawnActor<AGrenadeDecal>(GrenadeDecalClass, this->GetActorLocation(), DecalRotation, SpawnParams);

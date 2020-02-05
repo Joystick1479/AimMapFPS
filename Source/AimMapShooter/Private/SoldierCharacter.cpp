@@ -73,7 +73,8 @@ ASoldierCharacter::ASoldierCharacter()
 	SpringArmRender2 = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmRender2"));
 	SceneCapture = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("SceneCaptureComp"));
 
-	//GrenadeStartLocation = CreateDefaultSubobject<USceneComponent>(TEXT("SceneComponent"));
+	GrenadeStartLocation = CreateDefaultSubobject<USceneComponent>(TEXT("SceneComponent"));
+	GrenadeStartLocation->SetupAttachment(this->GetRootComponent());
 
 
 	ZoomingTime = 0.2f;
@@ -90,7 +91,7 @@ ASoldierCharacter::ASoldierCharacter()
 
 	bRiflePickUp = false;
 
-	//AmountGrenades = 10;
+	AmountGrenades = 10;
 
 	SetReplicates(true);
 	NetUpdateFrequency = 66.0f;
@@ -1047,6 +1048,10 @@ void ASoldierCharacter::FindingGrenadeTransform()
 	{
 		STL = GrenadeStartLocation->GetComponentLocation();
 		STR = GrenadeStartLocation->GetComponentRotation();
+
+	UE_LOG(LogTemp, Warning, TEXT("STL is: %s"), *STL.ToString());
+	UE_LOG(LogTemp, Warning, TEXT("STR is: %s"), *STR.ToString());
+
 	}
 }
 void ASoldierCharacter::ThrowGrenade()
