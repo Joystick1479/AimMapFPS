@@ -357,6 +357,12 @@ protected:
 
 
 public:	
+
+
+	///GRENADE///
+
+	void AngleFromFlash(FVector GrenadeLoc);
+
 	UPROPERTY(BlueprintReadWrite, Replicated)
 	FString PlayerName;
 

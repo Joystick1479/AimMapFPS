@@ -1018,6 +1018,22 @@ void ASoldierCharacter::NotifyActorBeginOverlap(AActor * OtherActor)
 	}
 }
 
+void ASoldierCharacter::AngleFromFlash(FVector GrenadeLoc)
+{
+	FVector CameraLocationVector = CameraComp->GetComponentLocation();
+	float LookAtRotaion = UKismetMathLibrary::FindLookAtRotation(CameraLocationVector, GrenadeLoc).Yaw;
+	float CameraRotation = CameraComp->GetComponentRotation().Yaw;
+	float DiffRotation = LookAtRotaion - CameraRotation;
+	if (DiffRotation >= 90.0f || DiffRotation <= -90.0f)
+	{
+		bool IsFacing = true;
+	}
+	else
+	{
+		bool IsFacing = false;
+	}
+}
+
 void ASoldierCharacter::OnHealthChanged(UHealthComponent * OwningHealthComp, float Health, float HealthDelta, const UDamageType * DamageType, AController * InstigatedBy, AActor * DamageCauser)
 {
 
