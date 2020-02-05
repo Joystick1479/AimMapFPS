@@ -2,15 +2,22 @@
 #include "SoldierCharacter.h"
 #include "Camera/CameraComponent.h"
 #include "AutomaticRifle.h"
+
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/SceneCaptureComponent2D.h"
+#include "Components/SceneComponent.h" 
+
 #include "SpriteComponent.h"
 #include "PaperSpriteComponent.h"
+
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Kismet/KismetMaterialLibrary.h"
+#include "Materials/MaterialParameterCollection.h"
+
 #include "HealthComponent.h"
 #include "AimMapShooter.h"
 #include "HoloScope.h"
@@ -31,6 +38,7 @@
 #include "PayloadCharacter.h"
 #include "RedEndgame.h"
 #include "BlueEndgame.h"
+#include "FlashGrenade.h"
 #include "Sound/SoundCue.h"
 
 // Sets default values
@@ -65,6 +73,8 @@ ASoldierCharacter::ASoldierCharacter()
 	SpringArmRender2 = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmRender2"));
 	SceneCapture = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("SceneCaptureComp"));
 
+	//GrenadeStartLocation = CreateDefaultSubobject<USceneComponent>(TEXT("SceneComponent"));
+
 
 	ZoomingTime = 0.2f;
 
@@ -79,6 +89,8 @@ ASoldierCharacter::ASoldierCharacter()
 	MaxUseDistance = 400;
 
 	bRiflePickUp = false;
+
+	//AmountGrenades = 10;
 
 	SetReplicates(true);
 	NetUpdateFrequency = 66.0f;
@@ -139,29 +151,35 @@ void ASoldierCharacter::BeginPlay()
 		HealthComp->Health = 100;
 	}
 
-	SpringArm->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, HeadSocket);
-	CameraComp->AttachToComponent(SpringArm, FAttachmentTransformRules::KeepRelativeTransform);
-	CameraComp->AttachToComponent(SpringArm, FAttachmentTransformRules::KeepRelativeTransform);
+	if (SpringArm)
+	{
+		SpringArm->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, HeadSocket);
+	}
+	if (CameraComp)
+	{
+		CameraComp->AttachToComponent(SpringArm, FAttachmentTransformRules::KeepRelativeTransform);
+	}
+
 }
 
 void ASoldierCharacter::LineTraceItem()
 {
-	if (Role < ROLE_Authority)
-	{
-		ServerLineTraceItem();
-		//return;
-	}
+	//if (Role < ROLE_Authority)
+	//{
+	//	ServerLineTraceItem();
+	//	//return;
+	//}
 
-		 FVector start_trace = CameraComp->GetComponentLocation();
-		 FVector direction = CameraComp->GetComponentRotation().Vector();
-		 FVector end_trace = start_trace + (direction* MaxUseDistance);
+	//	 FVector start_trace = CameraComp->GetComponentLocation();
+	//	 FVector direction = CameraComp->GetComponentRotation().Vector();
+	//	 FVector end_trace = start_trace + (direction* MaxUseDistance);
 
-		FCollisionQueryParams TraceParams(FName(TEXT("")), true, this);
-		TraceParams.bReturnPhysicalMaterial = false;
-		TraceParams.bTraceComplex = true;
-		TraceParams.AddIgnoredActor(this);
+	//	FCollisionQueryParams TraceParams(FName(TEXT("")), true, this);
+	//	TraceParams.bReturnPhysicalMaterial = false;
+	//	TraceParams.bTraceComplex = true;
+	//	TraceParams.AddIgnoredActor(this);
 
-		FHitResult Hit;
+	//	FHitResult Hit;
 
 		//	if (GetWorld()->LineTraceSingleByChannel(Hit, start_trace, end_trace, COLLISION_ITEMS, TraceParams) && HoldingWeaponState == EHoldingWeapon::None)
 		//	{
@@ -248,6 +266,8 @@ void ASoldierCharacter::Tick(float DeltaTime)
 
 	GameOverSound();
 
+	FindingGrenadeTransform();
+
 }
 void ASoldierCharacter::OnDeath()
 {
@@ -302,6 +322,9 @@ void ASoldierCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	PlayerInputComponent->BindAction("Vault", IE_Pressed, this, &ASoldierCharacter::Vault);
 
 	PlayerInputComponent->BindAction("Inspect", IE_Pressed, this, &ASoldierCharacter::WeaponInspectionOn);
+
+	PlayerInputComponent->BindAction("Grenade", IE_Pressed, this, &ASoldierCharacter::ThrowGrenade);
+
 
 
 }
@@ -1018,19 +1041,70 @@ void ASoldierCharacter::NotifyActorBeginOverlap(AActor * OtherActor)
 	}
 }
 
+void ASoldierCharacter::FindingGrenadeTransform()
+{
+	if (GrenadeStartLocation)
+	{
+		STL = GrenadeStartLocation->GetComponentLocation();
+		STR = GrenadeStartLocation->GetComponentRotation();
+	}
+}
+void ASoldierCharacter::ThrowGrenade()
+{
+	if (AmountGrenades > 0)
+	{
+		AmountGrenades--;
+		if (IsLocallyControlled())
+		{
+			SpawnGrenade(STL, STR);
+		}
+	}
+}
+void ASoldierCharacter::SpawnGrenade(FVector STL, FRotator STR)
+{
+	if (Role < ROLE_Authority)
+	{
+		ServerSpawnGrenade();
+	}
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	FlashGrenade = GetWorld()->SpawnActor<AFlashGrenade>(FlashGrenadeClass, STL, STR, SpawnParams);
+}
+void ASoldierCharacter::Flashbang(float Distance, FVector FacingAngle)
+{
+	FlashAmount = (UKismetMathLibrary::NormalizeToRange(Distance, 20.0f, 100.0f) / 10.0f) * (-1.0f);
+	if (Distance < 2000.0f)
+	{
+		AngleFromFlash(FacingAngle);
+		if (IsFacing == true)
+		{
+			FlashAmount = 0.5f;
+			UKismetMaterialLibrary::SetScalarParameterValue(this, MaterialCollection, "Flash_Value", FlashAmount);
+
+		}
+		else
+		{
+			UKismetMaterialLibrary::SetScalarParameterValue(this, MaterialCollection, "Flash_Value", FlashAmount);
+		}
+	}
+
+}
 void ASoldierCharacter::AngleFromFlash(FVector GrenadeLoc)
 {
-	FVector CameraLocationVector = CameraComp->GetComponentLocation();
-	float LookAtRotaion = UKismetMathLibrary::FindLookAtRotation(CameraLocationVector, GrenadeLoc).Yaw;
-	float CameraRotation = CameraComp->GetComponentRotation().Yaw;
-	float DiffRotation = LookAtRotaion - CameraRotation;
-	if (DiffRotation >= 90.0f || DiffRotation <= -90.0f)
+	if (CameraComp)
 	{
-		bool IsFacing = true;
-	}
-	else
-	{
-		bool IsFacing = false;
+		FVector CameraLocationVector = CameraComp->GetComponentLocation();
+		float LookAtRotaion = UKismetMathLibrary::FindLookAtRotation(CameraLocationVector, GrenadeLoc).Yaw;
+		float CameraRotation = CameraComp->GetComponentRotation().Yaw;
+		float DiffRotation = LookAtRotaion - CameraRotation;
+		if (DiffRotation >= 90.0f || DiffRotation <= -90.0f)
+		{
+			IsFacing = true;
+		}
+		else
+		{
+			IsFacing = false;
+		}
 	}
 }
 
@@ -1163,6 +1237,14 @@ void ASoldierCharacter::MulticastReloadingSound_Implementation()
 {
 	AudioCompReload->Activate(true);
 }
+void ASoldierCharacter::ServerSpawnGrenade_Implementation()
+{
+	SpawnGrenade(STL,STR);
+}
+bool ASoldierCharacter::ServerSpawnGrenade_Validate()
+{
+	return true;
+}
 
 void ASoldierCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
@@ -1205,7 +1287,8 @@ void ASoldierCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 
 	DOREPLIFETIME(ASoldierCharacter, PlayerName);
 	DOREPLIFETIME(ASoldierCharacter, CameraComp);
-
+	DOREPLIFETIME(ASoldierCharacter, STL);
+	DOREPLIFETIME(ASoldierCharacter, STR);
 
 
 	

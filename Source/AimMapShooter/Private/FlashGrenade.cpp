@@ -56,11 +56,13 @@ void AFlashGrenade::ThrowinGrenade(FVector Impulse, FVector Impulse2)
 	}
 
 	PinPullSound();
+	if (MeshComp)
+	{
+		MeshComp->AddImpulse(Impulse, NAME_None, true);
+		MeshComp->AddAngularImpulseInDegrees(Impulse, NAME_None, true);
+		GetWorldTimerManager().SetTimer(TimerHandle_Explosion, this, &AFlashGrenade::SpawnExplosionDecal, 3.0f);
+	}
 
-	MeshComp->AddImpulse(Impulse, NAME_None, true);
-	MeshComp->AddAngularImpulseInDegrees(Impulse, NAME_None, true);
-
-	GetWorldTimerManager().SetTimer(TimerHandle_Explosion, this, &AFlashGrenade::SpawnExplosionDecal, 3.0f);
 
 	
 }

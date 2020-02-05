@@ -23,6 +23,7 @@ class UAudioComponent;
 class APayloadCharacter;
 class ARedEndgame;
 class ABlueEndgame;
+class AFlashGrenade;
 
 class UMinimapComponent;
 
@@ -338,6 +339,9 @@ protected:
 
 	bool bStopSound;
 
+	UPROPERTY(EditDefaultsOnly, Category = "FlashMaterial")
+	UMaterialParameterCollection* MaterialCollection;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Payload")
 	TSubclassOf<APayloadCharacter> PayloadCharacterClass;
 
@@ -360,8 +364,32 @@ public:
 
 
 	///GRENADE///
-
+	void ThrowGrenade();
+	void SpawnGrenade(FVector STL, FRotator STR);
+	void FindingGrenadeTransform();
+	void Flashbang(float Distance, FVector FacingAngle);
 	void AngleFromFlash(FVector GrenadeLoc);
+	bool IsFacing;
+	float FlashAmount;
+	UPROPERTY(Replicated)
+	FVector STL;
+	UPROPERTY(Replicated)
+	FRotator STR;
+	UPROPERTY(EditDefaultsOnly)
+	int32 AmountGrenades;
+
+	AFlashGrenade* FlashGrenade;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Grenade")
+	TSubclassOf<AFlashGrenade> FlashGrenadeClass;
+	
+	///GRENADE REPLICATION///
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerSpawnGrenade();
+
+
+	UPROPERTY(VisibleAnywhere)
+	class USceneComponent* GrenadeStartLocation;
 
 	UPROPERTY(BlueprintReadWrite, Replicated)
 	FString PlayerName;
@@ -377,7 +405,7 @@ public:
 
 	void TurnOnLaser();
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Camera")
+	UPROPERTY(VisibleAnywhere, Category = "Camera")
 	USpringArmComponent* SpringArm;
 
 	FName HeadSocket;
