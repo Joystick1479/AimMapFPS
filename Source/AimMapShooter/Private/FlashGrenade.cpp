@@ -79,6 +79,21 @@ void AFlashGrenade::SpawnExplosionDecal()
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	GrenadeDecal = GetWorld()->SpawnActor<AGrenadeDecal>(GrenadeDecalClass, this->GetActorLocation(), DecalRotation, SpawnParams);
 
+	TArray<AActor*> Character;
+	UGameplayStatics::GetAllActorsOfClass(this, SoldierChar, Character);
+
+	for (int i = 0; i < Character.Num(); i++)
+	{
+		ASoldierCharacter*New = Cast<ASoldierCharacter>(Character[i]);
+		if (New)
+		{
+			float DistanceBetweenActors = FVector::Dist(this->GetActorLocation(), New->GetActorLocation());
+			New->Flashbang(DistanceBetweenActors, this->GetActorLocation());
+			Destroy();
+		}
+	}
+	
+
 	GetWorldTimerManager().ClearTimer(TimerHandle_Explosion);
 }
 

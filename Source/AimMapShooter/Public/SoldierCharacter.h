@@ -26,6 +26,7 @@ class ABlueEndgame;
 class AFlashGrenade;
 
 class UMinimapComponent;
+class UTimelineComponent;
 
 namespace ECharacterState
 {
@@ -369,6 +370,14 @@ public:
 	void FindingGrenadeTransform();
 	void Flashbang(float Distance, FVector FacingAngle);
 	void AngleFromFlash(FVector GrenadeLoc);
+	///Timeline for GRENADE//
+	void FlashTimeline();
+	UFUNCTION()
+	void TimelineCallback(float val);
+	UFUNCTION()
+	void TimelineFinishedCallback();
+	void PlayTimeline();
+
 	bool IsFacing;
 	float FlashAmount;
 	UPROPERTY(Replicated)
@@ -377,6 +386,12 @@ public:
 	FRotator STR;
 	UPROPERTY(EditDefaultsOnly)
 	int32 AmountGrenades;
+	UPROPERTY(VisibleAnywhere)
+	UTimelineComponent* MyTimeline;
+	UPROPERTY()
+	UCurveFloat* FloatCurve;
+
+	FTimerHandle Timer_Flash;
 
 	AFlashGrenade* FlashGrenade;
 

@@ -8,6 +8,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "Components/SceneCaptureComponent2D.h"
 #include "Components/SceneComponent.h" 
+#include "Components/TimelineComponent.h" 
 
 #include "SpriteComponent.h"
 #include "PaperSpriteComponent.h"
@@ -76,6 +77,11 @@ ASoldierCharacter::ASoldierCharacter()
 	GrenadeStartLocation = CreateDefaultSubobject<USceneComponent>(TEXT("SceneComponent"));
 	GrenadeStartLocation->SetupAttachment(this->GetRootComponent());
 
+	// TIMELINE//
+	static ConstructorHelpers::FObjectFinder<UCurveFloat> Curve(TEXT("/Game/Blueprints/Granates/C_MyCurve"));
+	check(Curve.Succeeded());
+	FloatCurve = Curve.Object;
+
 
 	ZoomingTime = 0.2f;
 
@@ -110,6 +116,34 @@ ASoldierCharacter::ASoldierCharacter()
 void ASoldierCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+	/// TIMELINE///
+	FOnTimelineFloat onTimelineCallback;
+	FOnTimelineEventStatic onTimelineFinishedCallback;
+
+	if (FloatCurve != NULL)
+	{
+		MyTimeline = NewObject<UTimelineComponent>(this, FName("TimelineAnimation"));
+		MyTimeline->CreationMethod = EComponentCreationMethod::UserConstructionScript;
+		this->BlueprintCreatedComponents.Add(MyTimeline);
+		MyTimeline->SetNetAddressable();
+		MyTimeline->SetPropertySetObject(this);
+		MyTimeline->SetDirectionPropertyName(FName("TimelineDirection"));
+
+		MyTimeline->SetLooping(false);
+		MyTimeline->SetTimelineLength(1.0f);
+		MyTimeline->SetTimelineLengthMode(ETimelineLengthMode::TL_LastKeyFrame);
+
+		MyTimeline->SetPlaybackPosition(0.0f, false);
+
+		onTimelineCallback.BindUFunction(this, FName{ TEXT("TimelineCallback") });
+		onTimelineFinishedCallback.BindUFunction(this, FName{ TEXT("TimelineFinishedCallback") });
+		MyTimeline->AddInterpFloat(FloatCurve, onTimelineCallback);
+		MyTimeline->SetTimelineFinishedFunc(onTimelineFinishedCallback);
+
+		MyTimeline->RegisterComponent();
+	}
+
 
 	/// MINIMAP ///
 	if (IsLocallyControlled())
@@ -268,6 +302,12 @@ void ASoldierCharacter::Tick(float DeltaTime)
 	GameOverSound();
 
 	FindingGrenadeTransform();
+
+	///TIMELINE///
+	if (MyTimeline != NULL)
+	{
+		MyTimeline->TickComponent(DeltaTime, ELevelTick::LEVELTICK_TimeOnly, NULL);
+	}
 
 }
 void ASoldierCharacter::OnDeath()
@@ -1088,13 +1128,41 @@ void ASoldierCharacter::Flashbang(float Distance, FVector FacingAngle)
 			UKismetMaterialLibrary::SetScalarParameterValue(this, MaterialCollection, "Flash_Value", FlashAmount);
 
 		}
-		else
+		if(IsFacing == false)
 		{
 			UKismetMaterialLibrary::SetScalarParameterValue(this, MaterialCollection, "Flash_Value", FlashAmount);
 		}
+
+		GetWorldTimerManager().SetTimer(Timer_Flash, this, &ASoldierCharacter::FlashTimeline, 1.0f);
+
 	}
 
 }
+void ASoldierCharacter::FlashTimeline()
+{
+	PlayTimeline();
+
+
+	GetWorldTimerManager().ClearTimer(Timer_Flash);
+}
+void ASoldierCharacter::TimelineCallback(float val)
+{
+	float LerpFloat = UKismetMathLibrary::Lerp(FlashAmount, 1.0f, val);
+	UKismetMaterialLibrary::SetScalarParameterValue(this, MaterialCollection, "Flash_Value", LerpFloat);
+
+}
+void ASoldierCharacter::TimelineFinishedCallback()
+{
+
+}
+void ASoldierCharacter::PlayTimeline()
+{
+	if (MyTimeline != NULL)
+	{
+		MyTimeline->PlayFromStart();
+	}
+}
+
 void ASoldierCharacter::AngleFromFlash(FVector GrenadeLoc)
 {
 	if (CameraComp)
