@@ -379,7 +379,12 @@ public:
 	void PlayTimeline();
 
 	bool IsFacing;
+	UPROPERTY(Replicated)
 	float FlashAmount;
+	//UPROPERTY(Replicated)
+	float Distance;
+	//UPROPERTY(Replicated)
+	FVector FacingAngle;
 	UPROPERTY(Replicated)
 	FVector STL;
 	UPROPERTY(Replicated)
@@ -393,6 +398,7 @@ public:
 
 	FTimerHandle Timer_Flash;
 
+	UPROPERTY(Replicated)
 	AFlashGrenade* FlashGrenade;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Grenade")
@@ -401,6 +407,13 @@ public:
 	///GRENADE REPLICATION///
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerSpawnGrenade();
+
+	UFUNCTION(Server, Reliable)
+	void ServerFlashbang(float Distance, FVector FacingAngle);
+
+	UFUNCTION(Client, Reliable)
+	void MulticastFlashbang(float Distance2, FVector FacingAngle2);
+
 
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Grenade")

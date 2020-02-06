@@ -46,9 +46,17 @@ private:
 
 	void ExplosionSound();
 
+	void Testy();
+
+	UFUNCTION(Server, Reliable)
+	void ServerTest();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastTest();
+
 	///MULTIPLAYER REPLICATION///
 	UFUNCTION(Server, Reliable, WithValidation)
-	void ServerThrowinGrenade();
+	void ServerThrowinGrenade(FVector Impulsee, FVector Impulse22);
 
 	UFUNCTION(Server, Reliable)
 	void ServerPinPullSound();
@@ -62,7 +70,14 @@ private:
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastExplosionSound();
 
+	UFUNCTION(Server, Reliable)
+	void ServerSpawnExplosionDecal();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastSpawnExplosionDecal();
 	
+	UPROPERTY(Replicated)
+	bool Test;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Pawn")
 	TSubclassOf<ASoldierCharacter> SoldierChar;
@@ -73,7 +88,7 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Sound")
 	class USoundBase* PinSound;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Sound")
+	UPROPERTY(EditDefaultsOnly,Category = "Sound")
 	class USoundBase* ExplosionSoundCue;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Sound")
@@ -83,6 +98,7 @@ private:
 	UPROPERTY()
 	AGrenadeDecal* GrenadeDecal;
 
+	ASoldierCharacter* New;
 
 	FTimerHandle TimerHandle_Explosion;
 

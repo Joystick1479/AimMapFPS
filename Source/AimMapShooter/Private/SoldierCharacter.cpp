@@ -1089,9 +1089,6 @@ void ASoldierCharacter::FindingGrenadeTransform()
 		STL = GrenadeStartLocation->GetComponentLocation();
 		STR = GrenadeStartLocation->GetComponentRotation();
 
-	UE_LOG(LogTemp, Warning, TEXT("STL is: %s"), *STL.ToString());
-	UE_LOG(LogTemp, Warning, TEXT("STR is: %s"), *STR.ToString());
-
 	}
 }
 void ASoldierCharacter::ThrowGrenade()
@@ -1112,12 +1109,20 @@ void ASoldierCharacter::SpawnGrenade(FVector STL, FRotator STR)
 		ServerSpawnGrenade();
 		return;
 	}
+	
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	FlashGrenade = GetWorld()->SpawnActor<AFlashGrenade>(FlashGrenadeClass, STL, STR, SpawnParams);
+	
+
+
 }
 void ASoldierCharacter::Flashbang(float Distance, FVector FacingAngle)
 {
+	if (Role < ROLE_Authority)
+	{
+		ServerFlashbang(Distance, FacingAngle);
+	}
 	FlashAmount = (UKismetMathLibrary::NormalizeToRange(Distance, 20.0f, 100.0f) / 10.0f) * (-1.0f);
 	if (Distance < 2000.0f)
 	{
@@ -1141,8 +1146,6 @@ void ASoldierCharacter::Flashbang(float Distance, FVector FacingAngle)
 void ASoldierCharacter::FlashTimeline()
 {
 	PlayTimeline();
-
-
 	GetWorldTimerManager().ClearTimer(Timer_Flash);
 }
 void ASoldierCharacter::TimelineCallback(float val)
@@ -1319,6 +1322,14 @@ bool ASoldierCharacter::ServerSpawnGrenade_Validate()
 {
 	return true;
 }
+void ASoldierCharacter::ServerFlashbang_Implementation(float Distance, FVector FacingAngle)
+{
+	MulticastFlashbang(Distance,FacingAngle);
+}
+void ASoldierCharacter::MulticastFlashbang_Implementation(float Distance2, FVector FacingAngle2)
+{
+	Flashbang(Distance2, FacingAngle2);
+}
 
 void ASoldierCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
@@ -1363,6 +1374,10 @@ void ASoldierCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	DOREPLIFETIME(ASoldierCharacter, CameraComp);
 	DOREPLIFETIME(ASoldierCharacter, STL);
 	DOREPLIFETIME(ASoldierCharacter, STR);
+	//DOREPLIFETIME(ASoldierCharacter, Distance);
+	//DOREPLIFETIME(ASoldierCharacter, FacingAngle);
+
+
 
 
 	

@@ -12,6 +12,7 @@ AGrenadeDecal::AGrenadeDecal()
 	PrimaryActorTick.bCanEverTick = true;
 
 	Decal = CreateDefaultSubobject<UDecalComponent>(TEXT("Decal"));
+	RootComponent = Decal;
 
 }
 
