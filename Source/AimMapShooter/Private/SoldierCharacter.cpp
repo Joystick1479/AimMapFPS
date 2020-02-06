@@ -1070,6 +1070,7 @@ void ASoldierCharacter::SpawnGrenade(FVector STL, FRotator STR)
 	if (Role < ROLE_Authority)
 	{
 		ServerSpawnGrenade();
+		return;
 	}
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;

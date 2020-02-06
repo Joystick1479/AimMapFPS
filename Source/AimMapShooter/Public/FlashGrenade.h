@@ -18,6 +18,13 @@ public:
 	// Sets default values for this actor's properties
 	AFlashGrenade();
 
+
+	UPROPERTY(Replicated)
+	FVector Impulse;
+
+	UPROPERTY(Replicated)
+	FVector Impulse2;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -41,7 +48,7 @@ private:
 
 	///MULTIPLAYER REPLICATION///
 	UFUNCTION(Server, Reliable, WithValidation)
-	void ServerThrowinGrenade(FVector Impulse, FVector Imuplse2);
+	void ServerThrowinGrenade();
 
 	UFUNCTION(Server, Reliable)
 	void ServerPinPullSound();
@@ -55,6 +62,7 @@ private:
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastExplosionSound();
 
+	
 
 	UPROPERTY(EditDefaultsOnly, Category = "Pawn")
 	TSubclassOf<ASoldierCharacter> SoldierChar;
@@ -79,6 +87,8 @@ private:
 	FTimerHandle TimerHandle_Explosion;
 
 public:	
+
+
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 

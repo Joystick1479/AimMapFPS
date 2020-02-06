@@ -16,6 +16,9 @@
 
 #include "TimerManager.h" 
 
+#include "Net/UnrealNetwork.h"
+
+
 // Sets default values
 AFlashGrenade::AFlashGrenade()
 {
@@ -24,6 +27,8 @@ AFlashGrenade::AFlashGrenade()
 
 	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComp"));
 	RootComponent = MeshComp;
+
+	SetReplicates(true);
 
 }
 
@@ -52,7 +57,7 @@ void AFlashGrenade::ThrowinGrenade(FVector Impulse, FVector Impulse2)
 {
 	if (Role < ROLE_Authority)
 	{
-		ServerThrowinGrenade(Impulse, Impulse2);
+		ServerThrowinGrenade();
 	}
 
 	PinPullSound();
@@ -62,8 +67,6 @@ void AFlashGrenade::ThrowinGrenade(FVector Impulse, FVector Impulse2)
 		MeshComp->AddAngularImpulseInDegrees(Impulse, NAME_None, true);
 		GetWorldTimerManager().SetTimer(TimerHandle_Explosion, this, &AFlashGrenade::SpawnExplosionDecal, 3.0f);
 	}
-
-
 	
 }
 
@@ -97,11 +100,11 @@ void AFlashGrenade::ExplosionSound()
 	UGameplayStatics::PlaySoundAtLocation(this, ExplosionSoundCue, this->GetActorLocation(), 2.0f, 1.0f, 0.0f, SoundAttenuation);
 }
 
-void AFlashGrenade::ServerThrowinGrenade_Implementation(FVector Impulse, FVector Impulse2)
+void AFlashGrenade::ServerThrowinGrenade_Implementation()
 {
 	ThrowinGrenade(Impulse, Impulse2);
 }
-bool AFlashGrenade::ServerThrowinGrenade_Validate(FVector Impulse, FVector Impulse2)
+bool AFlashGrenade::ServerThrowinGrenade_Validate()
 {
 	return true;
 }
@@ -126,6 +129,16 @@ void AFlashGrenade::MulticastExplosionSound_Implementation()
 void AFlashGrenade::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+}
+
+void AFlashGrenade::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	//This function tells us how we want to replicate things//
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AFlashGrenade, Impulse);
+	DOREPLIFETIME(AFlashGrenade, Impulse2);
 
 }
 
