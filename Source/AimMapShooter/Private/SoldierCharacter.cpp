@@ -10,6 +10,8 @@
 #include "Components/SceneComponent.h" 
 #include "Components/TimelineComponent.h" 
 
+#include "Containers/EnumAsByte.h"
+
 #include "SpriteComponent.h"
 #include "PaperSpriteComponent.h"
 
@@ -140,6 +142,7 @@ void ASoldierCharacter::BeginPlay()
 		onTimelineFinishedCallback.BindUFunction(this, FName{ TEXT("TimelineFinishedCallback") });
 		MyTimeline->AddInterpFloat(FloatCurve, onTimelineCallback);
 		MyTimeline->SetTimelineFinishedFunc(onTimelineFinishedCallback);
+		
 
 		MyTimeline->RegisterComponent();
 	}
@@ -1119,38 +1122,35 @@ void ASoldierCharacter::SpawnGrenade(FVector STL, FRotator STR)
 }
 void ASoldierCharacter::Flashbang(float Distance, FVector FacingAngle)
 {
-	if (Role < ROLE_Authority)
+	//if (Role < ROLE_Authority)
+	//{
+	//	ServerFlashbang(FacingAngle);
+	//}
+	if (IsLocallyControlled())
 	{
-		ServerFlashbang(Distance, FacingAngle);
-	}
-	FlashAmount = (UKismetMathLibrary::NormalizeToRange(Distance, 20.0f, 100.0f) / 10.0f) * (-1.0f);
-	if (Distance < 2000.0f)
-	{
-		AngleFromFlash(FacingAngle);
-		if (IsFacing == true)
+		FlashAmount = (UKismetMathLibrary::NormalizeToRange(Distance, 20.0f, 100.0f) / 10.0f) * (-1.0f);
+		if (Distance < 2000.0f)
 		{
-			FlashAmount = 0.5f;
+			AngleFromFlash(FacingAngle);
+			if (IsFacing == true)
+			{
+				FlashAmount = 0.5f;
+			}
+
 			UKismetMaterialLibrary::SetScalarParameterValue(this, MaterialCollection, "Flash_Value", FlashAmount);
 
+			GetWorldTimerManager().SetTimer(Timer_Flash, this, &ASoldierCharacter::FlashTimeline, 1.0f);
 		}
-		if(IsFacing == false)
-		{
-			UKismetMaterialLibrary::SetScalarParameterValue(this, MaterialCollection, "Flash_Value", FlashAmount);
-		}
-
-		GetWorldTimerManager().SetTimer(Timer_Flash, this, &ASoldierCharacter::FlashTimeline, 1.0f);
-
 	}
-
 }
 void ASoldierCharacter::FlashTimeline()
 {
 	PlayTimeline();
 	GetWorldTimerManager().ClearTimer(Timer_Flash);
 }
-void ASoldierCharacter::TimelineCallback(float val)
+void ASoldierCharacter::TimelineCallback(float interpolatedVal)
 {
-	float LerpFloat = UKismetMathLibrary::Lerp(FlashAmount, 1.0f, val);
+	float LerpFloat = UKismetMathLibrary::Lerp(FlashAmount, 1.0f, interpolatedVal);
 	UKismetMaterialLibrary::SetScalarParameterValue(this, MaterialCollection, "Flash_Value", LerpFloat);
 
 }
@@ -1168,21 +1168,27 @@ void ASoldierCharacter::PlayTimeline()
 
 void ASoldierCharacter::AngleFromFlash(FVector GrenadeLoc)
 {
-	if (CameraComp)
+	if (IsLocallyControlled())
 	{
-		FVector CameraLocationVector = CameraComp->GetComponentLocation();
-		float LookAtRotaion = UKismetMathLibrary::FindLookAtRotation(CameraLocationVector, GrenadeLoc).Yaw;
-		float CameraRotation = CameraComp->GetComponentRotation().Yaw;
-		float DiffRotation = LookAtRotaion - CameraRotation;
-		if (DiffRotation >= 90.0f || DiffRotation <= -90.0f)
+		if (CameraComp)
 		{
-			IsFacing = true;
-		}
-		else
-		{
-			IsFacing = false;
+			FVector CameraLocationVector = CameraComp->GetComponentLocation();
+			float LookAtRotaion = UKismetMathLibrary::FindLookAtRotation(CameraLocationVector, GrenadeLoc).Yaw;
+			float CameraRotation = CameraComp->GetComponentRotation().Yaw;
+			float DiffRotation = LookAtRotaion - CameraRotation;
+			/*	if (DiffRotation >= 90.0f || DiffRotation <= -90.0f)
+				{
+					IsFacing = true;
+				}
+				else
+				{
+					IsFacing = false;
+				}*/
+			IsFacing = UKismetMathLibrary::BooleanOR(DiffRotation >= 90.0f, DiffRotation <= -90.0f);
+
 		}
 	}
+	
 }
 
 void ASoldierCharacter::OnHealthChanged(UHealthComponent * OwningHealthComp, float Health, float HealthDelta, const UDamageType * DamageType, AController * InstigatedBy, AActor * DamageCauser)
@@ -1322,13 +1328,28 @@ bool ASoldierCharacter::ServerSpawnGrenade_Validate()
 {
 	return true;
 }
-void ASoldierCharacter::ServerFlashbang_Implementation(float Distance, FVector FacingAngle)
+void ASoldierCharacter::ServerFlashbang_Implementation(FVector Facing)
 {
-	MulticastFlashbang(Distance,FacingAngle);
+	MulticastFlashbang(Facing);
 }
-void ASoldierCharacter::MulticastFlashbang_Implementation(float Distance2, FVector FacingAngle2)
+void ASoldierCharacter::MulticastFlashbang_Implementation(FVector Facing)
 {
-	Flashbang(Distance2, FacingAngle2);
+	//Flashbang(Distance2, FacingAngle2);
+	FlashAmount = (UKismetMathLibrary::NormalizeToRange(Distance, 20.0f, 100.0f) / 10.0f) * (-1.0f);
+	if (Distance < 2000.0f)
+	{
+		AngleFromFlash(Facing);
+		if (IsFacing == true)
+		{
+			FlashAmount = 0.5f;
+
+		}
+
+		UKismetMaterialLibrary::SetScalarParameterValue(this, MaterialCollection, "Flash_Value", FlashAmount);
+
+		GetWorldTimerManager().SetTimer(Timer_Flash, this, &ASoldierCharacter::FlashTimeline, 1.0f);
+
+	}
 }
 
 void ASoldierCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -1374,8 +1395,8 @@ void ASoldierCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	DOREPLIFETIME(ASoldierCharacter, CameraComp);
 	DOREPLIFETIME(ASoldierCharacter, STL);
 	DOREPLIFETIME(ASoldierCharacter, STR);
-	//DOREPLIFETIME(ASoldierCharacter, Distance);
-	//DOREPLIFETIME(ASoldierCharacter, FacingAngle);
+	/*DOREPLIFETIME(ASoldierCharacter, Distance);
+	DOREPLIFETIME(ASoldierCharacter, FacingAngle);*/
 
 
 

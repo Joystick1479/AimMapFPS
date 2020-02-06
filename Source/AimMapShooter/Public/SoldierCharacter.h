@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Components/TimelineComponent.h"
 #include "SoldierCharacter.generated.h"
 
 class UCameraComponent;
@@ -27,6 +28,7 @@ class AFlashGrenade;
 
 class UMinimapComponent;
 class UTimelineComponent;
+
 
 namespace ECharacterState
 {
@@ -379,12 +381,11 @@ public:
 	void PlayTimeline();
 
 	bool IsFacing;
-	UPROPERTY(Replicated)
 	float FlashAmount;
 	//UPROPERTY(Replicated)
 	float Distance;
 	//UPROPERTY(Replicated)
-	FVector FacingAngle;
+ 	FVector FacingAngle;
 	UPROPERTY(Replicated)
 	FVector STL;
 	UPROPERTY(Replicated)
@@ -395,6 +396,9 @@ public:
 	UTimelineComponent* MyTimeline;
 	UPROPERTY()
 	UCurveFloat* FloatCurve;
+
+	UPROPERTY()
+	TEnumAsByte<ETimelineDirection::Type> TimelineDirection;
 
 	FTimerHandle Timer_Flash;
 
@@ -409,10 +413,10 @@ public:
 	void ServerSpawnGrenade();
 
 	UFUNCTION(Server, Reliable)
-	void ServerFlashbang(float Distance, FVector FacingAngle);
+	void ServerFlashbang(FVector Facing);
 
 	UFUNCTION(Client, Reliable)
-	void MulticastFlashbang(float Distance2, FVector FacingAngle2);
+	void MulticastFlashbang(FVector Facing);
 
 
 
