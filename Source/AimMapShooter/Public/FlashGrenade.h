@@ -40,19 +40,19 @@ private:
 
 	void ThrowinGrenade(FVector Impulse, FVector Impulse2);
 
-	void SpawnExplosionDecal();
+	void SpawnEffects();
 
 	void PinPullSound();
 
 	void ExplosionSound();
 
-	void Testy();
+	void SpawnExplosionDecal();
 
 	UFUNCTION(Server, Reliable)
-	void ServerTest();
+	void ServerSpawnExplosionDecal();
 
 	UFUNCTION(NetMulticast, Reliable)
-	void MulticastTest();
+	void MulticastSpawnExplosionDecal();
 
 	///MULTIPLAYER REPLICATION///
 	UFUNCTION(Server, Reliable, WithValidation)
@@ -71,10 +71,10 @@ private:
 	void MulticastExplosionSound();
 
 	UFUNCTION(Server, Reliable)
-	void ServerSpawnExplosionDecal();
+	void ServerSpawnEffects();
 
 	UFUNCTION(NetMulticast, Reliable)
-	void MulticastSpawnExplosionDecal();
+	void MulticastSpawnEffects();
 	
 	UPROPERTY(Replicated)
 	bool Test;

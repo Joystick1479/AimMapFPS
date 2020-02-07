@@ -39,28 +39,18 @@ void AFlashGrenade::BeginPlay()
 
 	if (Role == ROLE_Authority)
 	{
-		//TArray<AActor*> Character;
-		//UGameplayStatics::GetAllActorsOfClass(this, SoldierChar, Character);
-		//for (int i = 0; i < Character.Num(); i++)
-		//{
-		//	ASoldierCharacter*New = Cast<ASoldierCharacter>(Character[i]);
-		//	if (New)
-		//	{
-			FVector Impulse = MeshComp->GetForwardVector() * 750;
-			FVector Impulse2 = UKismetMathLibrary::RandomUnitVector() * 500;
-			ThrowinGrenade(Impulse, Impulse2);
+		FVector Impulse = MeshComp->GetForwardVector() * 750;
+		FVector Impulse2 = UKismetMathLibrary::RandomUnitVector() * 500;
+		ThrowinGrenade(Impulse, Impulse2);
 	}
 }
 
 void AFlashGrenade::ThrowinGrenade(FVector Impulse, FVector Impulse2)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Test czy doszlo3"));
-
 	if (Role < ROLE_Authority)
 	{
 		ServerThrowinGrenade(Impulse, Impulse2);
 	}
-	UE_LOG(LogTemp, Warning, TEXT("Test czy doszlo2"));
 
 	PinPullSound();
 
@@ -68,54 +58,28 @@ void AFlashGrenade::ThrowinGrenade(FVector Impulse, FVector Impulse2)
 	{
 		MeshComp->AddImpulse(Impulse, NAME_None, true);
 		MeshComp->AddAngularImpulseInDegrees(Impulse, NAME_None, true);
-		GetWorldTimerManager().SetTimer(TimerHandle_Explosion, this, &AFlashGrenade::SpawnExplosionDecal, 3.0f);
+		GetWorldTimerManager().SetTimer(TimerHandle_Explosion, this, &AFlashGrenade::SpawnEffects, 3.0f);
 	}
-	
 }
 
-void AFlashGrenade::SpawnExplosionDecal()
+void AFlashGrenade::SpawnEffects()
 {
 	if (Role < ROLE_Authority)
 	{
-		ServerSpawnExplosionDecal();
+		ServerSpawnEffects();
 	}
 
 	ExplosionSound();
 
-	Testy();
-
-	//UE_LOG(LogTemp, Warning, TEXT("Test czy doszlo"));
-
-	//FRotator DecalRotation = FRotator(90, 0, 0);
-	//FActorSpawnParameters SpawnParams;
-	//SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	//GrenadeDecal = GetWorld()->SpawnActor<AGrenadeDecal>(GrenadeDecalClass, this->GetActorLocation(), DecalRotation, SpawnParams);
-
-	//TArray<AActor*> Character;
-	//UGameplayStatics::GetAllActorsOfClass(this, SoldierChar, Character);
-
-	//for (int i = 0; i < Character.Num(); i++)
-	//	{
-	//		ASoldierCharacter*New = Cast<ASoldierCharacter>(Character[i]);
-	//		if (New)
-	//		{
-	//			float DistanceBetweenActors = FVector::Dist(this->GetActorLocation(), New->GetActorLocation());
-	//			New->Flashbang(DistanceBetweenActors, this->GetActorLocation());
-	//			Destroy();
-	//		}
-	//	}
-
-
-	//	GetWorldTimerManager().ClearTimer(TimerHandle_Explosion);
+	SpawnExplosionDecal();
 }
 
-void AFlashGrenade::Testy()
+void AFlashGrenade::SpawnExplosionDecal()
 {
 	if (Role == ROLE_Authority)
 	{
-		ServerTest();
+		ServerSpawnExplosionDecal();
 	}
-	UE_LOG(LogTemp, Warning, TEXT("Test czy doszlo"));
 
 	FRotator DecalRotation = FRotator(90, 0, 0);
 	FActorSpawnParameters SpawnParams;
@@ -143,7 +107,6 @@ void AFlashGrenade::PinPullSound()
 	{
 		ServerPinPullSound();
 	}
-	UE_LOG(LogTemp, Warning, TEXT("Test czy doszlo4"));
 
 	UGameplayStatics::PlaySoundAtLocation(this, PinSound, this->GetActorLocation(), 2.0f, 1.0f, 0.0f, SoundAttenuation);
 }
@@ -171,9 +134,7 @@ void AFlashGrenade::ServerPinPullSound_Implementation()
 }
 void AFlashGrenade::MulticastPinPullSound_Implementation()
 {
-	//PinPullSound();
 	UGameplayStatics::PlaySoundAtLocation(this, PinSound, this->GetActorLocation(), 2.0f, 1.0f, 0.0f, SoundAttenuation);
-
 }
 void AFlashGrenade::ServerExplosionSound_Implementation()
 {
@@ -181,23 +142,21 @@ void AFlashGrenade::ServerExplosionSound_Implementation()
 }
 void AFlashGrenade::MulticastExplosionSound_Implementation()
 {
-//	ExplosionSound();
 	UGameplayStatics::PlaySoundAtLocation(this, ExplosionSoundCue, this->GetActorLocation(), 2.0f, 1.0f, 0.0f, SoundAttenuation);
-
+}
+void AFlashGrenade::ServerSpawnEffects_Implementation()
+{
+	MulticastSpawnEffects();
+}
+void AFlashGrenade::MulticastSpawnEffects_Implementation()
+{
+	SpawnEffects();
 }
 void AFlashGrenade::ServerSpawnExplosionDecal_Implementation()
 {
 	MulticastSpawnExplosionDecal();
 }
 void AFlashGrenade::MulticastSpawnExplosionDecal_Implementation()
-{
-	SpawnExplosionDecal();
-}
-void AFlashGrenade::ServerTest_Implementation()
-{
-	MulticastTest();
-}
-void AFlashGrenade::MulticastTest_Implementation()
 {
 	FRotator DecalRotation = FRotator(90, 0, 0);
 	FActorSpawnParameters SpawnParams;
@@ -222,8 +181,6 @@ void AFlashGrenade::MulticastTest_Implementation()
 void AFlashGrenade::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-
 }
 
 void AFlashGrenade::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

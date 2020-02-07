@@ -109,7 +109,6 @@ ASoldierCharacter::ASoldierCharacter()
 	float MaxHeightForVault = 60;
 	isAllowClimbing = false;
 	isAbleToVault = false;
-
 }
 
 
@@ -147,7 +146,6 @@ void ASoldierCharacter::BeginPlay()
 		MyTimeline->RegisterComponent();
 	}
 
-
 	/// MINIMAP ///
 	if (IsLocallyControlled())
 	{
@@ -168,7 +166,6 @@ void ASoldierCharacter::BeginPlay()
 			SceneCapture->AttachToComponent(SpringArmRender2, FAttachmentTransformRules::KeepRelativeTransform);
 		}
 	}
-
 	///**Getting weapon on begin play *//
 	if (Role == ROLE_Authority)
 	{
@@ -181,7 +178,6 @@ void ASoldierCharacter::BeginPlay()
 			AutomaticRifle->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocket);
 		}
 	}
-	
 	HealthComp->OnHealthChanged.AddDynamic(this, &ASoldierCharacter::OnHealthChanged);
 
 	if (HealthComp)
@@ -197,7 +193,6 @@ void ASoldierCharacter::BeginPlay()
 	{
 		CameraComp->AttachToComponent(SpringArm, FAttachmentTransformRules::KeepRelativeTransform);
 	}
-
 }
 
 void ASoldierCharacter::LineTraceItem()
@@ -275,8 +270,6 @@ void ASoldierCharacter::LineTraceItem()
 		//	{
 		//		bLaserPickUp = false;
 		//	}
-		
-
 		
 	
 }
@@ -680,7 +673,6 @@ void ASoldierCharacter::PickUp()
 			}
 			UGameplayStatics::PlaySoundAtLocation(this, ItemsPickUp, GetActorLocation());
 		}
-	
 }
 
 void ASoldierCharacter::StartingHud()
@@ -724,10 +716,12 @@ void ASoldierCharacter::DyingAudioTrigger()
 	{
 		if (bDied == true)
 		{
-			AudioComp->DestroyComponent();
+			if (AudioComp)
+			{
+				AudioComp->DestroyComponent();
+			}
 		}
 	}
-
 }
 
 void ASoldierCharacter::ClearingHudAfterDeath()
@@ -1091,7 +1085,6 @@ void ASoldierCharacter::FindingGrenadeTransform()
 	{
 		STL = GrenadeStartLocation->GetComponentLocation();
 		STR = GrenadeStartLocation->GetComponentRotation();
-
 	}
 }
 void ASoldierCharacter::ThrowGrenade()
@@ -1122,10 +1115,6 @@ void ASoldierCharacter::SpawnGrenade(FVector STL, FRotator STR)
 }
 void ASoldierCharacter::Flashbang(float Distance, FVector FacingAngle)
 {
-	//if (Role < ROLE_Authority)
-	//{
-	//	ServerFlashbang(FacingAngle);
-	//}
 	if (IsLocallyControlled())
 	{
 		FlashAmount = (UKismetMathLibrary::NormalizeToRange(Distance, 20.0f, 100.0f) / 10.0f) * (-1.0f);
@@ -1136,9 +1125,7 @@ void ASoldierCharacter::Flashbang(float Distance, FVector FacingAngle)
 			{
 				FlashAmount = 0.5f;
 			}
-
 			UKismetMaterialLibrary::SetScalarParameterValue(this, MaterialCollection, "Flash_Value", FlashAmount);
-
 			GetWorldTimerManager().SetTimer(Timer_Flash, this, &ASoldierCharacter::FlashTimeline, 1.0f);
 		}
 	}
@@ -1176,19 +1163,10 @@ void ASoldierCharacter::AngleFromFlash(FVector GrenadeLoc)
 			float LookAtRotaion = UKismetMathLibrary::FindLookAtRotation(CameraLocationVector, GrenadeLoc).Yaw;
 			float CameraRotation = CameraComp->GetComponentRotation().Yaw;
 			float DiffRotation = LookAtRotaion - CameraRotation;
-			/*	if (DiffRotation >= 90.0f || DiffRotation <= -90.0f)
-				{
-					IsFacing = true;
-				}
-				else
-				{
-					IsFacing = false;
-				}*/
+	
 			IsFacing = UKismetMathLibrary::BooleanOR(DiffRotation >= 90.0f, DiffRotation <= -90.0f);
-
 		}
 	}
-	
 }
 
 void ASoldierCharacter::OnHealthChanged(UHealthComponent * OwningHealthComp, float Health, float HealthDelta, const UDamageType * DamageType, AController * InstigatedBy, AActor * DamageCauser)
@@ -1334,7 +1312,6 @@ void ASoldierCharacter::ServerFlashbang_Implementation(FVector Facing)
 }
 void ASoldierCharacter::MulticastFlashbang_Implementation(FVector Facing)
 {
-	//Flashbang(Distance2, FacingAngle2);
 	FlashAmount = (UKismetMathLibrary::NormalizeToRange(Distance, 20.0f, 100.0f) / 10.0f) * (-1.0f);
 	if (Distance < 2000.0f)
 	{
@@ -1342,13 +1319,9 @@ void ASoldierCharacter::MulticastFlashbang_Implementation(FVector Facing)
 		if (IsFacing == true)
 		{
 			FlashAmount = 0.5f;
-
 		}
-
 		UKismetMaterialLibrary::SetScalarParameterValue(this, MaterialCollection, "Flash_Value", FlashAmount);
-
 		GetWorldTimerManager().SetTimer(Timer_Flash, this, &ASoldierCharacter::FlashTimeline, 1.0f);
-
 	}
 }
 
@@ -1359,7 +1332,6 @@ void ASoldierCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 
 	DOREPLIFETIME(ASoldierCharacter, AutomaticRifle);
 
-	///GAME CHANGER!!!///
 	DOREPLIFETIME(ASoldierCharacter,IsReloading);
 	DOREPLIFETIME(ASoldierCharacter, IsZooming);
 	DOREPLIFETIME(ASoldierCharacter, ClimbAnim);
@@ -1374,12 +1346,6 @@ void ASoldierCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	DOREPLIFETIME(ASoldierCharacter, TimerHandle_Vault);
 	DOREPLIFETIME(ASoldierCharacter, bDied);
 	DOREPLIFETIME(ASoldierCharacter, IsCrouching);
-
-	//NIEPOTRZEBNA REPLIKACJA HUDA //
-	/*DOREPLIFETIME(ASoldierCharacter, bRemoveHud);*/
-	//DOREPLIFETIME(ASoldierCharacter, wPickUpvar);
-	//DOREPLIFETIME(ASoldierCharacter, wPickUp);
-
 	DOREPLIFETIME(ASoldierCharacter, wHealthIndicator);
 	DOREPLIFETIME(ASoldierCharacter, wHealthIndicatorvar);
 	DOREPLIFETIME(ASoldierCharacter, wAmmoCount);
@@ -1390,13 +1356,11 @@ void ASoldierCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	DOREPLIFETIME(ASoldierCharacter, bHeadsetPickUp);
 	DOREPLIFETIME(ASoldierCharacter, bLaserPickUp);
 	DOREPLIFETIME(ASoldierCharacter, bHelmetPickUp);
-
 	DOREPLIFETIME(ASoldierCharacter, PlayerName);
 	DOREPLIFETIME(ASoldierCharacter, CameraComp);
 	DOREPLIFETIME(ASoldierCharacter, STL);
 	DOREPLIFETIME(ASoldierCharacter, STR);
-	/*DOREPLIFETIME(ASoldierCharacter, Distance);
-	DOREPLIFETIME(ASoldierCharacter, FacingAngle);*/
+
 
 
 
