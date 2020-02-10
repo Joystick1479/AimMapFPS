@@ -9,9 +9,36 @@
 /**
  * 
  */
+
+class UTimerWidget;
+class UUserWidget;
+
 UCLASS()
 class AIMMAPSHOOTER_API AAimMapGameStateBase : public AGameStateBase
 {
-	GENERATED_BODY()
+	GENERATED_UCLASS_BODY()
+
+
+public:
+
+	virtual void Tick(float DeltaTime) override;
+	virtual void BeginPlay() override;
+
+
+
+private:
+	UPROPERTY(EditAnywhere, Category = "Widgets")
+	TSubclassOf<UTimerWidget> TimerWidgetClass;
+
+	UPROPERTY(EditDefaultsOnly, Category = "RoundTime")
+	float RoundTime;
+	bool IsTimerActive;
+
+	UTimerWidget* WidgetRef;
+	
+	void UpdateTimerText(float Seconds);
+
+
+
 	
 };
