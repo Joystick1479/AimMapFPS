@@ -14,6 +14,8 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetTextLibrary.h"
 
+#include "EngineUtils.h" 
+
 AAimMapGameStateBase::AAimMapGameStateBase(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	//static ConstructorHelpers::FClassFinder<UUserWidget> BlueprintClass(TEXT("/Game/UI/Timer/WBP_Timer"));
@@ -21,6 +23,7 @@ AAimMapGameStateBase::AAimMapGameStateBase(const FObjectInitializer& ObjectIniti
 	//{
 	//	TimerWidgetClass = BlueprintClass.Class;
 	//}
+	IsTimeOver = false;
 	
 
 }
@@ -29,7 +32,7 @@ void AAimMapGameStateBase::BeginPlay()
 {
 	Super::BeginPlay();
 
-	RoundTime = 120.0f;
+	//RoundTime = 120.0f;
 	UpdateTimerText(RoundTime);
 	IsTimerActive = true;
 
@@ -47,8 +50,11 @@ void AAimMapGameStateBase::Tick(float DeltaTime)
 
 	if (IsTimerActive == true)
 	{
-		RoundTime = RoundTime - DeltaTime;
-		UpdateTimerText(RoundTime);
+		if (RoundTime > 0)
+		{
+			RoundTime = RoundTime - DeltaTime;
+			UpdateTimerText(RoundTime);
+		}
 	}
 }
 
@@ -61,7 +67,8 @@ void AAimMapGameStateBase::UpdateTimerText(float Seconds)
 
 	FText SecondText = UKismetTextLibrary::Conv_IntToText(Second, false, false, 2, 2);
 	FText MinuteText = UKismetTextLibrary::Conv_IntToText(Minute);
-	FText FinalText = FText::Join({}, MinuteText, SecondText);
+	FText BreakText = FText::FromString(" : ");
+	FText FinalText = FText::Join({}, MinuteText, BreakText, SecondText);
 
 	if (WidgetRef)
 	{
@@ -69,6 +76,15 @@ void AAimMapGameStateBase::UpdateTimerText(float Seconds)
 		if (TextBlock)
 		{
 			TextBlock->SetText(FinalText);
+		}
+		if (Minute == 0 && Second == 0)
+		{
+			if (TextBlock)
+			{
+				FText GameOverText = FText::FromString("Game over");
+				TextBlock->SetText(GameOverText);
+				IsTimeOver = true;
+			}
 		}
 	}
 }

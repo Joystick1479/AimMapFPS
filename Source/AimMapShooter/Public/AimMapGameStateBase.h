@@ -24,7 +24,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void BeginPlay() override;
 
-
+	bool IsTimeOver;
 
 private:
 	UPROPERTY(EditAnywhere, Category = "Widgets")
@@ -34,9 +34,12 @@ private:
 	float RoundTime;
 	bool IsTimerActive;
 
+	class UTextBlock* TextBlock;
+
 	UTimerWidget* WidgetRef;
 	
 	void UpdateTimerText(float Seconds);
+	void TimeIsOver();
 
 
 
