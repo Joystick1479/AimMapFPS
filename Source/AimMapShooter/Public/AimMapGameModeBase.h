@@ -37,7 +37,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void CheckIfGameOver();
 
-
+	bool ShouldTimerOn;
 
 private:
 

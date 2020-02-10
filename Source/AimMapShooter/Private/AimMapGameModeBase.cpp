@@ -43,7 +43,7 @@ void AAimMapGameModeBase::PostLogin(APlayerController * NewPlayer)
 
 	if (NumberOfPlayers > 1)
 	{
-		GetWorldTimerManager().SetTimer(GameStartTimer, this, &AAimMapGameModeBase::StartGame, 10);
+		GetWorldTimerManager().SetTimer(GameStartTimer, this, &AAimMapGameModeBase::StartGame, 3);
 	}
 }
 
@@ -62,6 +62,8 @@ void AAimMapGameModeBase::StartGame()
 	bUseSeamlessTravel = true;
 	//World->ServerTravel("/Game/FirstPersonBP/Maps/Map?listen");
 	World->ServerTravel("/Game/AbandonedFactoryBuildings/Maps/Warehouse_01_day/Main_Warehouse_01?listen");
+
+	ShouldTimerOn = true;
 }
 
 void AAimMapGameModeBase::RestartGame()
@@ -129,9 +131,6 @@ void AAimMapGameModeBase::RespawningPlayer()
 	}
 }
 
-
-
-
 void AAimMapGameModeBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -140,4 +139,5 @@ void AAimMapGameModeBase::Tick(float DeltaTime)
 	//RespawningPlayer();
 	
 }
+
 

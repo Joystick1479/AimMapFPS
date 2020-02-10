@@ -39,9 +39,9 @@ private:
 	UTimerWidget* WidgetRef;
 	
 	void UpdateTimerText(float Seconds);
-	void TimeIsOver();
+	void GameRestart();
 
-
+	FTimerHandle TimerHandle;
 
 	
 };

@@ -3,6 +3,10 @@
 
 #include "AimMapGameStateBase.h"
 
+#include "AimMapGameModeBase.h"
+
+#include "TimerManager.h"
+
 #include "UObject/ConstructorHelpers.h" 
 
 #include "Blueprint/UserWidget.h" 
@@ -33,14 +37,15 @@ void AAimMapGameStateBase::BeginPlay()
 	Super::BeginPlay();
 
 	//RoundTime = 120.0f;
-	UpdateTimerText(RoundTime);
+	//UpdateTimerText(RoundTime);
 	IsTimerActive = true;
 
 	UWorld* World = this->GetWorld();
 	if (!ensure(World != nullptr)) return;
 	WidgetRef = CreateWidget<UTimerWidget>(World, TimerWidgetClass);
 	WidgetRef->AddToViewport();
-	
+	WidgetRef->SetVisibility(ESlateVisibility::Hidden);
+
 
 }
 
@@ -52,6 +57,7 @@ void AAimMapGameStateBase::Tick(float DeltaTime)
 	{
 		if (RoundTime > 0)
 		{
+			WidgetRef->SetVisibility(ESlateVisibility::Visible);
 			RoundTime = RoundTime - DeltaTime;
 			UpdateTimerText(RoundTime);
 		}
@@ -84,7 +90,19 @@ void AAimMapGameStateBase::UpdateTimerText(float Seconds)
 				FText GameOverText = FText::FromString("Game over");
 				TextBlock->SetText(GameOverText);
 				IsTimeOver = true;
+				GetWorldTimerManager().SetTimer(TimerHandle, this, &AAimMapGameStateBase::GameRestart, 3.0f);
 			}
 		}
 	}
+}
+
+void AAimMapGameStateBase::GameRestart()
+{
+	AAimMapGameModeBase* GameMode = Cast<AAimMapGameModeBase>(GetWorld()->GetAuthGameMode());
+	if (GameMode)
+	{
+		GameMode->RestartGame();
+	}
+
+	GetWorldTimerManager().ClearTimer(TimerHandle);
 }
