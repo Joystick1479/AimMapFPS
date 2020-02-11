@@ -293,7 +293,7 @@ void ASoldierCharacter::Tick(float DeltaTime)
 
 	DyingAudioTrigger();
 
-	DefendObjectiveSound();
+	//DefendObjectiveSound();
 
 	GameOverSound();
 
@@ -1069,11 +1069,14 @@ void ASoldierCharacter::GameOverSound()
 
 void ASoldierCharacter::NotifyActorBeginOverlap(AActor * OtherActor)
 {
+	bool DoOnce;
+	DoOnce = false;
 	APayloadCharacter* Payload = Cast<APayloadCharacter>(OtherActor);
 	if (Payload)
 	{
-		if (IsLocallyControlled())
+		if (IsLocallyControlled() && DoOnce == false)
 		{
+			DoOnce = true;
 			UGameplayStatics::PlaySound2D(this, EscortVehicle);
 		}
 	}
