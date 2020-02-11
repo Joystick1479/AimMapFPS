@@ -5,6 +5,8 @@
 
 #include "AimMapGameModeBase.h"
 
+#include "PayloadCharacter.h"
+
 #include "TimerManager.h"
 
 #include "UObject/ConstructorHelpers.h" 
@@ -17,6 +19,7 @@
 
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetTextLibrary.h"
+#include "Kismet/GameplayStatics.h"
 
 #include "EngineUtils.h" 
 
@@ -44,9 +47,8 @@ void AAimMapGameStateBase::BeginPlay()
 	if (!ensure(World != nullptr)) return;
 	WidgetRef = CreateWidget<UTimerWidget>(World, TimerWidgetClass);
 	WidgetRef->AddToViewport();
-//	WidgetRef->SetVisibility(ESlateVisibility::Hidden);
 
-
+	PayloadStatusHud();
 }
 
 void AAimMapGameStateBase::Tick(float DeltaTime)
@@ -57,9 +59,64 @@ void AAimMapGameStateBase::Tick(float DeltaTime)
 	{
 		if (RoundTime > 0)
 		{
-		//	WidgetRef->SetVisibility(ESlateVisibility::Visible);
 			RoundTime = RoundTime - DeltaTime;
 			UpdateTimerText(RoundTime);
+		}
+	}
+
+	///GameMode hud logic
+	TArray<AActor*> Payload;
+	UGameplayStatics::GetAllActorsOfClass(this, PayloadCharacterClass, Payload);
+	for (int i = 0; i < Payload.Num(); i++)
+	{
+		APayloadCharacter* PayloadChar = Cast<APayloadCharacter>(Payload[i]);
+		if (PayloadChar)
+		{
+			if (PayloadChar->OnePlayerPushing == true)
+			{
+				if (wPayloadObjectivesvar)
+				{
+					wPayloadObjectivesvar->SetVisibility(ESlateVisibility::Hidden);
+				}
+				if (wPayloadContestedvar)
+				{
+					wPayloadContestedvar->SetVisibility(ESlateVisibility::Hidden);
+				}
+				if (wPayloadPushingvar)
+				{
+					wPayloadPushingvar->SetVisibility(ESlateVisibility::Visible);
+				}
+			}
+			if (PayloadChar->ContestedPushing == true)
+			{
+				if (wPayloadObjectivesvar)
+				{
+					wPayloadObjectivesvar->SetVisibility(ESlateVisibility::Hidden);
+				}
+				if (wPayloadContestedvar)
+				{
+					wPayloadContestedvar->SetVisibility(ESlateVisibility::Visible);
+				}
+				if (wPayloadPushingvar)
+				{
+					wPayloadPushingvar->SetVisibility(ESlateVisibility::Hidden);
+				}
+			}
+			if (PayloadChar->ContestedPushing == false && PayloadChar->OnePlayerPushing == false)
+			{
+				if (wPayloadObjectivesvar)
+				{
+					wPayloadObjectivesvar->SetVisibility(ESlateVisibility::Visible);
+				}
+				if (wPayloadContestedvar)
+				{
+					wPayloadContestedvar->SetVisibility(ESlateVisibility::Hidden);
+				}
+				if (wPayloadPushingvar)
+				{
+					wPayloadPushingvar->SetVisibility(ESlateVisibility::Hidden);
+				}
+			}
 		}
 	}
 }
@@ -111,4 +168,41 @@ void AAimMapGameStateBase::GameRestart()
 	}
 
 	GetWorldTimerManager().ClearTimer(TimerHandle);
+}
+
+void AAimMapGameStateBase::PayloadStatusHud()
+{
+	UWorld* World = this->GetWorld();
+	if (!ensure(World != nullptr)) return;
+
+	//APlayerController* PC = Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
+//	if (PC)
+//	{
+		if (wPayloadObjective)
+		{
+			wPayloadObjectivesvar = CreateWidget<UUserWidget>(World, wPayloadObjective);
+			if (wPayloadObjectivesvar)
+			{
+				wPayloadObjectivesvar->AddToViewport();
+			}
+		}
+		if (wPayloadContested)
+		{
+			wPayloadContestedvar = CreateWidget<UUserWidget>(World, wPayloadContested);
+			if (wPayloadContestedvar)
+			{
+				wPayloadContestedvar->AddToViewport();
+				wPayloadContestedvar->SetVisibility(ESlateVisibility::Hidden);
+			}
+		}
+		if (wPayloadPushing)
+		{
+			wPayloadPushingvar = CreateWidget<UUserWidget>(World, wPayloadPushing);
+			if (wPayloadPushingvar)
+			{
+				wPayloadPushingvar->AddToViewport();
+				wPayloadPushingvar->SetVisibility(ESlateVisibility::Hidden);
+			}
+		}
+	//}
 }

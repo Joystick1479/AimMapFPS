@@ -12,6 +12,7 @@
 
 class UTimerWidget;
 class UUserWidget;
+class APayloadCharacter;
 
 UCLASS()
 class AIMMAPSHOOTER_API AAimMapGameStateBase : public AGameStateBase
@@ -40,6 +41,28 @@ private:
 	
 	void UpdateTimerText(float Seconds);
 	void GameRestart();
+	void PayloadStatusHud();
+
+	UPROPERTY(EditDefaultsOnly, Category = "Player")
+	TSubclassOf<APayloadCharacter> PayloadCharacterClass;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Player")
+	TSubclassOf<UUserWidget> wPayloadObjective;
+
+	UPROPERTY()
+	UUserWidget* wPayloadObjectivesvar;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Player")
+	TSubclassOf<UUserWidget> wPayloadPushing;
+
+	UPROPERTY()
+	UUserWidget* wPayloadPushingvar;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Player")
+	TSubclassOf<UUserWidget> wPayloadContested;
+
+	UPROPERTY()
+	UUserWidget* wPayloadContestedvar;
 
 	FTimerHandle TimerHandle;
 
