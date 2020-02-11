@@ -44,7 +44,7 @@ void AAimMapGameStateBase::BeginPlay()
 	if (!ensure(World != nullptr)) return;
 	WidgetRef = CreateWidget<UTimerWidget>(World, TimerWidgetClass);
 	WidgetRef->AddToViewport();
-	WidgetRef->SetVisibility(ESlateVisibility::Hidden);
+//	WidgetRef->SetVisibility(ESlateVisibility::Hidden);
 
 
 }
@@ -57,7 +57,7 @@ void AAimMapGameStateBase::Tick(float DeltaTime)
 	{
 		if (RoundTime > 0)
 		{
-			WidgetRef->SetVisibility(ESlateVisibility::Visible);
+		//	WidgetRef->SetVisibility(ESlateVisibility::Visible);
 			RoundTime = RoundTime - DeltaTime;
 			UpdateTimerText(RoundTime);
 		}
@@ -98,6 +98,12 @@ void AAimMapGameStateBase::UpdateTimerText(float Seconds)
 
 void AAimMapGameStateBase::GameRestart()
 {
+	if (WidgetRef)
+	{
+		WidgetRef->RemoveFromParent();
+	}
+
+
 	AAimMapGameModeBase* GameMode = Cast<AAimMapGameModeBase>(GetWorld()->GetAuthGameMode());
 	if (GameMode)
 	{
