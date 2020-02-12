@@ -72,6 +72,9 @@ ASoldierCharacter::ASoldierCharacter()
 	AudioCompReload = CreateDefaultSubobject<UAudioComponent>(TEXT("AudioCompReload"));
 	AudioCompReload->SetupAttachment(GetMesh());
 
+	AudioDamageComp = CreateDefaultSubobject<UAudioComponent>(TEXT("AudioDamageComp"));
+	AudioDamageComp->SetupAttachment(GetMesh());
+
 	// MINIMAP //
 	SpringArmRender2 = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmRender2"));
 	SceneCapture = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("SceneCaptureComp"));
@@ -990,6 +993,9 @@ void ASoldierCharacter::FireMode()
 			IsSingleFire = false;
 		}
 	}
+	
+	UGameplayStatics::PlaySoundAtLocation(GetWorld(), FiremodeSwitch, this->GetActorLocation());
+	
 }
 
 void ASoldierCharacter::WeaponInspectionOn()
@@ -1014,11 +1020,14 @@ void ASoldierCharacter::DefendObjectiveSound()
 		APayloadCharacter* PayloadChar = Cast<APayloadCharacter>(Payload[i]);
 		if (PayloadChar)
 		{
-			if (this->IsOverlappingActor(PayloadChar) == false)
+			if (IsLocallyControlled())
 			{
-				if (PayloadChar->ShouldPush == true)
+				if (this->IsOverlappingActor(PayloadChar) == false)
 				{
-					UGameplayStatics::PlaySound2D(this, DefendObjective);
+					if (PayloadChar->ShouldPush == true)
+					{
+						UGameplayStatics::PlaySound2D(this, DefendObjective);
+					}
 				}
 			}
 		}
@@ -1183,6 +1192,9 @@ void ASoldierCharacter::OnHealthChanged(UHealthComponent * OwningHealthComp, flo
 	{
 		AudioComp->Play();
 	}
+
+	AudioDamageComp->Play(0.0f);
+	
 }
 
 void ASoldierCharacter::ServerLineTraceItem_Implementation()

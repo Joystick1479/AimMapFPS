@@ -330,6 +330,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "Sounds")
 	UAudioComponent* AudioCompReload;
 
+	UPROPERTY(VisibleAnywhere, Category = "Sounds")
+	UAudioComponent* AudioDamageComp;
+
 
 	UPROPERTY(EditDefaultsOnly, Category = "Sounds")
 	USoundCue* EscortVehicle;
@@ -339,6 +342,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Sounds")
 	USoundCue* GameOverAudio;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Sounds")
+	USoundCue* FiremodeSwitch;
 
 	bool bStopSound;
 
