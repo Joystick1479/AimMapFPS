@@ -58,8 +58,11 @@ ASoldierCharacter::ASoldierCharacter()
 
 	RootComponent = this->GetRootComponent();
 
+	FPPMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("FPPMesh"));
+	FPPMesh->SetupAttachment(RootComponent);
+
 	SpringArm = CreateDefaultSubobject <USpringArmComponent>(TEXT("SpringArm"));
-	SpringArm->SetupAttachment(GetMesh(), HeadSocket);
+	SpringArm->SetupAttachment(FPPMesh);
 
 	CameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComp"));
 	CameraComp->SetupAttachment(SpringArm);
@@ -178,7 +181,7 @@ void ASoldierCharacter::BeginPlay()
 		if (AutomaticRifle)
 		{
 			AutomaticRifle->SetOwner(this);
-			AutomaticRifle->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocket);
+			AutomaticRifle->AttachToComponent(FPPMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocket);
 		}
 	}
 	HealthComp->OnHealthChanged.AddDynamic(this, &ASoldierCharacter::OnHealthChanged);
@@ -190,11 +193,11 @@ void ASoldierCharacter::BeginPlay()
 
 	if (SpringArm)
 	{
-		SpringArm->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, HeadSocket);
+		SpringArm->AttachToComponent(FPPMesh, FAttachmentTransformRules::SnapToTargetIncludingScale, "Camera_Socket");
 	}
 	if (CameraComp)
 	{
-		CameraComp->AttachToComponent(SpringArm, FAttachmentTransformRules::KeepRelativeTransform);
+		CameraComp->AttachToComponent(SpringArm, FAttachmentTransformRules::SnapToTargetIncludingScale);
 	}
 }
 
@@ -818,62 +821,62 @@ void ASoldierCharacter::EndCrouch()
 }
 void ASoldierCharacter::ZoomIn()
 {
-	UCharacterMovementComponent* MoveComp = this->FindComponentByClass<UCharacterMovementComponent>();
-	if (MoveComp && !IsSprinting &&!IsInspecting)
-	{
-		//MoveComp->MaxWalkSpeed = 78.0f;
-		MoveComp->MaxWalkSpeed = 250.0f;
+	//UCharacterMovementComponent* MoveComp = this->FindComponentByClass<UCharacterMovementComponent>();
+	//if (MoveComp && !IsSprinting &&!IsInspecting)
+	//{
+	//	//MoveComp->MaxWalkSpeed = 78.0f;
+	//	MoveComp->MaxWalkSpeed = 250.0f;
 
-		if (!IsSprinting)
-		{
-			if (Role < ROLE_Authority)
-			{
-				ServerZoomIn();
-				//return;
-			}
+	//	if (!IsSprinting)
+	//	{
+	//		if (Role < ROLE_Authority)
+	//		{
+	//			ServerZoomIn();
+	//			//return;
+	//		}
 			IsZooming = true;
 
-			if (IsLocallyControlled())
-			{
+	//		if (IsLocallyControlled())
+	//		{
 
-				APlayerController* PC = Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
-				if (PC)
-				{
-					if (AutomaticRifle)
-					{
-						PC->SetViewTargetWithBlend(AutomaticRifle, ZoomingTime, EViewTargetBlendFunction::VTBlend_Linear);
-					}
-				}
-			}
-		}
-	}
+	//			APlayerController* PC = Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
+	//			if (PC)
+	//			{
+	//				if (AutomaticRifle)
+	//				{
+	//					PC->SetViewTargetWithBlend(AutomaticRifle, ZoomingTime, EViewTargetBlendFunction::VTBlend_Linear);
+	//				}
+	//			}
+	//		}
+	//	}
+	//}
 }
 void ASoldierCharacter::ZoomOut()
 {
-	UCharacterMovementComponent* MoveComp = this->FindComponentByClass<UCharacterMovementComponent>();
-	if (MoveComp)
-	{
-		MoveComp->MaxWalkSpeed = 300.0f;
-	}
-	if (Role < ROLE_Authority)
-	{
-		ServerZoomOut();
-		//return;
-	}
+	//UCharacterMovementComponent* MoveComp = this->FindComponentByClass<UCharacterMovementComponent>();
+	//if (MoveComp)
+	//{
+	//	MoveComp->MaxWalkSpeed = 300.0f;
+	//}
+	//if (Role < ROLE_Authority)
+	//{
+	//	ServerZoomOut();
+	//	//return;
+	//}
 	IsZooming = false;
 
-	if (IsLocallyControlled())
-	{
+	//if (IsLocallyControlled())
+	//{
 
-		APlayerController* PC = Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
-		if (PC)
-		{
-			if (AutomaticRifle)
-			{
-				PC->SetViewTargetWithBlend(this, ZoomingTime, EViewTargetBlendFunction::VTBlend_Linear);
-			}
-		}
-	}
+	//	APlayerController* PC = Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
+	//	if (PC)
+	//	{
+	//		if (AutomaticRifle)
+	//		{
+	//			PC->SetViewTargetWithBlend(this, ZoomingTime, EViewTargetBlendFunction::VTBlend_Linear);
+	//		}
+	//	}
+	//}
 
 }
 

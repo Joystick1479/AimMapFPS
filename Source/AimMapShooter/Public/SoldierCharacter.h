@@ -115,6 +115,8 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	UPROPERTY(VisibleAnywhere, Category = "FPPMesh")
+	USkeletalMeshComponent* FPPMesh;
 
 	UPROPERTY(VisibleAnywhere, Category = "Minimap")
 	USpringArmComponent* SpringArmRender2;
