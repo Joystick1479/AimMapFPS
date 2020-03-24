@@ -32,3 +32,31 @@ void ATest::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 }
 
+//void SomeClass::Add(const FStructA & Struct)
+//{
+//	DataElementsA.Add(Struct);
+//}
+//
+//void SomeClass::Add(const FStructB & Struct)
+//{
+//	DataElementsB.Add(Struct);
+//}
+//
+//void SomeClass::Process()
+//{
+//	for (FStructA DataElement : DataElementsA) 
+//	{
+//		if (DataElement.GetType()) 
+//		{
+//			FStructA StructA = *reinterpret_cast<FStructA*>(DataElement.GetType());
+//			// Process A 
+//		} 
+//	}
+//	for (FStructB DataElement : DataElementsB)
+//	{
+//		if (DataElement.GetType())
+//		{
+//			FStructB StructB = *reinterpret_cast<FStructB*>(DataElement.GetType());
+//		}
+//	}
+//}

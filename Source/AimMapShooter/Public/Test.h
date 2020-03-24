@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Containers/Array.h" 
 #include "Test.generated.h"
 
 UCLASS()
@@ -27,3 +28,31 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 };
+
+//struct IStruct
+//{
+//	virtual bool GetType() const = 0;
+//};
+//struct FStructA : IStruct
+//{
+//	bool GetType() const override { return true; }
+//};
+//struct FStructB : IStruct
+//{
+//	bool GetType() const override { return false; }
+//};
+//
+//class SomeClass
+//{
+//public:
+//	void Add(const FStructA& Struct);
+//	void Add(const FStructB& Struct);
+//	void Process();
+//	
+//
+//private:
+//	TArray<FStructA> DataElementsA;
+//	TArray<FStructB> DataElementsB;
+//
+//
+//};

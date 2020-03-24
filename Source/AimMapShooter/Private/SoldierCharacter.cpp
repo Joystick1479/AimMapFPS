@@ -63,6 +63,7 @@ ASoldierCharacter::ASoldierCharacter()
 
 	SpringArm = CreateDefaultSubobject <USpringArmComponent>(TEXT("SpringArm"));
 	SpringArm->SetupAttachment(FPPMesh);
+	
 
 	CameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComp"));
 	CameraComp->SetupAttachment(SpringArm);
@@ -172,17 +173,32 @@ void ASoldierCharacter::BeginPlay()
 			SceneCapture->AttachToComponent(SpringArmRender2, FAttachmentTransformRules::KeepRelativeTransform);
 		}
 	}
-	///**Getting weapon on begin play *//
-	if (Role == ROLE_Authority)
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	///For third person animations///
+	/*if (Role != ROLE_Authority)
 	{
-		FActorSpawnParameters SpawnParams;
-		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 		AutomaticRifle = GetWorld()->SpawnActor<AAutomaticRifle>(StarterWeaponClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
 		if (AutomaticRifle)
 		{
 			AutomaticRifle->SetOwner(this);
+			AutomaticRifle->SkelMeshComp->bOwnerNoSee = true;
+			AutomaticRifle->AttachToComponent(this->GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocket);
+		}
+	}*/
+
+	///**Getting weapon on begin play *//
+	if (Role == ROLE_Authority)
+	{
+		///**Spawn weapmon for first person animation ///**
+		AutomaticRifle = GetWorld()->SpawnActor<AAutomaticRifle>(StarterWeaponClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
+		if (AutomaticRifle)
+		{
+			AutomaticRifle->SetOwner(this);
+			AutomaticRifle->SkelMeshComp->bOnlyOwnerSee = true;
 			AutomaticRifle->AttachToComponent(FPPMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocket);
 		}
+
 	}
 	HealthComp->OnHealthChanged.AddDynamic(this, &ASoldierCharacter::OnHealthChanged);
 
@@ -193,7 +209,8 @@ void ASoldierCharacter::BeginPlay()
 
 	if (SpringArm)
 	{
-		SpringArm->AttachToComponent(FPPMesh, FAttachmentTransformRules::SnapToTargetIncludingScale, "Camera_Socket");
+		SpringArm->AttachToComponent(FPPMesh, FAttachmentTransformRules::SnapToTargetIncludingScale);
+	
 	}
 	if (CameraComp)
 	{
