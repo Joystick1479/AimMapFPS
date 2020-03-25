@@ -188,18 +188,18 @@ void ASoldierCharacter::BeginPlay()
 	}*/
 
 	///**Getting weapon on begin play *//
+	///**Spawn weapmon for first person animation ///**
 	if (Role == ROLE_Authority)
 	{
-		///**Spawn weapmon for first person animation ///**
-		AutomaticRifle = GetWorld()->SpawnActor<AAutomaticRifle>(StarterWeaponClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
-		if (AutomaticRifle)
-		{
-			AutomaticRifle->SetOwner(this);
-			AutomaticRifle->SkelMeshComp->bOnlyOwnerSee = true;
-			AutomaticRifle->AttachToComponent(FPPMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocket);
-		}
-
+			AutomaticRifle = GetWorld()->SpawnActor<AAutomaticRifle>(StarterWeaponClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
+			if (AutomaticRifle)
+			{
+				AutomaticRifle->SkelMeshComp->bOnlyOwnerSee = true;
+				AutomaticRifle->SetOwner(this);
+				AutomaticRifle->AttachToComponent(FPPMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocket);
+			}
 	}
+
 	HealthComp->OnHealthChanged.AddDynamic(this, &ASoldierCharacter::OnHealthChanged);
 
 	if (HealthComp)
