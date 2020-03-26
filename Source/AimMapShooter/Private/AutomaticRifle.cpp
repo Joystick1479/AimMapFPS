@@ -169,6 +169,7 @@ void AAutomaticRifle::Fire()
 
 		ASoldierCharacter* SoldierChar = Cast<ASoldierCharacter>(GetOwner());
 		ALaser* Laser = Cast<ALaser>(GetOwner());
+		APlayerController* PC = Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
 		if (SoldierChar->IsZooming == true)
 		{
 			AActor* MyOwner = GetOwner();
@@ -243,8 +244,10 @@ void AAutomaticRifle::Fire()
 			{
 				FHitResult Hit;
 				FVector StartLocation = SkelMeshComp->GetSocketLocation(MuzzleSocket);
+				//FVector Rotation = SoldierChar->CameraComp->GetForwardVector();
 				FRotator Rotation = SkelMeshComp->GetSocketRotation(MuzzleSocket);
 				FVector ShotDirection = Rotation.Vector();
+				//FVector ShotDirection = Rotation;
 				if (SoldierChar->isGripAttached == true)
 				{
 					BulletSpread = BulletSpreadGrip;
@@ -417,5 +420,7 @@ void AAutomaticRifle::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME_CONDITION(AAutomaticRifle, HitScanTrace,COND_SkipOwner);
+	DOREPLIFETIME(AAutomaticRifle, SkelMeshComp);
+
 }
 

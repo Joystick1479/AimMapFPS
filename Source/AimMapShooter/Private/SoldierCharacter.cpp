@@ -1389,5 +1389,6 @@ void ASoldierCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 
 
 
+
 	
 }

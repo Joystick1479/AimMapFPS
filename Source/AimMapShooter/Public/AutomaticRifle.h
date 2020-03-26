@@ -236,7 +236,7 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components", Replicated)
 	USkeletalMeshComponent* SkelMeshComp;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
