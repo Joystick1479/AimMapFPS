@@ -173,31 +173,20 @@ void ASoldierCharacter::BeginPlay()
 			SceneCapture->AttachToComponent(SpringArmRender2, FAttachmentTransformRules::KeepRelativeTransform);
 		}
 	}
+
+	///**Getting weapon on begin play *//
+	///**Spawn weapmon for first person animation ///**
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	///For third person animations///
-	/*if (Role != ROLE_Authority)
+	if(Role==ROLE_Authority)
 	{
 		AutomaticRifle = GetWorld()->SpawnActor<AAutomaticRifle>(StarterWeaponClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
 		if (AutomaticRifle)
 		{
 			AutomaticRifle->SetOwner(this);
-			AutomaticRifle->SkelMeshComp->bOwnerNoSee = true;
-			AutomaticRifle->AttachToComponent(this->GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocket);
+			AutomaticRifle->AttachToComponent(FPPMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocket);
+			AutomaticRifle->SkelMeshComp->bOnlyOwnerSee = true;
 		}
-	}*/
-
-	///**Getting weapon on begin play *//
-	///**Spawn weapmon for first person animation ///**
-	if (Role == ROLE_Authority)
-	{
-			AutomaticRifle = GetWorld()->SpawnActor<AAutomaticRifle>(StarterWeaponClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
-			if (AutomaticRifle)
-			{
-				AutomaticRifle->SkelMeshComp->bOnlyOwnerSee = true;
-				AutomaticRifle->SetOwner(this);
-				AutomaticRifle->AttachToComponent(FPPMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocket);
-			}
 	}
 
 	HealthComp->OnHealthChanged.AddDynamic(this, &ASoldierCharacter::OnHealthChanged);
