@@ -169,7 +169,6 @@ void AAutomaticRifle::Fire()
 
 		ASoldierCharacter* SoldierChar = Cast<ASoldierCharacter>(GetOwner());
 		ALaser* Laser = Cast<ALaser>(GetOwner());
-		APlayerController* PC = Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
 		if (SoldierChar->IsZooming == true)
 		{
 			AActor* MyOwner = GetOwner();
@@ -244,10 +243,10 @@ void AAutomaticRifle::Fire()
 			{
 				FHitResult Hit;
 				FVector StartLocation = SkelMeshComp->GetSocketLocation(MuzzleSocket);
-				//FVector Rotation = SoldierChar->CameraComp->GetForwardVector();
-				FRotator Rotation = SkelMeshComp->GetSocketRotation(MuzzleSocket);
+				FRotator Rotation = SoldierChar->CameraComp->GetComponentRotation();
 				FVector ShotDirection = Rotation.Vector();
-				//FVector ShotDirection = Rotation;
+			//	FRotator Rotation = SkelMeshComp->GetSocketRotation(MuzzleSocket);
+			//	FVector ShotDirection = Rotation.Vector();
 				if (SoldierChar->isGripAttached == true)
 				{
 					BulletSpread = BulletSpreadGrip;
@@ -255,6 +254,7 @@ void AAutomaticRifle::Fire()
 				float HalfRad = FMath::DegreesToRadians(BulletSpread);
 				ShotDirection = FMath::VRandCone(ShotDirection, HalfRad, HalfRad);
 				FVector EndLocation = StartLocation + (ShotDirection * 10000);
+
 				FCollisionQueryParams QueryParams;
 				QueryParams.AddIgnoredActor(MyOwner);
 				QueryParams.AddIgnoredActor(this);
