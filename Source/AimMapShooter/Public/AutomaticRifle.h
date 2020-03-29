@@ -91,7 +91,7 @@ public:
 		EBtAmmo,
 	};
 
-
+	UPROPERTY(Replicated)
 	ASoldierCharacter* SoldierChar;
 
 
@@ -230,6 +230,9 @@ protected:
 	USoundCue* HitSound;
 
 	void PlayFireEffects(FVector EndLocation);
+
+	UPROPERTY(Replicated)
+	FRotator RotationCamera;
 
 
 public:	

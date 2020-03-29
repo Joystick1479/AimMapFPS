@@ -243,10 +243,17 @@ void AAutomaticRifle::Fire()
 			{
 				FHitResult Hit;
 				FVector StartLocation = SkelMeshComp->GetSocketLocation(MuzzleSocket);
-				FRotator Rotation = SoldierChar->CameraComp->GetComponentRotation();
-				FVector ShotDirection = Rotation.Vector();
-			//	FRotator Rotation = SkelMeshComp->GetSocketRotation(MuzzleSocket);
-			//	FVector ShotDirection = Rotation.Vector();
+			//	FRotator RotationCamera = SoldierChar->CameraComp->GetComponentRotation();
+			//	FVector ShotDirection = RotationCamera.Vector();
+
+				//FRotator Rotation = SkelMeshComp->GetSocketRotation(MuzzleSocket);
+				//FVector ShotDirection = Rotation.Vector();
+				FRotator temp;
+				MyOwner->GetActorEyesViewPoint(StartLocation, temp);
+
+				FRotator RotationCamera = temp;
+				FVector ShotDirection = RotationCamera.Vector();
+
 				if (SoldierChar->isGripAttached == true)
 				{
 					BulletSpread = BulletSpreadGrip;
@@ -421,6 +428,10 @@ void AAutomaticRifle::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 
 	DOREPLIFETIME_CONDITION(AAutomaticRifle, HitScanTrace,COND_SkipOwner);
 	DOREPLIFETIME(AAutomaticRifle, SkelMeshComp);
+	DOREPLIFETIME(AAutomaticRifle, SoldierChar);
+	DOREPLIFETIME(AAutomaticRifle, RotationCamera);
+
+
 
 }
 
