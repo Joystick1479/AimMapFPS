@@ -14,6 +14,7 @@ class ASoldierCharacter;
 class USphereComponent;
 class UCameraShake;
 class ALaser;
+class UAnimSequence;
 
 //Contains information of a single hitscan weapon line trace//
 USTRUCT()
@@ -231,8 +232,6 @@ protected:
 
 	void PlayFireEffects(FVector EndLocation);
 
-	UPROPERTY(Replicated)
-	FRotator RotationCamera;
 
 
 public:	
@@ -242,9 +241,11 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components", Replicated)
 	USkeletalMeshComponent* SkelMeshComp;
 
+	UPROPERTY(EditAnywhere, Category = "Animation reload")
+	UAnimSequence* AnimSeqReload;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
 	UCameraComponent* Camera;
-
 
 	void StartFire();
 

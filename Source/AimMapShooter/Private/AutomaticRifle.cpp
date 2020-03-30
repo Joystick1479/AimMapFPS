@@ -17,6 +17,7 @@
 #include "Math/Vector.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Net/UnrealNetwork.h"
+#include "Animation/AnimSequence.h"
 
 // Sets default values
 AAutomaticRifle::AAutomaticRifle()
@@ -36,7 +37,7 @@ AAutomaticRifle::AAutomaticRifle()
 	SphereComp = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
 	SphereComp->SetupAttachment(SkelMeshComp);
 
-	MuzzleSocket = "MuzzleSocket";
+	MuzzleSocket = "MuzzleFlash";
 	LineSocket = "LineSocket";
 	ScopeSocket = "ScopeSocket";
 	GripSocket = "GripSocket";
@@ -165,7 +166,6 @@ void AAutomaticRifle::Fire()
 	if (CurrentAmmoInClip > 0 && CurrentState != EWeaponState::Reloading)
 	{
 		CurrentState = EWeaponState::Firing;
-
 
 		ASoldierCharacter* SoldierChar = Cast<ASoldierCharacter>(GetOwner());
 		ALaser* Laser = Cast<ALaser>(GetOwner());
@@ -393,6 +393,7 @@ void AAutomaticRifle::StartReload()
 		ReloadingState = EReloadingState::Reloading;
 		CurrentState = EWeaponState::Reloading;
 
+		SkelMeshComp->PlayAnimation(AnimSeqReload, false);
 		//UGameplayStatics::PlaySoundAtLocation(GetWorld(), ReloadSound, GetActorLocation());
 
 		GetWorldTimerManager().SetTimer(TimerHandle_ReloadWeapon, this, &AAutomaticRifle::ReloadWeapon, 2.5f, false);
@@ -429,7 +430,6 @@ void AAutomaticRifle::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 	DOREPLIFETIME_CONDITION(AAutomaticRifle, HitScanTrace,COND_SkipOwner);
 	DOREPLIFETIME(AAutomaticRifle, SkelMeshComp);
 	DOREPLIFETIME(AAutomaticRifle, SoldierChar);
-	DOREPLIFETIME(AAutomaticRifle, RotationCamera);
 
 
 

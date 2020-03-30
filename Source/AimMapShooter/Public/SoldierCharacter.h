@@ -10,6 +10,7 @@
 class UCameraComponent;
 class AAutomaticRifle;
 class USkeletalMeshComponent;
+class UAnimInstance;
 class UHealthComponent;
 class AHoloScope;
 class AGrip;
@@ -123,6 +124,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, Category = "Minimap")
 	class USceneCaptureComponent2D* SceneCapture;
+
+	UPROPERTY(EditAnywhere, Category = "AnimationWeapon")
+	TSubclassOf<UAnimInstance> AnimBp;
 
 	ECharacterState::Type CharacterState;
 
@@ -464,6 +468,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Zoom")
 	bool IsSingleFire;
 
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite,Replicated, Category = "Zoom")
+	bool IsFiring;
 	///Bool for crouching///
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated, Category = "Crouch")
 	bool IsCrouching;

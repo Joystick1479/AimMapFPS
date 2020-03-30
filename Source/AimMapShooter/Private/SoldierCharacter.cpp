@@ -4,6 +4,7 @@
 #include "AutomaticRifle.h"
 
 #include "Components/SkeletalMeshComponent.h"
+#include "Animation//AnimInstance.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/SceneCaptureComponent2D.h"
@@ -186,6 +187,7 @@ void ASoldierCharacter::BeginPlay()
 			AutomaticRifle->SetOwner(this);
 			AutomaticRifle->AttachToComponent(FPPMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocket);
 			AutomaticRifle->SkelMeshComp->bOnlyOwnerSee = true;
+			AutomaticRifle->SkelMeshComp->SetAnimInstanceClass(AnimBp);
 		}
 	}
 
@@ -607,14 +609,17 @@ void ASoldierCharacter::PickUp()
 
 			FActorSpawnParameters SpawnParams;
 			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-
-			HoloScope = GetWorld()->SpawnActor<AHoloScope>(HoloClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
-			if (HoloScope)
+			if (Role == ROLE_Authority)
 			{
-				HoloScope->SetOwner(AutomaticRifle);
-				FName Socket = AutomaticRifle->ScopeSocket;
-				HoloScope->AttachToComponent(AutomaticRifle->SkelMeshComp, FAttachmentTransformRules::SnapToTargetNotIncludingScale, Socket);
-				isHoloAttached = true;
+				HoloScope = GetWorld()->SpawnActor<AHoloScope>(HoloClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
+				if (HoloScope)
+				{
+					HoloScope->SetOwner(AutomaticRifle);
+					FName Socket = AutomaticRifle->ScopeSocket;
+					HoloScope->AttachToComponent(AutomaticRifle->SkelMeshComp, FAttachmentTransformRules::SnapToTargetNotIncludingScale, Socket);
+					HoloScope->MeshComp->bOnlyOwnerSee = true;
+					isHoloAttached = true;
+				}
 			}
 			UGameplayStatics::PlaySoundAtLocation(this, ItemsPickUp, GetActorLocation());
 		}
@@ -827,68 +832,70 @@ void ASoldierCharacter::EndCrouch()
 }
 void ASoldierCharacter::ZoomIn()
 {
-	//UCharacterMovementComponent* MoveComp = this->FindComponentByClass<UCharacterMovementComponent>();
-	//if (MoveComp && !IsSprinting &&!IsInspecting)
-	//{
-	//	//MoveComp->MaxWalkSpeed = 78.0f;
-	//	MoveComp->MaxWalkSpeed = 250.0f;
+	UCharacterMovementComponent* MoveComp = this->FindComponentByClass<UCharacterMovementComponent>();
+	if (MoveComp && !IsSprinting &&!IsInspecting)
+	{
+		//MoveComp->MaxWalkSpeed = 78.0f;
+		MoveComp->MaxWalkSpeed = 250.0f;
 
-	//	if (!IsSprinting)
-	//	{
-	//		if (Role < ROLE_Authority)
-	//		{
-	//			ServerZoomIn();
-	//			//return;
-	//		}
+		if (!IsSprinting)
+		{
+			if (Role < ROLE_Authority)
+			{
+				ServerZoomIn();
+				//return;
+			}
 			IsZooming = true;
 
-	//		if (IsLocallyControlled())
-	//		{
+			if (IsLocallyControlled())
+			{
 
-	//			APlayerController* PC = Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
-	//			if (PC)
-	//			{
-	//				if (AutomaticRifle)
-	//				{
-	//					PC->SetViewTargetWithBlend(AutomaticRifle, ZoomingTime, EViewTargetBlendFunction::VTBlend_Linear);
-	//				}
-	//			}
-	//		}
-	//	}
-	//}
+				APlayerController* PC = Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
+				if (PC)
+				{
+					if (AutomaticRifle)
+					{
+						PC->SetViewTargetWithBlend(AutomaticRifle, ZoomingTime, EViewTargetBlendFunction::VTBlend_Linear);
+					}
+				}
+			}
+		}
+	}
 }
 void ASoldierCharacter::ZoomOut()
 {
-	//UCharacterMovementComponent* MoveComp = this->FindComponentByClass<UCharacterMovementComponent>();
-	//if (MoveComp)
-	//{
-	//	MoveComp->MaxWalkSpeed = 300.0f;
-	//}
-	//if (Role < ROLE_Authority)
-	//{
-	//	ServerZoomOut();
-	//	//return;
-	//}
+	UCharacterMovementComponent* MoveComp = this->FindComponentByClass<UCharacterMovementComponent>();
+	if (MoveComp)
+	{
+		MoveComp->MaxWalkSpeed = 300.0f;
+	}
+	if (Role < ROLE_Authority)
+	{
+		ServerZoomOut();
+		//return;
+	}
 	IsZooming = false;
 
-	//if (IsLocallyControlled())
-	//{
+	if (IsLocallyControlled())
+	{
 
-	//	APlayerController* PC = Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
-	//	if (PC)
-	//	{
-	//		if (AutomaticRifle)
-	//		{
-	//			PC->SetViewTargetWithBlend(this, ZoomingTime, EViewTargetBlendFunction::VTBlend_Linear);
-	//		}
-	//	}
-	//}
+		APlayerController* PC = Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
+		if (PC)
+		{
+			if (AutomaticRifle)
+			{
+				PC->SetViewTargetWithBlend(this, ZoomingTime, EViewTargetBlendFunction::VTBlend_Linear);
+			}
+		}
+	}
 
 }
 
 void ASoldierCharacter::StartFire()
 {
 	CharacterState = ECharacterState::Firing;
+
+	IsFiring = true;
 
 	if (IsSingleFire == false)
 	{
@@ -911,6 +918,7 @@ void ASoldierCharacter::StartFire()
 void ASoldierCharacter::StopFire()
 {
 	CharacterState = ECharacterState::Idle;
+	IsFiring = false;
 
 	if (AutomaticRifle)
 	{
@@ -970,8 +978,8 @@ void ASoldierCharacter::Reload()
 			CharacterState = ECharacterState::Reloading;
 			IsReloading = true;
 			AutomaticRifle->StartReload();
-			AudioCompReload->Activate(true);
-			ServerReloadingSound();
+		//	AudioCompReload->Activate(true);
+		//	ServerReloadingSound();
 			GetWorldTimerManager().SetTimer(ReloadTimer, this, &ASoldierCharacter::StopReload, 2.167f, false);
 		}
 	}
@@ -983,7 +991,7 @@ void ASoldierCharacter::StopReload()
 	{
 		CharacterState = ECharacterState::Idle;
 		IsReloading = false;
-		AudioCompReload->Deactivate();
+		//AudioCompReload->Deactivate();
 		GetWorldTimerManager().ClearTimer(ReloadTimer);
 	}
 }
@@ -1357,6 +1365,7 @@ void ASoldierCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	DOREPLIFETIME(ASoldierCharacter, AutomaticRifle);
 
 	DOREPLIFETIME(ASoldierCharacter,IsReloading);
+	DOREPLIFETIME(ASoldierCharacter, IsFiring);
 	DOREPLIFETIME(ASoldierCharacter, IsZooming);
 	DOREPLIFETIME(ASoldierCharacter, ClimbAnim);
 	DOREPLIFETIME(ASoldierCharacter, VaultAnim);
