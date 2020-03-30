@@ -617,7 +617,7 @@ void ASoldierCharacter::PickUp()
 					HoloScope->SetOwner(AutomaticRifle);
 					FName Socket = AutomaticRifle->ScopeSocket;
 					HoloScope->AttachToComponent(AutomaticRifle->SkelMeshComp, FAttachmentTransformRules::SnapToTargetNotIncludingScale, Socket);
-					HoloScope->MeshComp->bOnlyOwnerSee = true;
+					HoloScope->SkelMeshComp->bOnlyOwnerSee = true;
 					isHoloAttached = true;
 				}
 			}
@@ -833,7 +833,7 @@ void ASoldierCharacter::EndCrouch()
 void ASoldierCharacter::ZoomIn()
 {
 	UCharacterMovementComponent* MoveComp = this->FindComponentByClass<UCharacterMovementComponent>();
-	if (MoveComp && !IsSprinting &&!IsInspecting)
+	if (MoveComp && !IsSprinting &&!IsInspecting &&!IsReloading)
 	{
 		//MoveComp->MaxWalkSpeed = 78.0f;
 		MoveComp->MaxWalkSpeed = 250.0f;
@@ -971,7 +971,7 @@ void ASoldierCharacter::Reload()
 	{
 		ServerReload();
 	}
-	if (CharacterState == ECharacterState::Idle && (SoldierCurrentClips > 0))
+	if (CharacterState == ECharacterState::Idle && (SoldierCurrentClips > 0) && !IsZooming)
 	{
 		if (AutomaticRifle)
 		{

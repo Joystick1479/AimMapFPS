@@ -6,7 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "HoloScope.generated.h"
 
-class UStaticMeshComponent;
+class USkeletalMeshComponent;
 class USphereComponent;
 
 UCLASS()
@@ -20,7 +20,7 @@ public:
 
 
 	UPROPERTY(VisibleAnywhere, Category = "Components")
-	UStaticMeshComponent* MeshComp;
+	USkeletalMeshComponent* SkelMeshComp;
 
 protected:
 	// Called when the game starts or when spawned
