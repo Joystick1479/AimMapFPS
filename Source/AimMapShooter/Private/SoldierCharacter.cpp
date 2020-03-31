@@ -609,19 +609,19 @@ void ASoldierCharacter::PickUp()
 
 			FActorSpawnParameters SpawnParams;
 			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-			if (Role == ROLE_Authority)
+			if (IsLocallyControlled())
 			{
 				HoloScope = GetWorld()->SpawnActor<AHoloScope>(HoloClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
 				if (HoloScope)
 				{
 					HoloScope->SetOwner(this);
+					HoloScope->SkelMeshComp->bOnlyOwnerSee = true;
 					FName Socket = AutomaticRifle->ScopeSocket;
 					HoloScope->AttachToComponent(AutomaticRifle->SkelMeshComp, FAttachmentTransformRules::SnapToTargetNotIncludingScale, Socket);
-					HoloScope->SkelMeshComp->bOnlyOwnerSee = true;
 					isHoloAttached = true;
 				}
+				UGameplayStatics::PlaySoundAtLocation(this, ItemsPickUp, GetActorLocation());
 			}
-			UGameplayStatics::PlaySoundAtLocation(this, ItemsPickUp, GetActorLocation());
 		}
 		if (bGripPickUp == true && HoldingWeaponState == EHoldingWeapon::A4 && GripEquipState == EGripAttachment::None)
 		{
@@ -630,16 +630,19 @@ void ASoldierCharacter::PickUp()
 
 			FActorSpawnParameters SpawnParams;
 			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-
-			Grip = GetWorld()->SpawnActor<AGrip>(GripClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
-			if (Grip)
+			if (IsLocallyControlled())
 			{
-				Grip->SetOwner(AutomaticRifle);
-				FName GSocket = AutomaticRifle->GripSocket;
-				Grip->AttachToComponent(AutomaticRifle->SkelMeshComp, FAttachmentTransformRules::SnapToTargetNotIncludingScale, GSocket);
-				isGripAttached = true;
+				Grip = GetWorld()->SpawnActor<AGrip>(GripClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
+				if (Grip)
+				{
+					Grip->SetOwner(this);
+					Grip->MeshComp->bOnlyOwnerSee = true;
+					FName GSocket = AutomaticRifle->GripSocket;
+					Grip->AttachToComponent(AutomaticRifle->SkelMeshComp, FAttachmentTransformRules::SnapToTargetNotIncludingScale, GSocket);
+					isGripAttached = true;
+				}
+				UGameplayStatics::PlaySoundAtLocation(this, ItemsPickUp, GetActorLocation());
 			}
-			UGameplayStatics::PlaySoundAtLocation(this, ItemsPickUp, GetActorLocation());
 		}
 		if (bHelmetPickUp == true && HelmetEquipState==EHelmetAttachment::None)
 		{
@@ -680,15 +683,19 @@ void ASoldierCharacter::PickUp()
 			FActorSpawnParameters SpawnParams;
 			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-			Laser = GetWorld()->SpawnActor<ALaser>(LaserClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
-			if (Laser)
+			if (IsLocallyControlled())
 			{
-				Laser->SetOwner(AutomaticRifle);
-				FName LSocket = AutomaticRifle->LaserSocket;
-				Laser->AttachToComponent(AutomaticRifle->SkelMeshComp, FAttachmentTransformRules::SnapToTargetNotIncludingScale, LSocket);
-				isLaserAttached = true;
+				Laser = GetWorld()->SpawnActor<ALaser>(LaserClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
+				if (Laser)
+				{
+					Laser->SetOwner(this);
+					Laser->MeshComp->bOnlyOwnerSee = true;
+					FName LSocket = AutomaticRifle->LaserSocket;
+					Laser->AttachToComponent(AutomaticRifle->SkelMeshComp, FAttachmentTransformRules::SnapToTargetNotIncludingScale, LSocket);
+					isLaserAttached = true;
+				}
+				UGameplayStatics::PlaySoundAtLocation(this, ItemsPickUp, GetActorLocation());
 			}
-			UGameplayStatics::PlaySoundAtLocation(this, ItemsPickUp, GetActorLocation());
 		}
 }
 
@@ -856,7 +863,6 @@ void ASoldierCharacter::ZoomIn()
 					if (AutomaticRifle)
 					{
 						PC->SetViewTargetWithBlend(AutomaticRifle, ZoomingTime, EViewTargetBlendFunction::VTBlend_Linear);
-						AutomaticRifle->SkelMeshComp->bOwnerNoSee = true;
 					}
 				}
 			}
@@ -894,24 +900,25 @@ void ASoldierCharacter::ZoomOut()
 
 void ASoldierCharacter::StartFire()
 {
-	CharacterState = ECharacterState::Firing;
-
-	IsFiring = true;
-
-	if (IsSingleFire == false)
+	if (!IsSprinting)
 	{
-		if (AutomaticRifle)
-		{
-			AutomaticRifle->StartFire();
+		CharacterState = ECharacterState::Firing;
 
+		IsFiring = true;
+
+		if (IsSingleFire == false)
+		{
+			if (AutomaticRifle)
+			{
+				AutomaticRifle->StartFire();
+			}
 		}
-	}
-	else
-	{
-		if (AutomaticRifle)
+		else
 		{
-			AutomaticRifle->Fire();
-
+			if (AutomaticRifle)
+			{
+				AutomaticRifle->Fire();
+			}
 		}
 	}
 }
