@@ -614,7 +614,7 @@ void ASoldierCharacter::PickUp()
 				HoloScope = GetWorld()->SpawnActor<AHoloScope>(HoloClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
 				if (HoloScope)
 				{
-					HoloScope->SetOwner(AutomaticRifle);
+					HoloScope->SetOwner(this);
 					FName Socket = AutomaticRifle->ScopeSocket;
 					HoloScope->AttachToComponent(AutomaticRifle->SkelMeshComp, FAttachmentTransformRules::SnapToTargetNotIncludingScale, Socket);
 					HoloScope->SkelMeshComp->bOnlyOwnerSee = true;
@@ -856,6 +856,7 @@ void ASoldierCharacter::ZoomIn()
 					if (AutomaticRifle)
 					{
 						PC->SetViewTargetWithBlend(AutomaticRifle, ZoomingTime, EViewTargetBlendFunction::VTBlend_Linear);
+						AutomaticRifle->SkelMeshComp->bOwnerNoSee = true;
 					}
 				}
 			}
