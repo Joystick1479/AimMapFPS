@@ -188,7 +188,7 @@ void AAutomaticRifle::Fire()
 				QueryParams.bReturnPhysicalMaterial = true;
 				QueryParams.bTraceComplex = true;
 
-				if (GetWorld()->LineTraceSingleByChannel(Hit, StartLocation, EndLocation, ECollisionChannel::ECC_Pawn, QueryParams))
+				if (GetWorld()->LineTraceSingleByChannel(Hit, StartLocation, EndLocation, ECollisionChannel::ECC_Destructible, QueryParams))
 				{
 
 					//DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::Red, false, 1.0f, 0, 1.0f);
@@ -269,7 +269,7 @@ void AAutomaticRifle::Fire()
 				QueryParams.bTraceComplex = true;
 
 
-				if (GetWorld()->LineTraceSingleByChannel(Hit, StartLocation, EndLocation, ECollisionChannel::ECC_Pawn, QueryParams))
+				if (GetWorld()->LineTraceSingleByChannel(Hit, StartLocation, EndLocation, ECollisionChannel::ECC_Destructible, QueryParams))
 				{
 					//DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::White, false, 1.0f, 0, 1.0f);
 

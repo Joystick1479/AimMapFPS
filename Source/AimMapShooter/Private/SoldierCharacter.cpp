@@ -293,6 +293,7 @@ void ASoldierCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+
 	if (AutomaticRifle)
 	{
 		SoldierCurrentAmmoInClip = AutomaticRifle->CurrentAmmoInClip;

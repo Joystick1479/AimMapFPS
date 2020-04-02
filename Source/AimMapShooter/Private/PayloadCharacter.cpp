@@ -37,13 +37,13 @@ APayloadCharacter::APayloadCharacter()
 	MeshComp2 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComp2"));
 	PhysicsComp = CreateDefaultSubobject<UPhysicsConstraintComponent>(TEXT("PhysicsComp"));
 
-	UCapsuleComponent* CapsuleComp = this->GetCapsuleComponent();
-	if (CapsuleComp)
-	{
-		MeshComp->SetupAttachment(CapsuleComp);
-		MeshComp2->SetupAttachment(CapsuleComp);
-		PhysicsComp->SetupAttachment(CapsuleComp);
-	}
+	//UCapsuleComponent* CapsuleComp = this->GetCapsuleComponent();
+	//if (CapsuleComp)
+//	{
+		//MeshComp->SetupAttachment(CapsuleComp);
+	//	MeshComp2->SetupAttachment(CapsuleComp);
+		//PhysicsComp->SetupAttachment(CapsuleComp);
+	//}
 
 	AudioComp = CreateDefaultSubobject<UAudioComponent>(TEXT("AudioComp"));
 	SetReplicates(true);
