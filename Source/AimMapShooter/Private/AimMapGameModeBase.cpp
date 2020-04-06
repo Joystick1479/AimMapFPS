@@ -61,7 +61,7 @@ void AAimMapGameModeBase::StartGame()
 
 	bUseSeamlessTravel = true;
 	//World->ServerTravel("/Game/FirstPersonBP/Maps/Map?listen");
-	World->ServerTravel("/Game/AbandonedFactoryBuildings/Maps/Warehouse_01_day/Main_Warehouse_01?listen");
+	World->ServerTravel("/Game/AbandonedFactory/Maps/Warehouse_01_day/Main_Warehouse_01?listen");
 
 	ShouldTimerOn = true;
 }
@@ -74,7 +74,7 @@ void AAimMapGameModeBase::RestartGame()
 	if (!ensure(World != nullptr)) return;
 
 	bUseSeamlessTravel = true;
-	World->ServerTravel("/Game/AbandonedFactoryBuildings/Maps/Warehouse_01_day/Main_Warehouse_01?listen");
+	World->ServerTravel("/Game/AbandonedFactory/Maps/Warehouse_01_day/Main_Warehouse_01?listen");
 
 }
 

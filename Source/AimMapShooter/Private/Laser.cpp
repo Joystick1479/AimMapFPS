@@ -91,10 +91,12 @@ void ALaser::StartLaser()
 		AAutomaticRifle* Rifle = Cast<AAutomaticRifle>(GetOwner());
 		if (Rifle)
 		{
+			UE_LOG(LogTemp, Warning, TEXT("LOL"));
 			FName Socket = Rifle->MuzzleSocket;
 			FHitResult Hit;
 			FVector StartLocation = MeshComp->GetSocketLocation(LaserSocket);
-			FRotator Rotation = Rifle->GetRootComponent()->GetSocketRotation(Socket);
+		//	FRotator Rotation = Rifle->GetRootComponent()->GetSocketRotation(Socket);
+			FRotator Rotation = Rifle->SkelMeshComp->GetSocketTransform(Socket).Rotator();
 			FVector ShotDirection = Rotation.Vector();
 			FVector EndLocation = StartLocation + (ShotDirection * 10000);
 			FCollisionQueryParams QueryParams;
@@ -104,7 +106,7 @@ void ALaser::StartLaser()
 			if (GetWorld()->LineTraceSingleByChannel(Hit, StartLocation, EndLocation, ECollisionChannel::ECC_Visibility, QueryParams))
 			{
 
-				//DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::White, false, 1.0f, 0, 1.0f);
+				DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::White, false, 1.0f, 0, 10.0f);
 				FVector StartLocation = Hit.TraceStart;
 				FVector EndLocation = Hit.Location;
 				FVector Laser = StartLocation - EndLocation;
