@@ -119,8 +119,6 @@ ASoldierCharacter::ASoldierCharacter()
 	isAbleToVault = false;
 }
 
-
-
 // Called when the game starts or when spawned
 void ASoldierCharacter::BeginPlay()
 {
@@ -293,6 +291,7 @@ void ASoldierCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	//IsTargetFromBack();
 
 	if (AutomaticRifle)
 	{
@@ -568,6 +567,42 @@ void ASoldierCharacter::TurnOnLaser()
 		Laser->MeshComp2->ToggleVisibility();
 		Laser->PointLight->ToggleVisibility();
 	}
+}
+
+void ASoldierCharacter::IsTargetFromBack()
+{
+	FVector ActorForwardVector = this->GetActorForwardVector();
+
+	UE_LOG(LogTemp, Warning, TEXT("Function Fires"));
+
+	TArray<AActor*> Target;
+	UGameplayStatics::GetAllActorsOfClass(this, SoldierChar, Target);
+	for (int i = 0; i < Target.Num(); i++)
+	{
+		ASoldierCharacter* SoldChar = Cast<ASoldierCharacter>(Target[i]);
+		if (SoldChar)
+		{
+			FVector TargetLocation = SoldChar->GetActorLocation();
+			FVector DiffVector = (TargetLocation - ActorForwardVector);
+			FVector NormalizedDiffVector = UKismetMathLibrary::Normal(DiffVector);
+			float DotProduct = UKismetMathLibrary::Dot_VectorVector(NormalizedDiffVector, ActorForwardVector);
+			//UE_LOG(LogTemp, Warning, TEXT("%f"), DotProduct);
+			if (DotProduct > 0.55 && DotProduct < 0.999)
+			{
+				UE_LOG(LogTemp, Warning, TEXT("PLECY"));
+				MultipleDamage = true;
+				//return true;
+			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("NIE"));
+				MultipleDamage = false;
+				//return false;
+			}
+		}
+	}
+
+	//return false;
 }
 
 void ASoldierCharacter::ServerPickUpItem_Implementation()

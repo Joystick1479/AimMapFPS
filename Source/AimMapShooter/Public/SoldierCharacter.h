@@ -474,6 +474,12 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated, Category = "Crouch")
 	bool IsCrouching;
 
+	///Bool for BackTargeting ///
+	void IsTargetFromBack();
+	bool MultipleDamage;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Player")
+	TSubclassOf<ASoldierCharacter> SoldierChar;
 
 	///Bool for reloading///
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated, Category = "Reloading")

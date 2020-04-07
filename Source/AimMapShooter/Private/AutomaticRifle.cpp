@@ -167,10 +167,12 @@ void AAutomaticRifle::Fire()
 	{
 		CurrentState = EWeaponState::Firing;
 
+
 		ASoldierCharacter* SoldierChar = Cast<ASoldierCharacter>(GetOwner());
 		ALaser* Laser = Cast<ALaser>(GetOwner());
 		if (SoldierChar->IsZooming == true)
 		{
+
 			AActor* MyOwner = GetOwner();
 			if (MyOwner)
 			{
@@ -206,8 +208,16 @@ void AAutomaticRifle::Fire()
 					}
 					if (SurfaceType == SURFACE_CHEST)
 					{
+						if (SoldierChar->MultipleDamage == true)
+						{
+							ActualDamage *= 4.0f;
+							UE_LOG(LogTemp, Warning, TEXT("Multiple damage from back applied"));
+						}
+						else
+						{
+							ActualDamage *= 2.0f;
+						}
 						UGameplayStatics::PlaySoundAtLocation(GetWorld(), HitSound, GetActorLocation());
-						ActualDamage *= 2.0f;
 					}
 					if (SurfaceType == SURFACE_LEG)
 					{
@@ -238,6 +248,8 @@ void AAutomaticRifle::Fire()
 		}
 		else
 		{
+			SoldierChar->IsTargetFromBack();
+
 			AActor* MyOwner = GetOwner();
 			if (MyOwner)
 			{
@@ -286,7 +298,15 @@ void AAutomaticRifle::Fire()
 					}
 					if (SurfaceType == SURFACE_CHEST)
 					{
-						ActualDamage *= 2.0f;
+						if (SoldierChar->MultipleDamage == true)
+						{
+							ActualDamage *= 4.0f;
+							UE_LOG(LogTemp, Warning, TEXT("Multiple damage from back applied"));
+						}
+						else
+						{
+							ActualDamage *= 2.0f;
+						}
 						UGameplayStatics::PlaySoundAtLocation(GetWorld(), HitSound, GetActorLocation());
 					}
 					if (SurfaceType == SURFACE_LEG)
