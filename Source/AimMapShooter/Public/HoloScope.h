@@ -19,7 +19,7 @@ public:
 	AHoloScope();
 
 
-	UPROPERTY(VisibleAnywhere, Category = "Components")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	USkeletalMeshComponent* SkelMeshComp;
 
 protected:

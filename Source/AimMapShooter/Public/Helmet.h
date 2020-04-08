@@ -18,6 +18,8 @@ public:
 	// Sets default values for this actor's properties
 	AHelmet();
 
+	UPROPERTY(VisibleAnywhere, Category = "Components")
+	UStaticMeshComponent* MeshComp;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -25,8 +27,6 @@ protected:
 	void NotifyActorBeginOverlap(AActor* OtherActor);
 	void NotifyActorEndOverlap(AActor* OtherActor);
 
-	UPROPERTY(VisibleAnywhere, Category = "Components")
-	UStaticMeshComponent* MeshComp;
 
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	USphereComponent* SphereComp;

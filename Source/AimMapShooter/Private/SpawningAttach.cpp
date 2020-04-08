@@ -30,61 +30,89 @@ void ASpawningAttach::BeginPlay()
 	Super::BeginPlay();
 
 
-	Actors.Push(Holo);
-	Actors.Push(Headset);
-	Actors.Push(Helmet);
-	Actors.Push(Grip);
-	Actors.Push(Laser);
+	//Actors.Push(Holo);
+	//Actors.Push(Headset);
+	//Actors.Push(Helmet);
+	//Actors.Push(Grip);
+	//Actors.Push(Laser);
 
 	SpawnRandom();
 }
 
 void ASpawningAttach::SpawnRandom()
 {
+	UGameplayStatics::SpawnEmitterAtLocation(this, ParticleSystem, GetActorLocation());
+
 	if (Role < ROLE_Authority)
 	{
 		ServerSpawnRandom();
 		return;
 	}
-	int32 range = Actors.Num();
+	/*int32 range = Actors.Num();
 	UE_LOG(LogTemp, Warning, TEXT("Numbers: %i"), range);
+	int32 randomNumber = FMath::RandRange(0, range);*/
+	int32 range = 5;
 	int32 randomNumber = FMath::RandRange(0, range);
 
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	UE_LOG(LogTemp, Warning, TEXT("RandomNumbers: %i"), randomNumber);
 
-	switch (randomNumber) {
-	case 1:
+	if (randomNumber == 1)
+	{
 		UE_LOG(LogTemp, Warning, TEXT("HoloSpawn"));
-		Holo = GetWorld()->SpawnActor<AHoloScope>(HoloClass, GetActorLocation(), GetActorRotation(), SpawnParams);
-		UGameplayStatics::SpawnEmitterAtLocation(this, ParticleSystem, GetActorLocation());
-		break;
-	case 2:
-		UE_LOG(LogTemp, Warning, TEXT("Headset"));
-		Helmet = GetWorld()->SpawnActor<AHelmet>(HelmetClass, GetActorLocation(), GetActorRotation(), SpawnParams);
-		UGameplayStatics::SpawnEmitterAtLocation(this, ParticleSystem, GetActorLocation());
-		break;
-	case 3:
-		UE_LOG(LogTemp, Warning, TEXT("Helmet"));
-		Headset = GetWorld()->SpawnActor<AHeadset>(HeadsetClass, GetActorLocation(), GetActorRotation(), SpawnParams);
-		UGameplayStatics::SpawnEmitterAtLocation(this, ParticleSystem, GetActorLocation());
-		break;
-	case 4:
-		UE_LOG(LogTemp, Warning, TEXT("Grip"));
-		Laser = GetWorld()->SpawnActor<ALaser>(LaserClass, GetActorLocation(), GetActorRotation(), SpawnParams);
-		UGameplayStatics::SpawnEmitterAtLocation(this, ParticleSystem, GetActorLocation());
-		break;
-	case 5:
-		UE_LOG(LogTemp, Warning, TEXT("Laser"));
-		Grip = GetWorld()->SpawnActor<AGrip>(GripClass, GetActorLocation(), GetActorRotation(), SpawnParams);
-		UGameplayStatics::SpawnEmitterAtLocation(this, ParticleSystem, GetActorLocation());
-		break;
-	case 0:
-		UE_LOG(LogTemp, Warning, TEXT("NoAttachment, destroy particle"));
-		break;
-	}
+		Holo =GetWorld()->SpawnActor<AHoloScope>(HoloClass, GetActorLocation(), GetActorRotation(), SpawnParams);
+		if (Holo)
+		{
+			Holo->SetOwner(this);
+			Holo->SkelMeshComp->bOnlyOwnerSee = false;
 
+		}
+	}
+	if (randomNumber == 2)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Helmet"));
+		Helmet = GetWorld()->SpawnActor<AHelmet>(HelmetClass, GetActorLocation(), GetActorRotation(), SpawnParams);
+		if (Helmet)
+		{
+			Helmet->SetOwner(this);
+			Helmet->MeshComp->bOnlyOwnerSee = false;
+
+		}
+	}
+	if (randomNumber == 3)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Headset"));
+		Headset = GetWorld()->SpawnActor<AHeadset>(HeadsetClass, GetActorLocation(), GetActorRotation(), SpawnParams);
+		if (Headset)
+		{
+			Headset->SetOwner(this);
+			Headset->MeshComp->bOnlyOwnerSee = false;
+
+		}
+	}
+	if (randomNumber == 4)
+	{
+		 UE_LOG(LogTemp, Warning, TEXT("Laser"));
+		Laser = GetWorld()->SpawnActor<ALaser>(LaserClass, GetActorLocation(), GetActorRotation(), SpawnParams);
+		if (Laser)
+		{
+			Laser->SetOwner(this);
+			Laser->MeshComp->bOnlyOwnerSee = false;
+
+		}
+	}
+	if (randomNumber == 5)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Grip"));
+		Grip = GetWorld()->SpawnActor<AGrip>(GripClass, GetActorLocation(), GetActorRotation(), SpawnParams);
+		if (Grip)
+		{
+			Grip->SetOwner(this);
+			Grip->MeshComp->bOnlyOwnerSee = false;
+		}
+	}
+	
 
 }
 
@@ -104,3 +132,10 @@ void ASpawningAttach::Tick(float DeltaTime)
 	
 }
 
+void ASpawningAttach::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	//This function tells us how we want to replicate things//
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ASpawningAttach, ParticleSystem);
+}

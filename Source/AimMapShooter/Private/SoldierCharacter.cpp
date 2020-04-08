@@ -573,8 +573,6 @@ void ASoldierCharacter::IsTargetFromBack()
 {
 	FVector ActorForwardVector = this->GetActorForwardVector();
 
-	UE_LOG(LogTemp, Warning, TEXT("Function Fires"));
-
 	TArray<AActor*> Target;
 	UGameplayStatics::GetAllActorsOfClass(this, SoldierChar, Target);
 	for (int i = 0; i < Target.Num(); i++)
@@ -586,23 +584,18 @@ void ASoldierCharacter::IsTargetFromBack()
 			FVector DiffVector = (TargetLocation - ActorForwardVector);
 			FVector NormalizedDiffVector = UKismetMathLibrary::Normal(DiffVector);
 			float DotProduct = UKismetMathLibrary::Dot_VectorVector(NormalizedDiffVector, ActorForwardVector);
-			//UE_LOG(LogTemp, Warning, TEXT("%f"), DotProduct);
 			if (DotProduct > 0.55 && DotProduct < 0.999)
 			{
-				UE_LOG(LogTemp, Warning, TEXT("PLECY"));
+				UE_LOG(LogTemp, Warning, TEXT("Staying behind opponent back"));
 				MultipleDamage = true;
-				//return true;
 			}
 			else
 			{
-				UE_LOG(LogTemp, Warning, TEXT("NIE"));
+				UE_LOG(LogTemp, Warning, TEXT("NOT staying behind opponent back"));
 				MultipleDamage = false;
-				//return false;
 			}
 		}
 	}
-
-	//return false;
 }
 
 void ASoldierCharacter::ServerPickUpItem_Implementation()

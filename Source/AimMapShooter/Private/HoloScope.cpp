@@ -11,7 +11,7 @@ AHoloScope::AHoloScope()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	SkelMeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkelMeshComp"));
+	SkelMeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkelalMeshComp"));
 	RootComponent = SkelMeshComp;
 
 	SphereComp = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));

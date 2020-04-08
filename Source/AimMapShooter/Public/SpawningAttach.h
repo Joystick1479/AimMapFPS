@@ -31,17 +31,21 @@ protected:
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerSpawnRandom();
 
-
 	TArray<AActor*> Actors;
 
+	UPROPERTY()
 	AHoloScope* Holo;
 
+	UPROPERTY()
 	AHelmet* Helmet;
 
+	UPROPERTY()
 	AHeadset* Headset;
 
+	UPROPERTY()
 	ALaser* Laser;
 
+	UPROPERTY()
 	AGrip* Grip;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Player")
@@ -59,9 +63,12 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Player")
 	TSubclassOf<AGrip> GripClass;
 
-private:
-	UPROPERTY(EditDefaultsOnly, Category = "ParticlesEffects")
+	UPROPERTY(EditDefaultsOnly, Replicated, Category = "ParticlesEffects")
 	UParticleSystem* ParticleSystem;
+
+
+private:
+
 
 public:	
 	// Called every frame

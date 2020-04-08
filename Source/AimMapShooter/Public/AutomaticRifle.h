@@ -95,6 +95,9 @@ public:
 	UPROPERTY(Replicated)
 	ASoldierCharacter* SoldierChar;
 
+	UPROPERTY(EditDefaultsOnly, Category = "ActorHit")
+	TSubclassOf<ASoldierCharacter> SoldierHit;
+
 
 	void UseAmmo();
 
