@@ -52,14 +52,14 @@ void AAI_Animal_FOX::Tick(float DeltaTime)
 
 	Hearing();
 
-	if (IsAttacking == true)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Atakuje"));
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("NIE Atakuje"));
-	}
+	//if (IsAttacking == true)
+	//{
+	//	UE_LOG(LogTemp, Warning, TEXT("Atakuje"));
+	//}
+	//else
+	//{
+	//	UE_LOG(LogTemp, Warning, TEXT("NIE Atakuje"));
+	//}
 
 }
 
