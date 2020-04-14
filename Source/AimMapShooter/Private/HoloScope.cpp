@@ -17,6 +17,9 @@ AHoloScope::AHoloScope()
 	SphereComp = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
 	SphereComp->SetupAttachment(SkelMeshComp);
 
+	OutlineSphereComp = CreateDefaultSubobject<USphereComponent>(TEXT("OutlineSphereComp"));
+	OutlineSphereComp->SetupAttachment(SkelMeshComp);
+
 	SetReplicates(true);
 }
 
