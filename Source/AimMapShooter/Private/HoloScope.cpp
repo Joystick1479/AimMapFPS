@@ -17,9 +17,6 @@ AHoloScope::AHoloScope()
 	SphereComp = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
 	SphereComp->SetupAttachment(SkelMeshComp);
 
-	OutlineSphereComp = CreateDefaultSubobject<USphereComponent>(TEXT("OutlineSphereComp"));
-	OutlineSphereComp->SetupAttachment(SkelMeshComp);
-
 	SetReplicates(true);
 }
 
@@ -51,11 +48,11 @@ void AHoloScope::NotifyActorEndOverlap(AActor * OtherActor)
 	if (SoldierCharacter)
 	{
 		SoldierCharacter->bHoloPickUp = false;
-
 		if (SoldierCharacter->isHoloAttached == true)
 		{
 			this->Destroy();
 		}
+
 	}
 }
 
@@ -63,6 +60,8 @@ void AHoloScope::NotifyActorEndOverlap(AActor * OtherActor)
 void AHoloScope::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	
 
 }
 

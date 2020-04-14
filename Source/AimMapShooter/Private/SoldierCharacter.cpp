@@ -645,6 +645,7 @@ void ASoldierCharacter::PickUp()
 				{
 					HoloScope->SetOwner(this);
 					HoloScope->SkelMeshComp->bOnlyOwnerSee = true;
+					HoloScope->SkelMeshComp->SetRenderCustomDepth(false);
 					FName Socket = AutomaticRifle->ScopeSocket;
 					HoloScope->AttachToComponent(AutomaticRifle->SkelMeshComp, FAttachmentTransformRules::SnapToTargetNotIncludingScale, Socket);
 					isHoloAttached = true;
@@ -666,6 +667,7 @@ void ASoldierCharacter::PickUp()
 				{
 					Grip->SetOwner(this);
 					Grip->MeshComp->bOnlyOwnerSee = true;
+					Grip->MeshComp->SetRenderCustomDepth(false);
 					FName GSocket = AutomaticRifle->GripSocket;
 					Grip->AttachToComponent(AutomaticRifle->SkelMeshComp, FAttachmentTransformRules::SnapToTargetNotIncludingScale, GSocket);
 					isGripAttached = true;
@@ -684,6 +686,7 @@ void ASoldierCharacter::PickUp()
 			if (Helmet)
 			{
 				Helmet->SetOwner(this);
+				Helmet->MeshComp->SetRenderCustomDepth(false);
 				Helmet->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, HelmetSocket);
 				isHelmetAttached = true;
 			}
@@ -700,6 +703,7 @@ void ASoldierCharacter::PickUp()
 			if (Headset)
 			{
 				Headset->SetOwner(this);
+				Headset->MeshComp->SetRenderCustomDepth(false);
 				Headset->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, HeadsetSocket);
 				isHeadsetAttached = true;
 			}
@@ -719,6 +723,7 @@ void ASoldierCharacter::PickUp()
 				{
 					Laser->SetOwner(this);
 					Laser->MeshComp->bOnlyOwnerSee = true;
+					Laser->MeshComp->SetRenderCustomDepth(false);
 					FName LSocket = AutomaticRifle->LaserSocket;
 					Laser->AttachToComponent(AutomaticRifle->SkelMeshComp, FAttachmentTransformRules::SnapToTargetNotIncludingScale, LSocket);
 					isLaserAttached = true;

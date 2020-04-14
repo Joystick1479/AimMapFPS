@@ -168,10 +168,17 @@ void AAutomaticRifle::Fire()
 		CurrentState = EWeaponState::Firing;
 
 
+
 		ASoldierCharacter* SoldierChar = Cast<ASoldierCharacter>(GetOwner());
 		ALaser* Laser = Cast<ALaser>(GetOwner());
 		if (SoldierChar->IsZooming == true)
 		{
+			///RECOIL
+			float PitchRandomVal = UKismetMathLibrary::RandomFloatInRange(-0.1, -0.5);
+			SoldierChar->AddControllerPitchInput(PitchRandomVal);
+			float YawRandomVal = UKismetMathLibrary::RandomFloatInRange(-0.2, 0.2);
+			SoldierChar->AddControllerYawInput(YawRandomVal);
+
 
 			AActor* MyOwner = GetOwner();
 			if (MyOwner)
@@ -282,7 +289,15 @@ void AAutomaticRifle::Fire()
 		}
 		else
 		{
+			///CHECK IF SHOULD MULTIPLE DAMAGE FROM BEHIND
 			SoldierChar->IsTargetFromBack();
+
+			///RECOILD
+			float randomval = UKismetMathLibrary::RandomFloatInRange(-0.1, -0.5);
+			SoldierChar->AddControllerPitchInput(randomval);
+			float YawRandomVal = UKismetMathLibrary::RandomFloatInRange(-0.2, 0.2);
+			SoldierChar->AddControllerYawInput(YawRandomVal);
+
 
 			AActor* MyOwner = GetOwner();
 			if (MyOwner)
