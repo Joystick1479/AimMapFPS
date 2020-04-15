@@ -46,6 +46,8 @@
 #include "BlueEndgame.h"
 #include "FlashGrenade.h"
 #include "Sound/SoundCue.h"
+#include "Drink.h"
+#include "Food.h"
 
 // Sets default values
 ASoldierCharacter::ASoldierCharacter()
@@ -126,6 +128,8 @@ ASoldierCharacter::ASoldierCharacter()
 	/////SURVIVAL/////
 	FreQOfDrainingHealthWhenLowFood = 3.0f;
 	FreQOfDrainingHealthWhenLowDrink = 5.0f;
+	amountOfBoostDrink = 30;
+	amountOfBoostFood = 40;
 }
 
 // Called when the game starts or when spawned
@@ -202,7 +206,7 @@ void ASoldierCharacter::BeginPlay()
 
 	if (HealthComp)
 	{
-		HealthComp->Health = 30;
+		HealthComp->Health = 100;
 	}
 
 	if (SpringArm)
@@ -386,8 +390,43 @@ void ASoldierCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	PlayerInputComponent->BindAction("Grenade", IE_Pressed, this, &ASoldierCharacter::ThrowGrenade);
 
 
+	PlayerInputComponent->BindAction("EatFood", IE_Pressed, this, &ASoldierCharacter::EatFood);
+	PlayerInputComponent->BindAction("DrinkWater", IE_Pressed, this, &ASoldierCharacter::DrinkWater);
+
+
 
 }
+void ASoldierCharacter::EatFood()
+{
+	if (amountOfFood > 0)
+	{
+		amountOfFood--;
+
+		USurvivalComponent* SurvivalComp = this->FindComponentByClass<USurvivalComponent>();
+		if (SurvivalComp)
+		{
+			SurvivalComp->Food = SurvivalComp->Food + amountOfBoostFood;
+			UGameplayStatics::PlaySound2D(this, EatFoodSound);
+			
+		}
+
+	}
+}
+void ASoldierCharacter::DrinkWater()
+{
+	if (amountOfDrinks > 0)
+	{
+		amountOfDrinks--;
+
+		USurvivalComponent* SurvivalComp = this->FindComponentByClass<USurvivalComponent>();
+		if (SurvivalComp)
+		{
+			SurvivalComp->Drink = SurvivalComp->Drink + amountOfBoostDrink;
+			UGameplayStatics::PlaySound2D(this, DrinkWaterSound);
+		}
+	}
+}
+
 void ASoldierCharacter::Vault()
 {
 	if (Role < ROLE_Authority)
@@ -740,6 +779,43 @@ void ASoldierCharacter::PickUp()
 				UGameplayStatics::PlaySoundAtLocation(this, ItemsPickUp, GetActorLocation());
 			}
 		}
+		if (bDrinkPickup == true)
+		{
+			amountOfDrinks++;
+
+			TArray<AActor*> Drinks;
+			UGameplayStatics::GetAllActorsOfClass(this, DrinkClass, Drinks);
+			for (int i = 0; i < Drinks.Num(); i++)
+			{
+				ADrink* Drink = Cast<ADrink>(Drinks[i]);
+				if (Drink)
+				{
+					if (this->IsOverlappingActor(Drink))
+					{
+						Drink->IsPickedUp = true;
+					}
+				}
+			}
+
+		}
+		if (bFoodPickup == true)
+		{
+			amountOfFood++;
+
+			TArray<AActor*> Foods;
+			UGameplayStatics::GetAllActorsOfClass(this, FoodClass, Foods);
+			for (int i = 0; i < Foods.Num(); i++)
+			{
+				AFood* Food = Cast<AFood>(Foods[i]);
+				if (Food)
+				{
+					if (this->IsOverlappingActor(Food))
+					{
+						Food->IsPickedUp = true;
+					}
+				}
+			}
+		}
 }
 
 void ASoldierCharacter::StartingHud()
@@ -822,7 +898,7 @@ void ASoldierCharacter::ShowingPickUpHud()
 				wPickUpvar = CreateWidget<UUserWidget>(PC, wPickUp);
 				if (wPickUpvar)
 				{
-					if ((bRiflePickUp || bHeadsetPickUp || bLaserPickUp || bHelmetPickUp || bGripPickUp || bHoloPickUp) == true)
+					if ((bRiflePickUp || bHeadsetPickUp || bLaserPickUp || bHelmetPickUp || bGripPickUp || bHoloPickUp || bFoodPickup || bDrinkPickup) == true)
 					{
 						wPickUpvar->AddToViewport();
 					}

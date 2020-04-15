@@ -6,6 +6,8 @@
 #include "Components/StaticMeshComponent.h"
 #include "Components/SphereComponent.h"
 
+#include "SoldierCharacter.h"
+
 // Sets default values
 ADrink::ADrink()
 {
@@ -27,10 +29,38 @@ void ADrink::BeginPlay()
 	
 }
 
+void ADrink::NotifyActorBeginOverlap(AActor * OtherActor)
+{
+	Super::NotifyActorBeginOverlap(OtherActor);
+
+	ASoldierCharacter* SoldierCharacter = Cast<ASoldierCharacter>(OtherActor);
+	if (SoldierCharacter)
+	{
+		SoldierCharacter->bDrinkPickup = true;
+	}
+
+}
+
+void ADrink::NotifyActorEndOverlap(AActor * OtherActor)
+{
+	Super::NotifyActorEndOverlap(OtherActor);
+
+	ASoldierCharacter* SoldierCharacter = Cast<ASoldierCharacter>(OtherActor);
+	if (SoldierCharacter)
+	{
+		SoldierCharacter->bDrinkPickup = false;
+	}
+
+}
+
 // Called every frame
 void ADrink::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (IsPickedUp == true)
+	{
+		this->Destroy();
+	}
 }
 

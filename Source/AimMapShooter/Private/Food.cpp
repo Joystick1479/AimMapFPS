@@ -6,6 +6,8 @@
 #include "Components/StaticMeshComponent.h"
 #include "Components/SphereComponent.h"
 
+#include "SoldierCharacter.h"
+
 // Sets default values
 AFood::AFood()
 {
@@ -26,10 +28,36 @@ void AFood::BeginPlay()
 	
 }
 
+void AFood::NotifyActorBeginOverlap(AActor * OtherActor)
+{
+	Super::NotifyActorBeginOverlap(OtherActor);
+
+	ASoldierCharacter* SoldierCharacter = Cast<ASoldierCharacter>(OtherActor);
+	if (SoldierCharacter)
+	{
+		SoldierCharacter->bFoodPickup = true;
+	}
+}
+
+void AFood::NotifyActorEndOverlap(AActor * OtherActor)
+{
+	Super::NotifyActorEndOverlap(OtherActor);
+
+	ASoldierCharacter* SoldierCharacter = Cast<ASoldierCharacter>(OtherActor);
+	if (SoldierCharacter)
+	{
+		SoldierCharacter->bFoodPickup = false;
+	}
+}
+
 // Called every frame
 void AFood::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (IsPickedUp == true)
+	{
+		this->Destroy();
+	}
 }
 

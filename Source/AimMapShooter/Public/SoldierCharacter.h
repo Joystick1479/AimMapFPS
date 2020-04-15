@@ -320,6 +320,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	USurvivalComponent* SurvivalComp;
 
+	void EatFood();
+	void DrinkWater();
+
 
 	/////*SOUNDS WHEN PICK UP OBJECTS***////
 
@@ -511,6 +514,7 @@ public:
 	bool bLaserPickUp;
 
 
+
 	UPROPERTY(EditDefaultsOnly, Replicated,Category = "Player")
 	TSubclassOf<UUserWidget> wPickUp;
 
@@ -587,6 +591,32 @@ public:
 
 	FTimerHandle FoodLowTimer;
 	FTimerHandle DrinkLowTimer;
+
+	bool bDrinkPickup;
+	UPROPERTY(BlueprintReadOnly)
+	float amountOfDrinks;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Survival items")
+	TSubclassOf<class ADrink> DrinkClass;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Survival items")
+	TSubclassOf<class AFood> FoodClass;
+
+	bool bFoodPickup;
+	UPROPERTY(BlueprintReadOnly)
+	float amountOfFood;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Survival items")
+	float amountOfBoostFood;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Survival items")
+	float amountOfBoostDrink;
+
+	UPROPERTY(EditDefaultsOnly,Category = "Survival items")
+	USoundCue* EatFoodSound;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Survival items")
+	USoundCue* DrinkWaterSound;
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

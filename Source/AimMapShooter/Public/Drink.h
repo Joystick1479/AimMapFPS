@@ -25,8 +25,13 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	class USphereComponent* SphereComp;
 
+	void NotifyActorBeginOverlap(AActor* OtherActor);
+	void NotifyActorEndOverlap(AActor* OtherActor);
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	bool IsPickedUp;
 
 };
