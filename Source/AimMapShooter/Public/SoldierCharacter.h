@@ -12,6 +12,7 @@ class AAutomaticRifle;
 class USkeletalMeshComponent;
 class UAnimInstance;
 class UHealthComponent;
+class USurvivalComponent;
 class AHoloScope;
 class AGrip;
 class USpringArmComponent;
@@ -308,12 +309,17 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "LineTrace")
 	float MaxUseDistance;
 
+	///HEALTH AND SURVIVAL COMPONENTS///
 
 	UFUNCTION()
 	void OnHealthChanged(UHealthComponent* OwningHealthComp, float Health, float HealthDelta, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	UHealthComponent* HealthComp;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	USurvivalComponent* SurvivalComp;
+
 
 	/////*SOUNDS WHEN PICK UP OBJECTS***////
 
@@ -560,6 +566,27 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, Category = "Player")
 	int32 SoldierCurrentClips;
+
+
+	///SURVIVAL///
+	UPROPERTY(EditDefaultsOnly, Category = "Survival")
+	float FreQOfDrainingHealthWhenLowFood;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Survival")
+	float FreQOfDrainingHealthWhenLowDrink;
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerOnFoodLow();
+
+	void OnFoodLow();
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerOnDrinkLow();
+
+	void OnDrinkLow();
+
+	FTimerHandle FoodLowTimer;
+	FTimerHandle DrinkLowTimer;
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

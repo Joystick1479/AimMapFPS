@@ -29,9 +29,11 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Force")
+	float ImpulseForce;
 
-
-
+	UPROPERTY(EditDefaultsOnly, Category = "Force")
+	float ImpulseForce2;
 
 private:
 

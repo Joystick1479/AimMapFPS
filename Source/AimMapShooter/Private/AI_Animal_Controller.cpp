@@ -15,6 +15,8 @@
 
 #include "TimerManager.h"
 
+#include <stack>
+
 void AAI_Animal_Controller::BeginPlay()
 {
 	Super::BeginPlay();
@@ -27,6 +29,25 @@ void AAI_Animal_Controller::BeginPlay()
 
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ATargetPoint::StaticClass(), Waypoints);
 	GoToRandomWaypoint();
+
+	index2 = -1;
+	
+}
+
+void AAI_Animal_Controller::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	AAI_Animal_FOX* Fox = Cast<AAI_Animal_FOX>(GetPawn());
+	if (Fox)
+	{
+		if (Fox->IsAttacking)
+		{
+			GetWorldTimerManager().ClearTimer(TimerHandle);
+			GetWorldTimerManager().SetTimer(TestTimerHandle, this, &AAI_Animal_Controller::GoToRandomWaypoint, 0.01f, false);
+		}
+	}
+
 }
 
 AAI_Animal_FOX * AAI_Animal_Controller::GetControlledFox() const
@@ -36,8 +57,25 @@ AAI_Animal_FOX * AAI_Animal_Controller::GetControlledFox() const
 
 ATargetPoint * AAI_Animal_Controller::GetRandomWaypoint()
 {
+
+
+
 	index = FMath::RandRange(0, Waypoints.Num() - 1);
+	dupa.push(index);
+
+
+	if (!dupa.empty())
+	{
+		if (dupa.top() == index2)
+		{
+			GetRandomWaypoint();
+			dupa.pop();
+		}
+	}
+
+
 	index2 = index;
+
 
 	
 
@@ -54,6 +92,7 @@ void AAI_Animal_Controller::GoToRandomWaypoint()
 	{
 		if (Fox->IsAttacking == false)
 		{
+			GetWorldTimerManager().ClearTimer(TestTimerHandle);
 			auto Waypoint = GetRandomWaypoint();
 			FVector WaypointLocation = Waypoint->GetActorLocation();
 			FRotator LookDirection = UKismetMathLibrary::FindLookAtRotation(GetPawn()->GetActorLocation(), WaypointLocation);
@@ -91,12 +130,20 @@ void AAI_Animal_Controller::OnMoveCompleted(FAIRequestID RequestID, const FPathF
 	IsMoving = false;
 
 	auto randnomNumber = FMath::RandRange(1, 5);
-	UE_LOG(LogTemp, Warning, TEXT("Roll: %i"), randnomNumber);
 	if (IsRunning)
 	{
 		randnomNumber = 1;
 	}
 
+	AAI_Animal_FOX* Fox = Cast<AAI_Animal_FOX>(GetPawn());
+	if (Fox)
+	{
+		if (Fox->IsAttacking == true)
+		{
+			randnomNumber = 1;
+			UE_LOG(LogTemp, Warning, TEXT("FOX ATAKUUJEEE"));
+		}
+	}
 
 	GetWorldTimerManager().SetTimer(TimerHandle, this, &AAI_Animal_Controller::GoToRandomWaypoint, randnomNumber, false);
 

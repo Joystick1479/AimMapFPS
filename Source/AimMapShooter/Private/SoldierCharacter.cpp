@@ -23,6 +23,8 @@
 #include "Materials/MaterialParameterCollection.h"
 
 #include "HealthComponent.h"
+#include "SurvivalComponent.h"
+
 #include "AimMapShooter.h"
 #include "HoloScope.h"
 #include "Grip.h"
@@ -71,6 +73,8 @@ ASoldierCharacter::ASoldierCharacter()
 
 	HealthComp = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComp"));
 
+	SurvivalComp = CreateDefaultSubobject<USurvivalComponent>(TEXT("SurvivalComp"));
+
 	AudioComp = CreateDefaultSubobject<UAudioComponent>(TEXT("AudioComp"));
 	AudioComp->SetupAttachment(GetMesh());
 
@@ -117,6 +121,11 @@ ASoldierCharacter::ASoldierCharacter()
 	float MaxHeightForVault = 60;
 	isAllowClimbing = false;
 	isAbleToVault = false;
+
+
+	/////SURVIVAL/////
+	FreQOfDrainingHealthWhenLowFood = 3.0f;
+	FreQOfDrainingHealthWhenLowDrink = 5.0f;
 }
 
 // Called when the game starts or when spawned
@@ -193,7 +202,7 @@ void ASoldierCharacter::BeginPlay()
 
 	if (HealthComp)
 	{
-		HealthComp->Health = 100;
+		HealthComp->Health = 30;
 	}
 
 	if (SpringArm)
@@ -1256,6 +1265,66 @@ void ASoldierCharacter::OnHealthChanged(UHealthComponent * OwningHealthComp, flo
 	
 }
 
+void ASoldierCharacter::OnFoodLow()
+{
+	if (Role < ROLE_Authority)
+	{
+		ServerOnFoodLow();
+		return;
+	}
+	UHealthComponent* HealthComp = this->FindComponentByClass<UHealthComponent>();
+	if (HealthComp)
+	{
+		if (HealthComp->Health > 0)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Znalazlem healthcomp"));
+			HealthComp->Health = HealthComp->Health - 1;
+		}
+
+		if (HealthComp->Health == 0) bDied = true;
+	}
+	UE_LOG(LogTemp, Warning, TEXT("Food low!!!"));
+	GetWorldTimerManager().SetTimer(FoodLowTimer, this, &ASoldierCharacter::OnFoodLow, FreQOfDrainingHealthWhenLowFood,false);
+}
+void ASoldierCharacter::OnDrinkLow()
+{
+	if (Role < ROLE_Authority)
+	{
+		ServerOnDrinkLow();
+		return;
+	}
+	UHealthComponent* HealthComp = this->FindComponentByClass<UHealthComponent>();
+	if (HealthComp)
+	{
+		if (HealthComp->Health > 0)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Znalazlem healthcomp"));
+			HealthComp->Health = HealthComp->Health - 1;
+		}
+
+		if (HealthComp->Health == 0) bDied = true;
+		
+	}
+	UE_LOG(LogTemp, Warning, TEXT("Drink low!!!"));
+	GetWorldTimerManager().SetTimer(DrinkLowTimer, this, &ASoldierCharacter::OnDrinkLow, FreQOfDrainingHealthWhenLowDrink, false);
+
+}
+void ASoldierCharacter::ServerOnFoodLow_Implementation()
+{
+	OnFoodLow();
+}
+bool ASoldierCharacter::ServerOnFoodLow_Validate()
+{
+	return true;
+}
+void ASoldierCharacter::ServerOnDrinkLow_Implementation()
+{
+	OnDrinkLow();
+}
+bool ASoldierCharacter::ServerOnDrinkLow_Validate()
+{
+	return true;
+}
 void ASoldierCharacter::ServerLineTraceItem_Implementation()
 {
 	LineTraceItem();

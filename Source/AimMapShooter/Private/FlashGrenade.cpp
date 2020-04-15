@@ -39,8 +39,8 @@ void AFlashGrenade::BeginPlay()
 
 	if (Role == ROLE_Authority)
 	{
-		FVector Impulse = MeshComp->GetForwardVector() * 750;
-		FVector Impulse2 = UKismetMathLibrary::RandomUnitVector() * 500;
+		FVector Impulse = MeshComp->GetForwardVector() * ImpulseForce;
+		FVector Impulse2 = UKismetMathLibrary::RandomUnitVector() * ImpulseForce2;
 		ThrowinGrenade(Impulse, Impulse2);
 	}
 }

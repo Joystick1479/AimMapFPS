@@ -4,7 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "AIController.h"
+#include <stack>
+
 #include "AI_Animal_Controller.generated.h"
+
 
 class AAI_Animal_FOX;
 class ATargetPoint;
@@ -21,6 +24,8 @@ class AIMMAPSHOOTER_API AAI_Animal_Controller : public AAIController
 public:
 
 	virtual void BeginPlay() override;
+
+	virtual void Tick(float DeltaTime) override;
 
 	AAI_Animal_FOX* GetControlledFox() const;
 
@@ -40,6 +45,7 @@ public:
 	void GoToRandomWaypoint();
 
 	FTimerHandle TimerHandle;
+	FTimerHandle TestTimerHandle;
 
 	void OnMoveCompleted(FAIRequestID RequestID, const FPathFollowingResult& Result) override;
 
@@ -51,5 +57,6 @@ public:
 	
 	int32 index;
 	int32 index2;
+	std::stack<int> dupa;
 
 };
