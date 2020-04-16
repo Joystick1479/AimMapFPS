@@ -285,6 +285,11 @@ protected:
 
 	void SprintOn();
 	void SprintOff();
+	void SprintProgressBar();
+	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly, Category = "Player")
+	float stamina;
+	FTimerHandle SprintTimerHandle;
+	FTimerHandle SprintRestingTimerHandle;
 
 	void FireMode();
 

@@ -130,6 +130,7 @@ ASoldierCharacter::ASoldierCharacter()
 	FreQOfDrainingHealthWhenLowDrink = 5.0f;
 	amountOfBoostDrink = 30;
 	amountOfBoostFood = 40;
+	stamina = 100;
 }
 
 // Called when the game starts or when spawned
@@ -330,6 +331,17 @@ void ASoldierCharacter::Tick(float DeltaTime)
 	if (MyTimeline != NULL)
 	{
 		MyTimeline->TickComponent(DeltaTime, ELevelTick::LEVELTICK_TimeOnly, NULL);
+	}
+
+	////SLOW DOWN WHEN OUT OF STAMINA
+	if (stamina == 1)
+	{
+		IsSprinting = false;
+		UCharacterMovementComponent* MoveComp = this->FindComponentByClass<UCharacterMovementComponent>();
+		if (MoveComp)
+		{
+			MoveComp->MaxWalkSpeed = 300.0f;
+		}
 	}
 
 }
@@ -1059,19 +1071,29 @@ void ASoldierCharacter::SprintOn()
 	{
 		ServerSprintOn();
 	}
-	if (IsZooming != true)
+	if (stamina == 0) SprintOff();
+	if (stamina < 10)
 	{
-		IsSprinting = true;
 		UCharacterMovementComponent* MoveComp = this->FindComponentByClass<UCharacterMovementComponent>();
 		if (MoveComp)
 		{
-			//MoveComp->MaxWalkSpeed = 270.0f;
-			MoveComp->MaxWalkSpeed = 400.0f;
+			MoveComp->MaxWalkSpeed = 300.0f;
 		}
 	}
-	
-	//CameraComp->ToggleActive();
-	//CameraSprintComp->ToggleActive();
+	else if (stamina > 10 && IsSprinting == false)
+	{
+		if (IsZooming != true)
+		{
+			SprintProgressBar();
+			IsSprinting = true;
+			UCharacterMovementComponent* MoveComp = this->FindComponentByClass<UCharacterMovementComponent>();
+			if (MoveComp)
+			{
+				MoveComp->MaxWalkSpeed = 400.0f;
+			}
+		}
+	}
+
 }
 
 void ASoldierCharacter::SprintOff()
@@ -1081,15 +1103,43 @@ void ASoldierCharacter::SprintOff()
 	{
 		ServerSprintOff();
 	}
+
+	SprintProgressBar();
+
 	IsSprinting = false;
 	UCharacterMovementComponent* MoveComp = this->FindComponentByClass<UCharacterMovementComponent>();
 	if (MoveComp)
 	{
-		//MoveComp->MaxWalkSpeed = 149.0f;
 		MoveComp->MaxWalkSpeed = 300.0f;
 	}
-	//CameraComp->ToggleActive();
-	//CameraSprintComp->ToggleActive();
+	
+}
+
+void ASoldierCharacter::SprintProgressBar()
+{
+	if (IsSprinting == true)
+	{
+		GetWorldTimerManager().SetTimer(SprintTimerHandle, this, &ASoldierCharacter::SprintProgressBar, 0.2f, false);
+		stamina--;
+		if (stamina == 0) IsSprinting = false;
+		UE_LOG(LogTemp, Warning, TEXT("Sprinting now, bar is: %f"), stamina);
+	}
+	if (IsSprinting == false)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Resting spring now, bar is: %f"), stamina);
+
+		if (stamina < 100)
+		{
+			stamina++;
+		}
+		else if (stamina == 100) GetWorldTimerManager().ClearTimer(SprintRestingTimerHandle);
+
+		GetWorldTimerManager().ClearTimer(SprintTimerHandle);
+
+		GetWorldTimerManager().SetTimer(SprintRestingTimerHandle, this, &ASoldierCharacter::SprintProgressBar, 0.5f, false);
+		
+	}
+
 }
 
 void ASoldierCharacter::Reload()
@@ -1353,13 +1403,13 @@ void ASoldierCharacter::OnFoodLow()
 	{
 		if (HealthComp->Health > 0)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Znalazlem healthcomp"));
+			//UE_LOG(LogTemp, Warning, TEXT("Znalazlem healthcomp"));
 			HealthComp->Health = HealthComp->Health - 1;
 		}
 
 		if (HealthComp->Health == 0) bDied = true;
 	}
-	UE_LOG(LogTemp, Warning, TEXT("Food low!!!"));
+	//UE_LOG(LogTemp, Warning, TEXT("Food low!!!"));
 	GetWorldTimerManager().SetTimer(FoodLowTimer, this, &ASoldierCharacter::OnFoodLow, FreQOfDrainingHealthWhenLowFood,false);
 }
 void ASoldierCharacter::OnDrinkLow()
@@ -1374,14 +1424,14 @@ void ASoldierCharacter::OnDrinkLow()
 	{
 		if (HealthComp->Health > 0)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Znalazlem healthcomp"));
+			//UE_LOG(LogTemp, Warning, TEXT("Znalazlem healthcomp"));
 			HealthComp->Health = HealthComp->Health - 1;
 		}
 
 		if (HealthComp->Health == 0) bDied = true;
 		
 	}
-	UE_LOG(LogTemp, Warning, TEXT("Drink low!!!"));
+	//UE_LOG(LogTemp, Warning, TEXT("Drink low!!!"));
 	GetWorldTimerManager().SetTimer(DrinkLowTimer, this, &ASoldierCharacter::OnDrinkLow, FreQOfDrainingHealthWhenLowDrink, false);
 
 }
