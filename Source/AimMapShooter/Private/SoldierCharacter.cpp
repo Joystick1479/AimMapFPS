@@ -939,7 +939,10 @@ void ASoldierCharacter::MoveForward(float Value)
 }
 void ASoldierCharacter::MoveRight(float Value)
 {
-	AddMovementInput(GetActorRightVector() * Value);
+	if (!IsSprinting)
+	{
+		AddMovementInput(GetActorRightVector() * Value);
+	}
 }
 void ASoldierCharacter::BeginCrouch()
 {
