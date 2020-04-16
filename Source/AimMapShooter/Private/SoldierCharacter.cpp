@@ -349,16 +349,20 @@ void ASoldierCharacter::OnDeath()
 {
 	UE_LOG(LogTemp, Warning, TEXT("DEAD"));
 
-	this->Destroy();
-
 	if (IsLocallyControlled())
 	{
-		APlayerController* PC = Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
+		APlayerController* PC = Cast<APlayerController>(this->GetController());
 		if (PC)
 		{
 			this->EnableInput(PC);
+			UE_LOG(LogTemp, Warning, TEXT("Input enabled"));
+
 		}
 	}
+
+	this->Destroy();
+
+	
 }
 
 // Called to bind functionality to input
@@ -884,10 +888,12 @@ void ASoldierCharacter::ClearingHudAfterDeath()
 	///***IF DEAD, DESTROY ACTOR AFTER 2 seconds ***///
 	if (bDied == true)
 	{
-		APlayerController* PC = Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
+		///zmienilem tutaj get world get firs player controller na this get controller
+		APlayerController* PC = Cast<APlayerController>(this->GetController());
 		if (PC)
 		{
 			this->DisableInput(PC);
+			UE_LOG(LogTemp, Warning, TEXT("Input disabled"));
 		}
 		FTimerHandle DeathTimer;
 		GetWorldTimerManager().SetTimer(DeathTimer, this, &ASoldierCharacter::OnDeath, 2.5f, false);
