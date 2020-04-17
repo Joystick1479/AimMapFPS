@@ -326,7 +326,14 @@ protected:
 	USurvivalComponent* SurvivalComp;
 
 	void EatFood();
+
 	void DrinkWater();
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerEatFood();
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerDrinkWater();
 
 
 	/////*SOUNDS WHEN PICK UP OBJECTS***////

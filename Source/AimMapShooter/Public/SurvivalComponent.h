@@ -27,11 +27,6 @@ protected:
 	float DefaultDrink;
 
 
-	UFUNCTION()
-	void OnRep_Food();
-
-	UFUNCTION()
-	void OnRep_Drink();
 
 	UPROPERTY(EditDefaultsOnly,Category = "Food")
 	float FreQOfDrainingFood;
@@ -51,4 +46,10 @@ public:
 
 	UPROPERTY(ReplicatedUsing = OnRep_Drink, EditAnywhere, BlueprintReadWrite, Category = "SurvivalComponent")
 	float Drink;
+
+	UFUNCTION()
+	void OnRep_Food();
+
+	UFUNCTION()
+	void OnRep_Drink();
 };

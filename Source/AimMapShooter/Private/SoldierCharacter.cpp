@@ -414,6 +414,13 @@ void ASoldierCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 }
 void ASoldierCharacter::EatFood()
 {
+	UGameplayStatics::PlaySound2D(this, EatFoodSound);
+
+	if (Role < ROLE_Authority)
+	{
+		ServerEatFood();
+		return;
+	}
 	if (amountOfFood > 0)
 	{
 		amountOfFood--;
@@ -422,25 +429,44 @@ void ASoldierCharacter::EatFood()
 		if (SurvivalComp)
 		{
 			SurvivalComp->Food = SurvivalComp->Food + amountOfBoostFood;
-			UGameplayStatics::PlaySound2D(this, EatFoodSound);
-			
 		}
-
 	}
 }
 void ASoldierCharacter::DrinkWater()
 {
+	UGameplayStatics::PlaySound2D(this, DrinkWaterSound);
+
+	if (Role < ROLE_Authority)
+	{
+		ServerDrinkWater();
+		return;
+	}
 	if (amountOfDrinks > 0)
 	{
 		amountOfDrinks--;
 
-		USurvivalComponent* SurvivalComp = this->FindComponentByClass<USurvivalComponent>();
+		//USurvivalComponent* SurvivalComp = this->FindComponentByClass<USurvivalComponent>();
 		if (SurvivalComp)
 		{
 			SurvivalComp->Drink = SurvivalComp->Drink + amountOfBoostDrink;
-			UGameplayStatics::PlaySound2D(this, DrinkWaterSound);
 		}
 	}
+}
+void ASoldierCharacter::ServerDrinkWater_Implementation()
+{
+	DrinkWater();
+}
+bool ASoldierCharacter::ServerDrinkWater_Validate()
+{
+	return true;
+}
+void ASoldierCharacter::ServerEatFood_Implementation()
+{
+	EatFood();
+}
+bool ASoldierCharacter::ServerEatFood_Validate()
+{
+	return true;
 }
 
 void ASoldierCharacter::Vault()
@@ -1405,21 +1431,32 @@ void ASoldierCharacter::OnFoodLow()
 	if (Role < ROLE_Authority)
 	{
 		ServerOnFoodLow();
-		return;
+		//return;
 	}
-	UHealthComponent* HealthComp = this->FindComponentByClass<UHealthComponent>();
-	if (HealthComp)
+	if (SurvivalComp)
 	{
-		if (HealthComp->Health > 0)
+		if (SurvivalComp->Food == 0)
 		{
-			//UE_LOG(LogTemp, Warning, TEXT("Znalazlem healthcomp"));
-			HealthComp->Health = HealthComp->Health - 1;
-		}
+			UHealthComponent* HealthComp = this->FindComponentByClass<UHealthComponent>();
+			if (HealthComp)
+			{
+				if (HealthComp->Health > 0)
+				{
+					//UE_LOG(LogTemp, Warning, TEXT("Znalazlem healthcomp"));
+					HealthComp->Health = HealthComp->Health - 1;
+				}
 
-		if (HealthComp->Health == 0) bDied = true;
+				if (HealthComp->Health == 0) bDied = true;
+			}
+			//UE_LOG(LogTemp, Warning, TEXT("Food low!!!"));
+			GetWorldTimerManager().SetTimer(FoodLowTimer, this, &ASoldierCharacter::OnFoodLow, FreQOfDrainingHealthWhenLowFood, false);
+		}
+		if (SurvivalComp->Food > 0)
+		{
+			SurvivalComp->OnRep_Food();
+		}
 	}
-	//UE_LOG(LogTemp, Warning, TEXT("Food low!!!"));
-	GetWorldTimerManager().SetTimer(FoodLowTimer, this, &ASoldierCharacter::OnFoodLow, FreQOfDrainingHealthWhenLowFood,false);
+	
 }
 void ASoldierCharacter::OnDrinkLow()
 {
@@ -1428,20 +1465,32 @@ void ASoldierCharacter::OnDrinkLow()
 		ServerOnDrinkLow();
 		return;
 	}
-	UHealthComponent* HealthComp = this->FindComponentByClass<UHealthComponent>();
-	if (HealthComp)
-	{
-		if (HealthComp->Health > 0)
-		{
-			//UE_LOG(LogTemp, Warning, TEXT("Znalazlem healthcomp"));
-			HealthComp->Health = HealthComp->Health - 1;
-		}
 
-		if (HealthComp->Health == 0) bDied = true;
-		
+	//USurvivalComponent* SurvComp = this->FindComponentByClass<USurvivalComponent>();
+	if (SurvivalComp)
+	{
+		if (SurvivalComp->Drink == 0)
+		{
+			UHealthComponent* HealthComp = this->FindComponentByClass<UHealthComponent>();
+			if (HealthComp)
+			{
+				if (HealthComp->Health > 0)
+				{
+					//UE_LOG(LogTemp, Warning, TEXT("Znalazlem healthcomp"));
+					HealthComp->Health = HealthComp->Health - 1;
+				}
+
+				if (HealthComp->Health == 0) bDied = true;
+
+			}
+			//UE_LOG(LogTemp, Warning, TEXT("Drink low!!!"));
+			GetWorldTimerManager().SetTimer(DrinkLowTimer, this, &ASoldierCharacter::OnDrinkLow, FreQOfDrainingHealthWhenLowDrink, false);
+		}
+		if (SurvivalComp->Drink > 0)
+		{
+			SurvivalComp->OnRep_Drink();
+		}
 	}
-	//UE_LOG(LogTemp, Warning, TEXT("Drink low!!!"));
-	GetWorldTimerManager().SetTimer(DrinkLowTimer, this, &ASoldierCharacter::OnDrinkLow, FreQOfDrainingHealthWhenLowDrink, false);
 
 }
 void ASoldierCharacter::ServerOnFoodLow_Implementation()
@@ -1639,9 +1688,6 @@ void ASoldierCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	DOREPLIFETIME(ASoldierCharacter, CameraComp);
 	DOREPLIFETIME(ASoldierCharacter, STL);
 	DOREPLIFETIME(ASoldierCharacter, STR);
-
-
-
 
 
 
