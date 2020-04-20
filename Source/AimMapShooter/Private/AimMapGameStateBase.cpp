@@ -55,17 +55,20 @@ void AAimMapGameStateBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (IsTimerActive == true)
+	///TIMER
+
+	/*if (IsTimerActive == true)
 	{
 		if (RoundTime > 0)
 		{
 			RoundTime = RoundTime - DeltaTime;
 			UpdateTimerText(RoundTime);
 		}
-	}
+	}*/
 
 	///GameMode hud logic
-	TArray<AActor*> Payload;
+
+	/*TArray<AActor*> Payload;
 	UGameplayStatics::GetAllActorsOfClass(this, PayloadCharacterClass, Payload);
 	for (int i = 0; i < Payload.Num(); i++)
 	{
@@ -118,7 +121,7 @@ void AAimMapGameStateBase::Tick(float DeltaTime)
 				}
 			}
 		}
-	}
+	}*/
 }
 
 void AAimMapGameStateBase::UpdateTimerText(float Seconds)

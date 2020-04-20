@@ -48,6 +48,7 @@
 #include "Sound/SoundCue.h"
 #include "Drink.h"
 #include "Food.h"
+#include "Survival/Water.h"
 
 // Sets default values
 ASoldierCharacter::ASoldierCharacter()
@@ -220,6 +221,8 @@ void ASoldierCharacter::BeginPlay()
 		CameraComp->AttachToComponent(SpringArm, FAttachmentTransformRules::SnapToTargetIncludingScale);
 	}
 }
+
+
 
 void ASoldierCharacter::LineTraceItem()
 {
@@ -414,15 +417,15 @@ void ASoldierCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 }
 void ASoldierCharacter::EatFood()
 {
-	UGameplayStatics::PlaySound2D(this, EatFoodSound);
 
 	if (Role < ROLE_Authority)
 	{
 		ServerEatFood();
-		return;
+	//	return;
 	}
 	if (amountOfFood > 0)
 	{
+		UGameplayStatics::PlaySound2D(this, EatFoodSound);
 		amountOfFood--;
 
 		USurvivalComponent* SurvivalComp = this->FindComponentByClass<USurvivalComponent>();
@@ -434,15 +437,15 @@ void ASoldierCharacter::EatFood()
 }
 void ASoldierCharacter::DrinkWater()
 {
-	UGameplayStatics::PlaySound2D(this, DrinkWaterSound);
 
 	if (Role < ROLE_Authority)
 	{
 		ServerDrinkWater();
-		return;
+		//return;
 	}
 	if (amountOfDrinks > 0)
 	{
+		UGameplayStatics::PlaySound2D(this, DrinkWaterSound);
 		amountOfDrinks--;
 
 		//USurvivalComponent* SurvivalComp = this->FindComponentByClass<USurvivalComponent>();
@@ -821,6 +824,8 @@ void ASoldierCharacter::PickUp()
 				UGameplayStatics::PlaySoundAtLocation(this, ItemsPickUp, GetActorLocation());
 			}
 		}
+
+		///SURVIVAL STUFF///
 		if (bDrinkPickup == true)
 		{
 			amountOfDrinks++;
@@ -858,39 +863,20 @@ void ASoldierCharacter::PickUp()
 				}
 			}
 		}
-}
-
-void ASoldierCharacter::StartingHud()
-{
-	//if (Role < ROLE_Authority)
-	//{
-	//	ServerStartingHud();
-	//	//return;
-	//}
-	/*if (IsLocallyControlled())
-	{
-		APlayerController* PC = Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
-
-		if (PC)
+		if (DrinkFromPond == true)
 		{
-			if (wAmmoCount)
+			APlayerController* PC = Cast<APlayerController>(GetController());
+			DisableInput(PC);
+			FTimerDelegate DelegateFunc = FTimerDelegate::CreateUObject(this, &ASoldierCharacter::EnableInput, PC);
+			GetWorldTimerManager().SetTimer(DrinkFromPondTimer, DelegateFunc, 2.5f, false);
+
+			if (SurvivalComp)
 			{
-				wAmmoCountvar = CreateWidget<UUserWidget>(PC, wAmmoCount);
-				if (wAmmoCountvar)
-				{
-					wAmmoCountvar->AddToViewport();
-				}
+				SurvivalComp->Drink = SurvivalComp->Drink + amountOfBoostDrink;
+
 			}
-			if (wHealthIndicator)
-			{
-				wHealthIndicatorvar = CreateWidget<UUserWidget>(PC, wHealthIndicator);
-				if (wHealthIndicatorvar)
-				{
-					wHealthIndicatorvar->AddToViewport();
-				}
-			}
+			DrinkFromPond = false;
 		}
-	}*/
 }
 
 void ASoldierCharacter::DyingAudioTrigger()
@@ -1157,11 +1143,11 @@ void ASoldierCharacter::SprintProgressBar()
 		GetWorldTimerManager().SetTimer(SprintTimerHandle, this, &ASoldierCharacter::SprintProgressBar, 0.2f, false);
 		stamina--;
 		if (stamina == 0) IsSprinting = false;
-		UE_LOG(LogTemp, Warning, TEXT("Sprinting now, bar is: %f"), stamina);
+		//UE_LOG(LogTemp, Warning, TEXT("Sprinting now, bar is: %f"), stamina);
 	}
 	if (IsSprinting == false)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Resting spring now, bar is: %f"), stamina);
+		//UE_LOG(LogTemp, Warning, TEXT("Resting spring now, bar is: %f"), stamina);
 
 		if (stamina < 100)
 		{
@@ -1317,6 +1303,13 @@ void ASoldierCharacter::NotifyActorBeginOverlap(AActor * OtherActor)
 			DoOnce = true;
 			UGameplayStatics::PlaySound2D(this, EscortVehicle);
 		}
+	}
+
+	AWater* Water = Cast<AWater>(OtherActor);
+	if (Water)
+	{
+		DrinkFromPond = true;
+		UE_LOG(LogTemp, Warning, TEXT("WaterPond"));
 	}
 }
 
@@ -1594,14 +1587,6 @@ void ASoldierCharacter::ServerShowingPickUpHud_Implementation()
 	ShowingPickUpHud();
 }
 bool ASoldierCharacter::ServerShowingPickUpHud_Validate()
-{
-	return true;
-}
-void ASoldierCharacter::ServerStartingHud_Implementation()
-{
-	StartingHud();
-}
-bool ASoldierCharacter::ServerStartingHud_Validate()
 {
 	return true;
 }

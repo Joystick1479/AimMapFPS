@@ -203,7 +203,6 @@ protected:
 
 	/////*** DISPLAYING HUD ****////
 	void ShowingPickUpHud();
-	void StartingHud();
 
 	///**STOP PLAY LOW HEALTH/DIE AUDIO **//
 	void DyingAudioTrigger();
@@ -212,9 +211,6 @@ protected:
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerLineTraceItem();
-
-	UFUNCTION(Server, Reliable, WithValidation)
-	void ServerStartingHud();
 
 	void LineTraceItem();
 
@@ -334,6 +330,8 @@ protected:
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerDrinkWater();
+
+	bool DrinkFromPond;
 
 
 	/////*SOUNDS WHEN PICK UP OBJECTS***////
@@ -603,6 +601,7 @@ public:
 
 	FTimerHandle FoodLowTimer;
 	FTimerHandle DrinkLowTimer;
+	FTimerHandle DrinkFromPondTimer;
 
 	bool bDrinkPickup;
 	UPROPERTY(BlueprintReadOnly)

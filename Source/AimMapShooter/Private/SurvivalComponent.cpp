@@ -44,7 +44,7 @@ void USurvivalComponent::OnRep_Food()
 	{
 		Food = Food - 1;
 
-		UE_LOG(LogTemp, Warning, TEXT("Food is: %f"), Food);
+		//UE_LOG(LogTemp, Warning, TEXT("Food is: %f"), Food);
 		GetWorld()->GetTimerManager().SetTimer(FoodTimerHandle, this, &USurvivalComponent::OnRep_Food, FreQOfDrainingFood, false);
 	}
 
@@ -70,7 +70,7 @@ void USurvivalComponent::OnRep_Drink()
 	{
 		Drink = Drink - 1;
 
-		UE_LOG(LogTemp, Warning, TEXT("Drink is: %f"), Drink);
+		//UE_LOG(LogTemp, Warning, TEXT("Drink is: %f"), Drink);
 		GetWorld()->GetTimerManager().SetTimer(DrinkTimerHandle, this, &USurvivalComponent::OnRep_Drink, FreQOfDrainingDrink, false);
 	}
 	if (Drink == 0)
