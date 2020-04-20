@@ -331,7 +331,8 @@ protected:
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerDrinkWater();
 
-	bool DrinkFromPond;
+
+	void EndDrinkFromPond(APlayerController* PC);
 
 
 	/////*SOUNDS WHEN PICK UP OBJECTS***////
@@ -614,6 +615,9 @@ public:
 	TSubclassOf<class AFood> FoodClass;
 
 	bool bFoodPickup;
+
+	bool bDrinkFromPond;
+
 	UPROPERTY(BlueprintReadOnly)
 	float amountOfFood;
 
@@ -628,6 +632,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Survival items")
 	USoundCue* DrinkWaterSound;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Survival items")
+	USoundCue* DrinkFromPondSound;
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

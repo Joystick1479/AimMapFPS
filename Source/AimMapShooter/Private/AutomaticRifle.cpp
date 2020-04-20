@@ -189,7 +189,7 @@ void AAutomaticRifle::Fire()
 				FVector ShotDirection = Rotation.Vector();
 				float HalfRad = FMath::DegreesToRadians(BulletSpreadZooming);
 				ShotDirection = FMath::VRandCone(ShotDirection, HalfRad, HalfRad);
-				FVector EndLocation = StartLocation + (ShotDirection * 10000);
+				FVector EndLocation = StartLocation + (ShotDirection * 100000);
 
 				FCollisionQueryParams QueryParams;
 				QueryParams.AddIgnoredActor(MyOwner);
@@ -246,11 +246,13 @@ void AAutomaticRifle::Fire()
 					if (SurfaceType == SURFACE_LEG)
 					{
 						UGameplayStatics::PlaySoundAtLocation(GetWorld(), HitSound, GetActorLocation());
+
 						ActualDamage *= 0.5f;
 					}
 					if (SurfaceType == SURFACE_ARM)
 					{
 						UGameplayStatics::PlaySoundAtLocation(GetWorld(), HitSound, GetActorLocation());
+
 						ActualDamage *= 1.5f;
 					}
 					if (SurfaceType == SURFACE_HELMET)
@@ -274,12 +276,17 @@ void AAutomaticRifle::Fire()
 							}
 						}
 						UGameplayStatics::PlaySoundAtLocation(GetWorld(), HeadshotSound, GetActorLocation());
+
 					}
 					UGameplayStatics::ApplyPointDamage(HitActor, ActualDamage, ShotDirection, Hit, MyOwner->GetInstigatorController(), MyOwner, DamageType);
+					UseAmmo();
+					PlayFireEffects(Hit.ImpactPoint);
 				}
-				UseAmmo();
-			//	PlayFireEffects(EndLocation);
-				PlayFireEffects(Hit.ImpactPoint);
+				else
+				{
+					UseAmmo();
+					PlayFireEffects(EndLocation);
+				}
 
 				if (Role == ROLE_Authority)
 				{
@@ -321,7 +328,7 @@ void AAutomaticRifle::Fire()
 				}
 				float HalfRad = FMath::DegreesToRadians(BulletSpread);
 				ShotDirection = FMath::VRandCone(ShotDirection, HalfRad, HalfRad);
-				FVector EndLocation = StartLocation + (ShotDirection * 10000);
+				FVector EndLocation = StartLocation + (ShotDirection * 100000);
 
 				FCollisionQueryParams QueryParams;
 				QueryParams.AddIgnoredActor(MyOwner);
@@ -408,12 +415,16 @@ void AAutomaticRifle::Fire()
 						UGameplayStatics::PlaySoundAtLocation(GetWorld(), HeadshotSound, GetActorLocation());
 					}
 					UGameplayStatics::ApplyPointDamage(HitActor, ActualDamage, ShotDirection, Hit, MyOwner->GetInstigatorController(), MyOwner, DamageType);
+					//PlayFireEffects(EndLocation);
+					UseAmmo();
+					PlayFireEffects(Hit.ImpactPoint);
+				}
+				else
+				{
+					UseAmmo();
+					PlayFireEffects(EndLocation);
 
 				}
-				UseAmmo();
-				//PlayFireEffects(EndLocation);
-				PlayFireEffects(Hit.ImpactPoint);
-
 				if (Role == ROLE_Authority)
 				{
 					HitScanTrace.TraceTo = Hit.ImpactPoint;

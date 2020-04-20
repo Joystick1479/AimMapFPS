@@ -863,22 +863,28 @@ void ASoldierCharacter::PickUp()
 				}
 			}
 		}
-		if (DrinkFromPond == true)
+		if (bDrinkFromPond == true)
 		{
 			APlayerController* PC = Cast<APlayerController>(GetController());
 			DisableInput(PC);
-			FTimerDelegate DelegateFunc = FTimerDelegate::CreateUObject(this, &ASoldierCharacter::EnableInput, PC);
+			FTimerDelegate DelegateFunc = FTimerDelegate::CreateUObject(this, &ASoldierCharacter::EndDrinkFromPond, PC);
 			GetWorldTimerManager().SetTimer(DrinkFromPondTimer, DelegateFunc, 2.5f, false);
 
-			if (SurvivalComp)
+			if (IsLocallyControlled())
 			{
-				SurvivalComp->Drink = SurvivalComp->Drink + amountOfBoostDrink;
-
+				UGameplayStatics::PlaySound2D(this, DrinkFromPondSound);
 			}
-			DrinkFromPond = false;
 		}
 }
-
+void ASoldierCharacter::EndDrinkFromPond(APlayerController* PC)
+{
+	EnableInput(PC);
+	bDrinkFromPond = false;
+	if (SurvivalComp)
+	{
+		SurvivalComp->Drink = SurvivalComp->Drink + amountOfBoostDrink;
+	}
+}
 void ASoldierCharacter::DyingAudioTrigger()
 {
 	///** PLAYING/STOPPING SOUND WHEN LOW HEALTH/DEAD**//
@@ -928,7 +934,7 @@ void ASoldierCharacter::ShowingPickUpHud()
 				wPickUpvar = CreateWidget<UUserWidget>(PC, wPickUp);
 				if (wPickUpvar)
 				{
-					if ((bRiflePickUp || bHeadsetPickUp || bLaserPickUp || bHelmetPickUp || bGripPickUp || bHoloPickUp || bFoodPickup || bDrinkPickup) == true)
+					if ((bRiflePickUp || bHeadsetPickUp || bLaserPickUp || bHelmetPickUp || bGripPickUp || bHoloPickUp || bFoodPickup || bDrinkPickup || bDrinkFromPond) == true)
 					{
 						wPickUpvar->AddToViewport();
 					}
@@ -1303,13 +1309,6 @@ void ASoldierCharacter::NotifyActorBeginOverlap(AActor * OtherActor)
 			DoOnce = true;
 			UGameplayStatics::PlaySound2D(this, EscortVehicle);
 		}
-	}
-
-	AWater* Water = Cast<AWater>(OtherActor);
-	if (Water)
-	{
-		DrinkFromPond = true;
-		UE_LOG(LogTemp, Warning, TEXT("WaterPond"));
 	}
 }
 
