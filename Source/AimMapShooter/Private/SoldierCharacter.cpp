@@ -1068,6 +1068,10 @@ void ASoldierCharacter::StartFire()
 		{
 			if (AutomaticRifle)
 			{
+				if (AutomaticRifle->CurrentAmmoInClip > 0 && AutomaticRifle->CurrentState != EWeaponState::Reloading)
+				{
+					bFireAnimation = true;
+				}
 				AutomaticRifle->StartFire();
 			}
 		}
@@ -1075,6 +1079,10 @@ void ASoldierCharacter::StartFire()
 		{
 			if (AutomaticRifle)
 			{
+				if (AutomaticRifle->CurrentAmmoInClip > 0 && AutomaticRifle->CurrentState != EWeaponState::Reloading)
+				{
+					bFireAnimation = true;
+				}
 				AutomaticRifle->Fire();
 			}
 		}
@@ -1085,6 +1093,8 @@ void ASoldierCharacter::StopFire()
 {
 	CharacterState = ECharacterState::Idle;
 	IsFiring = false;
+
+	bFireAnimation = false;
 
 	if (AutomaticRifle)
 	{

@@ -139,6 +139,8 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = WeaponStat)
 	float TimeBetweenShots;
 
+	EWeaponState::Type CurrentState;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -176,7 +178,6 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon")
 	TSubclassOf<UDamageType> DamageType;
 
-	EWeaponState::Type CurrentState;
 	EReloadingState::Type ReloadingState;
 
 
@@ -235,6 +236,8 @@ protected:
 
 	void PlayFireEffects(FVector EndLocation);
 
+	UPROPERTY(BlueprintReadOnly,Replicated)
+	bool bFireAnimation;
 
 
 public:	

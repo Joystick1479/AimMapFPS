@@ -167,8 +167,6 @@ void AAutomaticRifle::Fire()
 	{
 		CurrentState = EWeaponState::Firing;
 
-
-
 		ASoldierCharacter* SoldierChar = Cast<ASoldierCharacter>(GetOwner());
 		ALaser* Laser = Cast<ALaser>(GetOwner());
 		if (SoldierChar->IsZooming == true)
@@ -432,12 +430,19 @@ void AAutomaticRifle::Fire()
 			}
 		}
 	}
+
+
 		LastFireTime = GetWorld()->TimeSeconds;
 
 	//*Sound when no ammo in clip*//
 
 	if (CurrentAmmoInClip == 0 && CurrentState!=EWeaponState::Reloading)
 	{
+		ASoldierCharacter* SoldierChar = Cast<ASoldierCharacter>(GetOwner());
+		if (SoldierChar)
+		{
+			SoldierChar->bFireAnimation = false;
+		}
 		UGameplayStatics::PlaySoundAtLocation(GetWorld(), NoAmmoSound, GetActorLocation());
 	}
 	
@@ -544,7 +549,6 @@ void AAutomaticRifle::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 	DOREPLIFETIME_CONDITION(AAutomaticRifle, HitScanTrace,COND_SkipOwner);
 	DOREPLIFETIME(AAutomaticRifle, SkelMeshComp);
 	DOREPLIFETIME(AAutomaticRifle, SoldierChar);
-
 
 
 }

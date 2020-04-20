@@ -128,6 +128,7 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "AnimationWeapon")
 	TSubclassOf<UAnimInstance> AnimBp;
 
+
 	ECharacterState::Type CharacterState;
 
 	EHoldingWeapon::Type HoldingWeaponState;
@@ -493,6 +494,10 @@ public:
 	///Bool for crouching///
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated, Category = "Crouch")
 	bool IsCrouching;
+
+
+	UPROPERTY(BlueprintReadOnly)
+	bool bFireAnimation;
 
 	///Bool for BackTargeting ///
 	void IsTargetFromBack();
