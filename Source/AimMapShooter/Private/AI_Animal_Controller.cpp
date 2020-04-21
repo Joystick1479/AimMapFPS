@@ -41,10 +41,10 @@ void AAI_Animal_Controller::Tick(float DeltaTime)
 	AAI_Animal_FOX* Fox = Cast<AAI_Animal_FOX>(GetPawn());
 	if (Fox)
 	{
-		if (Fox->IsAttacking)
+		if (Fox->IsAttacking == true)
 		{
-			GetWorldTimerManager().ClearTimer(TimerHandle);
-			GetWorldTimerManager().SetTimer(TestTimerHandle, this, &AAI_Animal_Controller::GoToRandomWaypoint, 0.01f, false);
+			//GetWorldTimerManager().ClearTimer(TimerHandle);
+			//GetWorldTimerManager().SetTimer(TestTimerHandle, this, &AAI_Animal_Controller::GoToRandomWaypoint, 0.01f, false);
 		}
 	}
 
@@ -92,7 +92,7 @@ void AAI_Animal_Controller::GoToRandomWaypoint()
 	{
 		if (Fox->IsAttacking == false)
 		{
-			GetWorldTimerManager().ClearTimer(TestTimerHandle);
+			//GetWorldTimerManager().ClearTimer(TimerHandle);
 			auto Waypoint = GetRandomWaypoint();
 			FVector WaypointLocation = Waypoint->GetActorLocation();
 			FRotator LookDirection = UKismetMathLibrary::FindLookAtRotation(GetPawn()->GetActorLocation(), WaypointLocation);
@@ -100,6 +100,7 @@ void AAI_Animal_Controller::GoToRandomWaypoint()
 			IsMoving = true;
 			IsRunning = false;
 			MoveToActor(Waypoint);
+
 		}
 		else if(Fox->IsAttacking == true)
 		{
@@ -111,9 +112,12 @@ void AAI_Animal_Controller::GoToRandomWaypoint()
 				ASoldierCharacter* SoldierChar = Cast<ASoldierCharacter>(Target[i]);
 				if (SoldierChar)
 				{
+					//GetWorldTimerManager().ClearTimer(TimerHandle);
+
 					FVector SoldierLocation = SoldierChar->GetActorLocation() - CorrectingVectorForSoldierHeight;
 					FRotator LookAtSoldier = UKismetMathLibrary::FindLookAtRotation(GetPawn()->GetActorLocation(), SoldierLocation);
 					GetPawn()->SetActorRotation(LookAtSoldier);
+					IsMoving = true;
 					IsRunning = true;
 					MoveToActor(SoldierChar);
 				}
@@ -121,7 +125,7 @@ void AAI_Animal_Controller::GoToRandomWaypoint()
 		}
 	}
 	
-
+	
 }
 
 void AAI_Animal_Controller::OnMoveCompleted(FAIRequestID RequestID, const FPathFollowingResult & Result)
@@ -135,16 +139,22 @@ void AAI_Animal_Controller::OnMoveCompleted(FAIRequestID RequestID, const FPathF
 		randnomNumber = 1;
 	}
 
-	AAI_Animal_FOX* Fox = Cast<AAI_Animal_FOX>(GetPawn());
+	GetWorldTimerManager().SetTimer(TimerHandle, this, &AAI_Animal_Controller::GoToRandomWaypoint, randnomNumber, false);
+
+	/*AAI_Animal_FOX* Fox = Cast<AAI_Animal_FOX>(GetPawn());
 	if (Fox)
 	{
 		if (Fox->IsAttacking == true)
 		{
 			randnomNumber = 1;
 			UE_LOG(LogTemp, Warning, TEXT("FOX ATAKUUJEEE"));
+			GetWorldTimerManager().SetTimer(TestTimerHandle, this, &AAI_Animal_Controller::GoToRandomWaypoint, randnomNumber, false);
 		}
-	}
+		else
+		{
+			GetWorldTimerManager().SetTimer(TimerHandle, this, &AAI_Animal_Controller::GoToRandomWaypoint, randnomNumber, false);
+		}
+	}*/
 
-	GetWorldTimerManager().SetTimer(TimerHandle, this, &AAI_Animal_Controller::GoToRandomWaypoint, randnomNumber, false);
 
 }

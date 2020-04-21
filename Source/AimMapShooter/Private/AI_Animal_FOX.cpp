@@ -37,13 +37,42 @@ void AAI_Animal_FOX::Hearing()
 		if (SoldChar)
 		{
 			IsAttacking = HearingSphere->IsOverlappingActor(SoldChar);
+			if (IsAttacking == true)
+			{
+				UCharacterMovementComponent* MoveComp = this->FindComponentByClass<UCharacterMovementComponent>();
+				if (MoveComp)
+				{
+					MoveComp->MaxWalkSpeed = 600;
+				}
+			}
+			else if (IsAttacking == false)
+			{
+				UCharacterMovementComponent* MoveComp = this->FindComponentByClass<UCharacterMovementComponent>();
+				if (MoveComp)
+				{
+					MoveComp->MaxWalkSpeed = 150;
+				}
+			}
 		}
 		else
 		{
-			IsAttacking = false;
+			//IsAttacking = false;
 		}
 	}
 }
+
+void AAI_Animal_FOX::NotifyActorEndOverlap(AActor * OtherActor)
+{
+	Super::NotifyActorEndOverlap(OtherActor);
+
+	ASoldierCharacter* SoldierCharacter = Cast<ASoldierCharacter>(OtherActor);
+	if (SoldierCharacter)
+	{
+		IsAttacking = false;
+		UE_LOG(LogTemp, Warning, TEXT("NieAtakuje"));
+	}
+}
+
 
 // Called every frame
 void AAI_Animal_FOX::Tick(float DeltaTime)
