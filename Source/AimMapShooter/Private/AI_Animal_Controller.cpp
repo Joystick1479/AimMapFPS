@@ -15,6 +15,8 @@
 
 #include "TimerManager.h"
 
+#include "Net/UnrealNetwork.h"
+
 #include <stack>
 
 void AAI_Animal_Controller::BeginPlay()
@@ -28,7 +30,10 @@ void AAI_Animal_Controller::BeginPlay()
 	}
 
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ATargetPoint::StaticClass(), Waypoints);
-	GoToRandomWaypoint();
+	if (Role == ROLE_Authority)
+	{
+		GoToRandomWaypoint();
+	}
 
 	index2 = -1;
 	
@@ -38,15 +43,6 @@ void AAI_Animal_Controller::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	AAI_Animal_FOX* Fox = Cast<AAI_Animal_FOX>(GetPawn());
-	if (Fox)
-	{
-		if (Fox->IsAttacking == true)
-		{
-			//GetWorldTimerManager().ClearTimer(TimerHandle);
-			//GetWorldTimerManager().SetTimer(TestTimerHandle, this, &AAI_Animal_Controller::GoToRandomWaypoint, 0.01f, false);
-		}
-	}
 
 }
 
@@ -86,6 +82,10 @@ ATargetPoint * AAI_Animal_Controller::GetRandomWaypoint()
 
 void AAI_Animal_Controller::GoToRandomWaypoint()
 {
+	if (Role < ROLE_Authority)
+	{
+		Server_GoToRandomWaypoint();
+	}
 	//Rotate pawn to face waypoint while moving//
 	AAI_Animal_FOX* Fox = Cast<AAI_Animal_FOX>(GetPawn());
 	if (Fox)
@@ -128,12 +128,22 @@ void AAI_Animal_Controller::GoToRandomWaypoint()
 	
 }
 
+void AAI_Animal_Controller::Server_GoToRandomWaypoint_Implementation()
+{
+	GoToRandomWaypoint();
+}
+bool AAI_Animal_Controller::Server_GoToRandomWaypoint_Validate()
+{
+	return true;
+}
+
 void AAI_Animal_Controller::OnMoveCompleted(FAIRequestID RequestID, const FPathFollowingResult & Result)
 {
 	Super::OnMoveCompleted(RequestID, Result);
 	IsMoving = false;
 
 	auto randnomNumber = FMath::RandRange(1, 5);
+
 	if (IsRunning)
 	{
 		randnomNumber = 1;
@@ -155,6 +165,17 @@ void AAI_Animal_Controller::OnMoveCompleted(FAIRequestID RequestID, const FPathF
 			GetWorldTimerManager().SetTimer(TimerHandle, this, &AAI_Animal_Controller::GoToRandomWaypoint, randnomNumber, false);
 		}
 	}*/
+
+
+}
+void AAI_Animal_Controller::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	//This function tells us how we want to replicate things//
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AAI_Animal_Controller, IsMoving);
+	DOREPLIFETIME(AAI_Animal_Controller, IsRunning);
+
 
 
 }

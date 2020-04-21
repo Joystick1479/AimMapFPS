@@ -44,15 +44,18 @@ public:
 	UFUNCTION()
 	void GoToRandomWaypoint();
 
+	UFUNCTION(Server,Reliable,WithValidation)
+	void Server_GoToRandomWaypoint();
+
 	FTimerHandle TimerHandle;
 	FTimerHandle TestTimerHandle;
 
 	void OnMoveCompleted(FAIRequestID RequestID, const FPathFollowingResult& Result) override;
 
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly, Replicated)
 	bool IsMoving;
 
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly,Replicated)
 	bool IsRunning;
 	
 	int32 index;

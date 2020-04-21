@@ -8,6 +8,8 @@
 
 class USphereComponent;
 class ASoldierCharacter;
+class UHealthComponent;
+class UCapsuleComponent;
 
 UCLASS()
 class AIMMAPSHOOTER_API AAI_Animal_FOX : public ACharacter
@@ -28,11 +30,36 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "Query")
 	USphereComponent* HearingSphere;
 
+	UPROPERTY(VisibleAnywhere, Category = "Query")
+	UCapsuleComponent* DamagingSphere;
+
+	UPROPERTY(VisibleAnywhere, Category = "Query")
+	UHealthComponent* HealthComponent;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Query")
 	TSubclassOf<ASoldierCharacter> SoldierChar;
 
 	void Hearing();
+	void Attacking();
+	void Dying();
+	void DestroyAfterDeath();
 
+	UPROPERTY(BlueprintReadOnly)
+	bool bDied;
+
+	FTimerHandle DeadTimer;
+
+	bool DoOnce;
+
+	bool DoOnce2;
+
+	UPROPERTY(BlueprintReadOnly,Replicated)
+	bool test1;
+
+	UPROPERTY(BlueprintReadOnly,Replicated)
+	bool test2;
+
+	void NotifyActorBeginOverlap(AActor* OtherActor);
 	void NotifyActorEndOverlap(AActor* OtherActor);
 
 public:	
