@@ -20,6 +20,10 @@
 		{
 			"Name": "OnlineSubsystemSteam",
 			"Enabled": true
+		},
+		{
+			"Name": "TrueSkyPlugin",
+			"Enabled": false
 		}
 	]
 }

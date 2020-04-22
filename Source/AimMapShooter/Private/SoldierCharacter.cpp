@@ -425,7 +425,10 @@ void ASoldierCharacter::EatFood()
 	}
 	if (amountOfFood > 0)
 	{
-		UGameplayStatics::PlaySound2D(this, EatFoodSound);
+		if (IsLocallyControlled())
+		{
+			UGameplayStatics::PlaySound2D(this, EatFoodSound);
+		}
 		amountOfFood--;
 
 		USurvivalComponent* SurvivalComp = this->FindComponentByClass<USurvivalComponent>();
@@ -445,7 +448,10 @@ void ASoldierCharacter::DrinkWater()
 	}
 	if (amountOfDrinks > 0)
 	{
-		UGameplayStatics::PlaySound2D(this, DrinkWaterSound);
+		if (IsLocallyControlled())
+		{
+			UGameplayStatics::PlaySound2D(this, DrinkWaterSound);
+		}
 		amountOfDrinks--;
 
 		//USurvivalComponent* SurvivalComp = this->FindComponentByClass<USurvivalComponent>();
