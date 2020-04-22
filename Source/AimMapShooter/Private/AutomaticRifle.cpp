@@ -97,28 +97,28 @@ void AAutomaticRifle::Tick(float DeltaTime)
 
 }
 
-//void AAutomaticRifle::NotifyActorBeginOverlap(AActor* OtherActor)
-//{
-//	Super::NotifyActorBeginOverlap(OtherActor);
-//
-//	ASoldierCharacter* SoldierCharacter = Cast<ASoldierCharacter>(OtherActor);
-//	if (SoldierCharacter)
-//	{
-//		SoldierCharacter->bRiflePickUp = true;
-//		SphereComp->ToggleActive();
-//	}
-//}
-//void AAutomaticRifle::NotifyActorEndOverlap(AActor* OtherActor)
-//{
-//	Super::NotifyActorEndOverlap(OtherActor);
-//
-//	ASoldierCharacter* SoldierCharacter = Cast<ASoldierCharacter>(OtherActor);
-//	if (SoldierCharacter)
-//	{
-//		SoldierCharacter->bRiflePickUp = false;
-//
-//	}
-//}
+void AAutomaticRifle::NotifyActorBeginOverlap(AActor* OtherActor)
+{
+	Super::NotifyActorBeginOverlap(OtherActor);
+
+	ASoldierCharacter* SoldierCharacter = Cast<ASoldierCharacter>(OtherActor);
+	if (SoldierCharacter)
+	{
+		SoldierCharacter->bRiflePickUp = true;
+		SphereComp->ToggleActive();
+	}
+}
+void AAutomaticRifle::NotifyActorEndOverlap(AActor* OtherActor)
+{
+	Super::NotifyActorEndOverlap(OtherActor);
+
+	ASoldierCharacter* SoldierCharacter = Cast<ASoldierCharacter>(OtherActor);
+	if (SoldierCharacter)
+	{
+		SoldierCharacter->bRiflePickUp = false;
+
+	}
+}
 void AAutomaticRifle::StartFire()
 {
 	float FirstDelay = FMath::Max(LastFireTime + TimeBetweenShots - GetWorld()->TimeSeconds,0.0f);

@@ -19,6 +19,7 @@ class USpringArmComponent;
 class AHelmet;
 class AHeadset;
 class ALaser;
+class ARifle_3rd;
 class UCapsuleComponent;
 class UUserWidget;
 class USoundCue;
@@ -149,6 +150,9 @@ protected:
 	AAutomaticRifle* AutomaticRifle;
 
 	UPROPERTY(Replicated)
+	ARifle_3rd* Rifle_3rd;
+
+	UPROPERTY(Replicated)
 	AHoloScope* HoloScope;
 
 	UPROPERTY(Replicated)
@@ -252,6 +256,9 @@ protected:
 	TSubclassOf<AAutomaticRifle> StarterWeaponClass;
 
 	UPROPERTY(EditDefaultsOnly, Replicated, Category = "Player")
+	TSubclassOf<ARifle_3rd> ThirdWeaponClass;
+
+	UPROPERTY(EditDefaultsOnly, Replicated, Category = "Player")
 	TSubclassOf<AHoloScope> HoloClass;
 
 	UPROPERTY(EditDefaultsOnly, Replicated, Category = "Player")
@@ -303,6 +310,9 @@ protected:
 
 	void WeaponInspectionOn();
 	void WeaponInspectionOff();
+
+	void PutWeaponOnBack();
+	bool bWeaponOnBack;
 	FTimerHandle InspectionTimer;
 
 	UPROPERTY(BlueprintReadOnly)
@@ -331,6 +341,10 @@ protected:
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerDrinkWater();
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerPutWeaponOnBack();
+
 
 
 	void EndDrinkFromPond(APlayerController* PC);
@@ -477,6 +491,7 @@ public:
 	FName WeaponSocket;
 	FName HelmetSocket;
 	FName HeadsetSocket;
+	FName WeaponBackSocket;
 	
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated,Category = "Zoom")
@@ -559,6 +574,9 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, Replicated,Category = "Player")
 	bool bRemoveHud;
+
+	UPROPERTY(BlueprintReadOnly, Replicated, Category = "Player")
+	bool isWeaponAttached;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Player")
 	bool isLaserAttached;

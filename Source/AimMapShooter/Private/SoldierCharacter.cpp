@@ -26,13 +26,18 @@
 #include "SurvivalComponent.h"
 
 #include "AimMapShooter.h"
+
 #include "HoloScope.h"
 #include "Grip.h"
-#include "GameFramework/SpringArmComponent.h"
-#include "GameFramework/CharacterMovementComponent.h"
 #include "Helmet.h"
 #include "Headset.h"
 #include "Laser.h"
+#include "3rdPersonMeshes/Rifle_3rd.h"
+
+#include "GameFramework/SpringArmComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
+
+
 #include "TimerManager.h"
 #include "Net/UnrealNetwork.h"
 #include "Blueprint/UserWidget.h"
@@ -61,6 +66,7 @@ ASoldierCharacter::ASoldierCharacter()
 	ArmSocket = "ArmSocket";
 	HelmetSocket = "HelmetSocket";
 	HeadsetSocket = "HeadsetSocket";
+	WeaponBackSocket = "WeaponBackSocket";
 
 	RootComponent = this->GetRootComponent();
 
@@ -106,13 +112,14 @@ ASoldierCharacter::ASoldierCharacter()
 	IsReloading = false;
 
 	CharacterState = ECharacterState::Idle;
-	//HoldingWeaponState = EHoldingWeapon::None;
-	HoldingWeaponState = EHoldingWeapon::A4;
+	HoldingWeaponState = EHoldingWeapon::None;
+	//HoldingWeaponState = EHoldingWeapon::A4;
 	HoldingAttachmentState = EHoldingAttachment::None;
 	LaserEquipState = ELaserAttachment::None;
 	MaxUseDistance = 400;
 
 	bRiflePickUp = false;
+	bWeaponOnBack = false;
 
 	AmountGrenades = 10;
 
@@ -190,19 +197,19 @@ void ASoldierCharacter::BeginPlay()
 
 	///**Getting weapon on begin play *//
 	///**Spawn weapmon for first person animation ///**
-	FActorSpawnParameters SpawnParams;
-	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	if(Role==ROLE_Authority)
-	{
-		AutomaticRifle = GetWorld()->SpawnActor<AAutomaticRifle>(StarterWeaponClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
-		if (AutomaticRifle)
-		{
-			AutomaticRifle->SetOwner(this);
-			AutomaticRifle->AttachToComponent(FPPMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocket);
-			AutomaticRifle->SkelMeshComp->bOnlyOwnerSee = true;
-			AutomaticRifle->SkelMeshComp->SetAnimInstanceClass(AnimBp);
-		}
-	}
+	//FActorSpawnParameters SpawnParams;
+	//SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	//if(Role==ROLE_Authority)
+	//{
+	//	AutomaticRifle = GetWorld()->SpawnActor<AAutomaticRifle>(StarterWeaponClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
+	//	if (AutomaticRifle)
+	//	{
+	//		AutomaticRifle->SetOwner(this);
+	//		AutomaticRifle->AttachToComponent(FPPMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocket);
+	//		AutomaticRifle->SkelMeshComp->bOnlyOwnerSee = true;
+	//		AutomaticRifle->SkelMeshComp->SetAnimInstanceClass(AnimBp);
+	//	}
+	//}
 
 	HealthComp->OnHealthChanged.AddDynamic(this, &ASoldierCharacter::OnHealthChanged);
 
@@ -412,8 +419,49 @@ void ASoldierCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	PlayerInputComponent->BindAction("EatFood", IE_Pressed, this, &ASoldierCharacter::EatFood);
 	PlayerInputComponent->BindAction("DrinkWater", IE_Pressed, this, &ASoldierCharacter::DrinkWater);
 
+	PlayerInputComponent->BindAction("TakeOutWeapon", IE_Pressed, this, &ASoldierCharacter::PutWeaponOnBack);
 
 
+
+}
+void ASoldierCharacter::PutWeaponOnBack()
+{
+	if (Role < ROLE_Authority)
+	{
+		ServerPutWeaponOnBack();
+	}
+	if (HoldingWeaponState == EHoldingWeapon::A4 && bWeaponOnBack == false)
+	{
+		/// TO DO NIE WOLNO STRZELAC JAK NA PLECACH BRON
+
+		///Put weapon on back for 3rd person and hide weapon for 1st person///
+		if (this->AutomaticRifle)
+		{
+			this->AutomaticRifle->SetActorHiddenInGame(true);
+		}
+		if (Rifle_3rd)
+		{
+			Rifle_3rd->AttachToComponent(this->GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponBackSocket);
+		}
+
+		isWeaponAttached = false;
+		bWeaponOnBack = true;
+	}
+	else if (HoldingWeaponState == EHoldingWeapon::A4 && bWeaponOnBack == true)
+	{
+		///Put weapon on back//
+		if (this->AutomaticRifle)
+		{
+			this->AutomaticRifle->SetActorHiddenInGame(false);
+		}
+		if (Rifle_3rd)
+		{
+			Rifle_3rd->AttachToComponent(this->GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocket);
+		}
+
+		isWeaponAttached = true;
+		bWeaponOnBack = false;
+	}
 }
 void ASoldierCharacter::EatFood()
 {
@@ -713,22 +761,35 @@ void ASoldierCharacter::PickUp()
 			ServerPickUpItem();
 			//return;
 		}
-		/*if (bRiflePickUp == true && HoldingWeaponState==EHoldingWeapon::None)
+		
+		if (bRiflePickUp == true && HoldingWeaponState==EHoldingWeapon::None)
 		{
-
+			UE_LOG(LogTemp, Warning, TEXT("Test"));
 			HoldingWeaponState = EHoldingWeapon::A4;
 
 			FActorSpawnParameters SpawnParams;
 			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-
-			AutomaticRifle = GetWorld()->SpawnActor<AAutomaticRifle>(StarterWeaponClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
-			if (AutomaticRifle)
+			if (Role == ROLE_Authority)
 			{
-				AutomaticRifle->SetOwner(this);
-				AutomaticRifle->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocket);
+				AutomaticRifle = GetWorld()->SpawnActor<AAutomaticRifle>(StarterWeaponClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
+				if (AutomaticRifle)
+				{
+					AutomaticRifle->SetOwner(this);
+					AutomaticRifle->AttachToComponent(FPPMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocket);
+					AutomaticRifle->SkelMeshComp->bOnlyOwnerSee = true;
+					AutomaticRifle->SkelMeshComp->SetAnimInstanceClass(AnimBp);
+					isWeaponAttached = true;
+				}
+				
 			}
-			UGameplayStatics::PlaySoundAtLocation(this, RiflePickUp, GetActorLocation());
-		}*/
+			Rifle_3rd = GetWorld()->SpawnActor<ARifle_3rd>(ThirdWeaponClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
+			if (Rifle_3rd)
+			{
+				Rifle_3rd->SetOwner(this);
+				Rifle_3rd->AttachToComponent(this->GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocket);
+			}
+
+		}
 
 		if (bHoloPickUp == true && HoldingWeaponState == EHoldingWeapon::A4 && HoloEquipState == EHoloAttachment::None)
 		{
@@ -815,7 +876,7 @@ void ASoldierCharacter::PickUp()
 			FActorSpawnParameters SpawnParams;
 			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-			if (IsLocallyControlled())
+			if (Role<ROLE_Authority)
 			{
 				Laser = GetWorld()->SpawnActor<ALaser>(LaserClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
 				if (Laser)
@@ -1064,7 +1125,7 @@ void ASoldierCharacter::ZoomOut()
 
 void ASoldierCharacter::StartFire()
 {
-	if (!IsSprinting)
+	if (!IsSprinting && bWeaponOnBack == false)
 	{
 		CharacterState = ECharacterState::Firing;
 
@@ -1501,6 +1562,14 @@ void ASoldierCharacter::OnDrinkLow()
 	}
 
 }
+void ASoldierCharacter::ServerPutWeaponOnBack_Implementation()
+{
+	PutWeaponOnBack();
+}
+bool ASoldierCharacter::ServerPutWeaponOnBack_Validate()
+{
+	return true;
+}
 void ASoldierCharacter::ServerOnFoodLow_Implementation()
 {
 	OnFoodLow();
@@ -1688,7 +1757,7 @@ void ASoldierCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	DOREPLIFETIME(ASoldierCharacter, CameraComp);
 	DOREPLIFETIME(ASoldierCharacter, STL);
 	DOREPLIFETIME(ASoldierCharacter, STR);
-
+	DOREPLIFETIME(ASoldierCharacter, isWeaponAttached);
 
 
 	

@@ -146,8 +146,8 @@ protected:
 	virtual void BeginPlay() override;
 
 
-	//void NotifyActorBeginOverlap(AActor* OtherActor);
-	//void NotifyActorEndOverlap(AActor* OtherActor);
+	void NotifyActorBeginOverlap(AActor* OtherActor);
+	void NotifyActorEndOverlap(AActor* OtherActor);
 
 	UPROPERTY(EditDefaultsOnly, Category = "Player")
 	TSubclassOf<AAutomaticRifle> StarterWeaponClass;
