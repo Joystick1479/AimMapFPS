@@ -67,6 +67,7 @@ ASoldierCharacter::ASoldierCharacter()
 	HelmetSocket = "HelmetSocket";
 	HeadsetSocket = "HeadsetSocket";
 	WeaponBackSocket = "WeaponBackSocket";
+	LookUp = "LookUp";
 
 	RootComponent = this->GetRootComponent();
 
@@ -139,6 +140,10 @@ ASoldierCharacter::ASoldierCharacter()
 	amountOfBoostDrink = 30;
 	amountOfBoostFood = 40;
 	stamina = 100;
+
+
+	SmoothAmount = 8.0f;
+	LookAmount = 5.0f;
 }
 
 // Called when the game starts or when spawned
@@ -354,6 +359,34 @@ void ASoldierCharacter::Tick(float DeltaTime)
 		}
 	}
 
+	//Weapon Sway
+	//float temp1;
+//	float temp2;
+	APlayerController* PC = Cast<APlayerController>(GetController());
+	if (PC)
+	{
+		//temp1 = PC->InputPitchScale;
+		//temp1 = PC->GetInputAxisValue("LookUp");
+		//temp1 = PC->PlayerInput->GetKeyValue("MouseY");
+		//temp1 = PC->InputComponent->GetAxisValue(LookUp);
+		//UE_LOG(LogTemp, Warning, TEXT("Pitch is %f"), temp1);
+		//temp2 = PC->InputYawScale;
+	//	temp2 = PC->GetInputAxisKeyValue("MouseY");
+		
+		//UE_LOG(LogTemp, Warning, TEXT("Yaw is %f"), temp2);
+	}
+	FRotator AlmostFinal = FRotator(temp2*LookAmount, temp1*LookAmount, temp1*LookAmount);
+	FinalWeaponRot = AlmostFinal;
+
+	FRotator TempRotator = FRotator(InitialWeaponRot.Pitch - FinalWeaponRot.Pitch, FinalWeaponRot.Yaw + InitialWeaponRot.Yaw, InitialWeaponRot.Roll + FinalWeaponRot.Roll);
+	if (AutomaticRifle)
+	{
+		float timeWorld = UGameplayStatics::GetWorldDeltaSeconds(GetWorld());
+		FRotator mamyto = UKismetMathLibrary::RLerp(AutomaticRifle->SkelMeshComp->GetRelativeTransform().GetRotation().Rotator(), TempRotator, timeWorld, false);
+		AutomaticRifle->SetActorRelativeRotation(mamyto);
+	}
+	
+
 }
 void ASoldierCharacter::OnDeath()
 {
@@ -387,6 +420,7 @@ void ASoldierCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	//Mouse look
 	PlayerInputComponent->BindAxis("LookUp", this, &ASoldierCharacter::AddControllerPitchInput);
 	PlayerInputComponent->BindAxis("Turn", this, &ASoldierCharacter::AddControllerYawInput);
+	
 
 	//Crouching
 	PlayerInputComponent->BindAction("Crouch", IE_Pressed, this, &ASoldierCharacter::BeginCrouch);
@@ -779,6 +813,8 @@ void ASoldierCharacter::PickUp()
 					AutomaticRifle->SkelMeshComp->bOnlyOwnerSee = true;
 					AutomaticRifle->SkelMeshComp->SetAnimInstanceClass(AnimBp);
 					isWeaponAttached = true;
+					//Weapon Sway//
+					InitialWeaponRot = AutomaticRifle->SkelMeshComp->GetRelativeTransform().GetRotation().Rotator();
 				}
 				
 			}

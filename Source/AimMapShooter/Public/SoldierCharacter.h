@@ -578,6 +578,19 @@ public:
 	UPROPERTY(BlueprintReadOnly, Replicated, Category = "Player")
 	bool isWeaponAttached;
 
+	FRotator InitialWeaponRot;
+	UPROPERTY(BlueprintReadOnly)
+	FRotator FinalWeaponRot;
+	UPROPERTY(EditDefaultsOnly)
+	float SmoothAmount;
+	UPROPERTY(EditDefaultsOnly)
+	float LookAmount;
+	FName LookUp;
+	UPROPERTY(BlueprintReadWrite)
+	float temp1;
+	UPROPERTY(BlueprintReadWrite)
+	float temp2;
+
 	UPROPERTY(BlueprintReadOnly, Category = "Player")
 	bool isLaserAttached;
 
