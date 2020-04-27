@@ -360,30 +360,18 @@ void ASoldierCharacter::Tick(float DeltaTime)
 	}
 
 	//Weapon Sway
-	//float temp1;
-//	float temp2;
-	APlayerController* PC = Cast<APlayerController>(GetController());
-	if (PC)
-	{
-		//temp1 = PC->InputPitchScale;
-		//temp1 = PC->GetInputAxisValue("LookUp");
-		//temp1 = PC->PlayerInput->GetKeyValue("MouseY");
-		//temp1 = PC->InputComponent->GetAxisValue(LookUp);
-		//UE_LOG(LogTemp, Warning, TEXT("Pitch is %f"), temp1);
-		//temp2 = PC->InputYawScale;
-	//	temp2 = PC->GetInputAxisKeyValue("MouseY");
-		
-		//UE_LOG(LogTemp, Warning, TEXT("Yaw is %f"), temp2);
-	}
 	FRotator AlmostFinal = FRotator(temp2*LookAmount, temp1*LookAmount, temp1*LookAmount);
-	FinalWeaponRot = AlmostFinal;
+	//FinalWeaponRot = AlmostFinal;
 
-	FRotator TempRotator = FRotator(InitialWeaponRot.Pitch - FinalWeaponRot.Pitch, FinalWeaponRot.Yaw + InitialWeaponRot.Yaw, InitialWeaponRot.Roll + FinalWeaponRot.Roll);
+	//FRotator TempRotator = FRotator(InitialWeaponRot.Pitch - FinalWeaponRot.Pitch, FinalWeaponRot.Yaw + InitialWeaponRot.Yaw, InitialWeaponRot.Roll + FinalWeaponRot.Roll);
+	FRotator TempRotator = FRotator(InitialWeaponRot.Pitch - AlmostFinal.Pitch, AlmostFinal.Yaw + InitialWeaponRot.Yaw, InitialWeaponRot.Roll + AlmostFinal.Roll);
 	if (AutomaticRifle)
 	{
-		float timeWorld = UGameplayStatics::GetWorldDeltaSeconds(GetWorld());
-		FRotator mamyto = UKismetMathLibrary::RLerp(AutomaticRifle->SkelMeshComp->GetRelativeTransform().GetRotation().Rotator(), TempRotator, timeWorld, false);
-		AutomaticRifle->SetActorRelativeRotation(mamyto);
+		//float timeWorld = UGameplayStatics::GetWorldDeltaSeconds(GetWorld());
+		//FRotator mamyto = UKismetMathLibrary::RLerp(AutomaticRifle->SkelMeshComp->GetRelativeTransform().GetRotation().Rotator(), TempRotator, timeWorld, false);
+		//FinalWeaponRot = UKismetMathLibrary::RLerp(AutomaticRifle->SkelMeshComp->GetRelativeTransform().GetRotation().Rotator(), TempRotator, timeWorld *SmoothAmount, false);
+		FinalWeaponRot = UKismetMathLibrary::RInterpTo(AutomaticRifle->SkelMeshComp->GetRelativeTransform().GetRotation().Rotator(), TempRotator, DeltaTime, SmoothAmount);
+	//	AutomaticRifle->SetActorRelativeRotation(mamyto);
 	}
 	
 
