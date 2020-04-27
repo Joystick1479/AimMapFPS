@@ -404,6 +404,7 @@ protected:
 
 	void GameOverSound();
 
+
 	void NotifyActorBeginOverlap(AActor * OtherActor);
 	
 	class UStaticMeshComponent* MeshComp;

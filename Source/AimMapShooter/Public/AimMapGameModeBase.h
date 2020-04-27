@@ -75,6 +75,8 @@ private:
 	UPROPERTY()
 	UUserWidget* wGameOverWidget;
 
+	virtual void RestartPlayer(AController* PC) override;
+
 
 	virtual void Tick(float DeltaTime) override;
 

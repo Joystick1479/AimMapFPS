@@ -54,6 +54,7 @@
 #include "Drink.h"
 #include "Food.h"
 #include "Survival/Water.h"
+#include "AimMapGameModeBase.h"
 
 // Sets default values
 ASoldierCharacter::ASoldierCharacter()
@@ -387,13 +388,9 @@ void ASoldierCharacter::OnDeath()
 		{
 			this->EnableInput(PC);
 			UE_LOG(LogTemp, Warning, TEXT("Input enabled"));
-
 		}
 	}
-
 	this->Destroy();
-
-	
 }
 
 // Called to bind functionality to input
@@ -1002,7 +999,6 @@ void ASoldierCharacter::ClearingHudAfterDeath()
 		if (PC)
 		{
 			this->DisableInput(PC);
-			UE_LOG(LogTemp, Warning, TEXT("Input disabled"));
 		}
 		FTimerHandle DeathTimer;
 		GetWorldTimerManager().SetTimer(DeathTimer, this, &ASoldierCharacter::OnDeath, 2.5f, false);
@@ -1443,8 +1439,6 @@ void ASoldierCharacter::SpawnGrenade(FVector STL, FRotator STR)
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	FlashGrenade = GetWorld()->SpawnActor<AFlashGrenade>(FlashGrenadeClass, STL, STR, SpawnParams);
-	
-
 
 }
 void ASoldierCharacter::Flashbang(float Distance, FVector FacingAngle)
@@ -1516,7 +1510,6 @@ void ASoldierCharacter::OnHealthChanged(UHealthComponent * OwningHealthComp, flo
 	}
 
 	AudioDamageComp->Play(0.0f);
-	
 }
 
 void ASoldierCharacter::OnFoodLow()

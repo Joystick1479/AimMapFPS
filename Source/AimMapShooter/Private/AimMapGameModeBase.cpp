@@ -120,17 +120,30 @@ void AAimMapGameModeBase::CheckIfGameOver()
 }
 void AAimMapGameModeBase::RespawningPlayer()
 {
-	for (TActorIterator<ASoldierCharacter> Itr(GetWorld()); Itr; ++Itr)
+	TArray<AActor*> Target;
+	UGameplayStatics::GetAllActorsOfClass(this, SoldierCharClass, Target);
+	for (int i = 0; i < Target.Num(); i++)
 	{
-		ASoldierCharacter* Soldier = *Itr;
-		if (Soldier->bDied == true)
+		ASoldierCharacter* SoldChar = Cast<ASoldierCharacter>(Target[i]);
+		if (SoldChar)
 		{
-			APlayerController* PC = Cast<APlayerController>(Soldier->GetController());
+			if (SoldChar->bDied == true)
 			{
-				RestartPlayer(PC);
+				AController* PC = Cast<AController>(SoldChar->GetController());
+				{
+					FTimerHandle DeathTimer2;
+					FTimerDelegate DelegateFunc = FTimerDelegate::CreateUObject(this, &AAimMapGameModeBase::RestartPlayer, PC);
+					GetWorldTimerManager().SetTimer(DeathTimer2, DelegateFunc, 5.0f, false);
+				}
 			}
 		}
 	}
+}
+
+void AAimMapGameModeBase::RestartPlayer(AController* PC)
+{
+	Super::RestartPlayer(PC);
+
 }
 
 void AAimMapGameModeBase::Tick(float DeltaTime)
@@ -138,7 +151,7 @@ void AAimMapGameModeBase::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	CheckIfGameOver();
-	//RespawningPlayer();
+	RespawningPlayer();
 	
 }
 
