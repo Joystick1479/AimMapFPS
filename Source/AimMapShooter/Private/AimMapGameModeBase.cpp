@@ -127,17 +127,39 @@ void AAimMapGameModeBase::RespawningPlayer()
 		ASoldierCharacter* SoldChar = Cast<ASoldierCharacter>(Target[i]);
 		if (SoldChar)
 		{
-			if (SoldChar->bDied == true)
+			if (SoldChar->bDied == true && SoldChar->bWantsToRepawn == true)
 			{
 				AController* PC = Cast<AController>(SoldChar->GetController());
+				if(PC)
 				{
-					FTimerHandle DeathTimer2;
-					FTimerDelegate DelegateFunc = FTimerDelegate::CreateUObject(this, &AAimMapGameModeBase::RestartPlayer, PC);
-					GetWorldTimerManager().SetTimer(DeathTimer2, DelegateFunc, 5.0f, false);
+					//FTimerHandle DeathTimer2;
+					/*FTimerDelegate DelegateFunc = FTimerDelegate::CreateUObject(this, &AAimMapGameModeBase::RestartPlayer, PC);
+					GetWorldTimerManager().SetTimer(DeathTimer2, DelegateFunc, 5.0f, false);*/
+					SpawnAndPossPawn(PC);
 				}
 			}
 		}
 	}
+}
+
+void AAimMapGameModeBase::SpawnAndPossPawn(AController* PC)
+{
+		///Find player start and respawn player
+		///TODO random spawns
+	if (PC)
+	{
+		AActor* StartSpot = FindPlayerStart(PC);
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+		UE_LOG(LogTemp, Warning, TEXT("SPAWNING"));
+		if (StartSpot)
+		{
+			Soldiero = GetWorld()->SpawnActor<ASoldierCharacter>(SoldierCharClass, StartSpot->GetActorLocation(), StartSpot->GetActorRotation(), SpawnParams);
+			PC->Possess(Soldiero);
+		}
+	}
+
 }
 
 void AAimMapGameModeBase::RestartPlayer(AController* PC)
@@ -151,7 +173,6 @@ void AAimMapGameModeBase::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	CheckIfGameOver();
-	RespawningPlayer();
 	
 }
 

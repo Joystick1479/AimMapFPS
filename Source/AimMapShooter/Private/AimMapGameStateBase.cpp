@@ -45,8 +45,9 @@ void AAimMapGameStateBase::BeginPlay()
 
 	UWorld* World = this->GetWorld();
 	if (!ensure(World != nullptr)) return;
-	WidgetRef = CreateWidget<UTimerWidget>(World, TimerWidgetClass);
-	WidgetRef->AddToViewport();
+	//Timer UI turned off for now
+	//WidgetRef = CreateWidget<UTimerWidget>(World, TimerWidgetClass);
+	//WidgetRef->AddToViewport();
 
 	PayloadStatusHud();
 }

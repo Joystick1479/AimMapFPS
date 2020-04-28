@@ -39,6 +39,10 @@ public:
 
 	bool ShouldTimerOn;
 
+
+	UFUNCTION(BlueprintCallable)
+	void RespawningPlayer();
+
 private:
 
 	uint32 NumberOfPlayers = 0;
@@ -49,9 +53,6 @@ private:
 	FTimerHandle GameStartTimer;
 	FTimerHandle GameOverTimer;
 	FTimerHandle RespawnDeadPlayer;
-
-	UFUNCTION(BlueprintCallable)
-	void RespawningPlayer();
 
 
 	bool BlueIsWinner;
@@ -74,6 +75,8 @@ private:
 
 	UPROPERTY()
 	UUserWidget* wGameOverWidget;
+
+	void SpawnAndPossPawn(AController* PC);
 
 	virtual void RestartPlayer(AController* PC) override;
 

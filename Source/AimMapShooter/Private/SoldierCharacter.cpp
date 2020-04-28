@@ -333,8 +333,6 @@ void ASoldierCharacter::Tick(float DeltaTime)
 	///***SHOWING/HIDING PICKUP HUD UI////
 	ShowingPickUpHud();
 
-	ClearingHudAfterDeath();
-
 	DyingAudioTrigger();
 
 	//DefendObjectiveSound();
@@ -375,73 +373,82 @@ void ASoldierCharacter::Tick(float DeltaTime)
 	//	AutomaticRifle->SetActorRelativeRotation(mamyto);
 	}
 	
-
 }
-void ASoldierCharacter::OnDeath()
-{
-	UE_LOG(LogTemp, Warning, TEXT("DEAD"));
 
-	if (IsLocallyControlled())
-	{
-		APlayerController* PC = Cast<APlayerController>(this->GetController());
-		if (PC)
-		{
-			this->EnableInput(PC);
-			UE_LOG(LogTemp, Warning, TEXT("Input enabled"));
-		}
-	}
-	this->Destroy();
-}
 
 // Called to bind functionality to input
 void ASoldierCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
+		Super::SetupPlayerInputComponent(PlayerInputComponent);
+	
+		//Keyboard movement
+		PlayerInputComponent->BindAxis("MoveForward", this, &ASoldierCharacter::MoveForward);
+		PlayerInputComponent->BindAxis("MoveRight", this, &ASoldierCharacter::MoveRight);
 
-	//Keyboard movement
-	PlayerInputComponent->BindAxis("MoveForward", this, &ASoldierCharacter::MoveForward);
-	PlayerInputComponent->BindAxis("MoveRight", this, &ASoldierCharacter::MoveRight);
+		//Mouse look
+		PlayerInputComponent->BindAxis("LookUp", this, &ASoldierCharacter::AddPichInput);
+		PlayerInputComponent->BindAxis("Turn", this, &ASoldierCharacter::AddYawInput);
 
-	//Mouse look
-	PlayerInputComponent->BindAxis("LookUp", this, &ASoldierCharacter::AddControllerPitchInput);
-	PlayerInputComponent->BindAxis("Turn", this, &ASoldierCharacter::AddControllerYawInput);
+
+		//Crouching
+		PlayerInputComponent->BindAction("Crouch", IE_Pressed, this, &ASoldierCharacter::BeginCrouch);
+		PlayerInputComponent->BindAction("Crouch", IE_Released, this, &ASoldierCharacter::EndCrouch);
+
+		PlayerInputComponent->BindAction("ZoomIn", IE_Pressed, this, &ASoldierCharacter::ZoomIn);
+		PlayerInputComponent->BindAction("ZoomIn", IE_Released, this, &ASoldierCharacter::ZoomOut);
+
+		PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &ASoldierCharacter::StartFire);
+		PlayerInputComponent->BindAction("Fire", IE_Released, this, &ASoldierCharacter::StopFire);
+
+		PlayerInputComponent->BindAction("Reload", IE_Pressed, this, &ASoldierCharacter::Reload);
+
+		PlayerInputComponent->BindAction("FireMode", IE_Pressed, this, &ASoldierCharacter::FireMode);
+
+		PlayerInputComponent->BindAction("PickUp", IE_Pressed, this, &ASoldierCharacter::PickUp);
+
+		PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &ASoldierCharacter::SprintOn);
+		PlayerInputComponent->BindAction("Sprint", IE_Released, this, &ASoldierCharacter::SprintOff);
+
+		PlayerInputComponent->BindAction("ToogleLaser", IE_Pressed, this, &ASoldierCharacter::TurnOnLaser);
+
+		PlayerInputComponent->BindAction("Vault", IE_Pressed, this, &ASoldierCharacter::Vault);
+
+		PlayerInputComponent->BindAction("Inspect", IE_Pressed, this, &ASoldierCharacter::WeaponInspectionOn);
+
+		PlayerInputComponent->BindAction("Grenade", IE_Pressed, this, &ASoldierCharacter::ThrowGrenade);
+
+
+		PlayerInputComponent->BindAction("EatFood", IE_Pressed, this, &ASoldierCharacter::EatFood);
+		PlayerInputComponent->BindAction("DrinkWater", IE_Pressed, this, &ASoldierCharacter::DrinkWater);
+
+		PlayerInputComponent->BindAction("TakeOutWeapon", IE_Pressed, this, &ASoldierCharacter::PutWeaponOnBack);
+
+		PlayerInputComponent->BindAction("Respawn", IE_Pressed, this, &ASoldierCharacter::ServerWantToRespawn);
 	
 
-	//Crouching
-	PlayerInputComponent->BindAction("Crouch", IE_Pressed, this, &ASoldierCharacter::BeginCrouch);
-	PlayerInputComponent->BindAction("Crouch", IE_Released, this, &ASoldierCharacter::EndCrouch);
 
-	PlayerInputComponent->BindAction("ZoomIn", IE_Pressed, this, &ASoldierCharacter::ZoomIn);
-	PlayerInputComponent->BindAction("ZoomIn", IE_Released, this, &ASoldierCharacter::ZoomOut);
+}
+void ASoldierCharacter::ServerWantToRespawn_Implementation()
+{
+	///ASK SERVER TO RESPAWN
+	
+	UE_LOG(LogTemp, Warning, TEXT("Trying to respawn1"));
+	if (bDied == true)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Trying to respawn2"));
 
-	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &ASoldierCharacter::StartFire);
-	PlayerInputComponent->BindAction("Fire", IE_Released, this, &ASoldierCharacter::StopFire);
-
-	PlayerInputComponent->BindAction("Reload", IE_Pressed, this, &ASoldierCharacter::Reload);
-
-	PlayerInputComponent->BindAction("FireMode", IE_Pressed, this, &ASoldierCharacter::FireMode);
-
-	PlayerInputComponent->BindAction("PickUp", IE_Pressed, this, &ASoldierCharacter::PickUp);
-
-	PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &ASoldierCharacter::SprintOn);
-	PlayerInputComponent->BindAction("Sprint", IE_Released, this, &ASoldierCharacter::SprintOff);
-
-	PlayerInputComponent->BindAction("ToogleLaser", IE_Pressed, this, &ASoldierCharacter::TurnOnLaser);
-
-	PlayerInputComponent->BindAction("Vault", IE_Pressed, this, &ASoldierCharacter::Vault);
-
-	PlayerInputComponent->BindAction("Inspect", IE_Pressed, this, &ASoldierCharacter::WeaponInspectionOn);
-
-	PlayerInputComponent->BindAction("Grenade", IE_Pressed, this, &ASoldierCharacter::ThrowGrenade);
-
-
-	PlayerInputComponent->BindAction("EatFood", IE_Pressed, this, &ASoldierCharacter::EatFood);
-	PlayerInputComponent->BindAction("DrinkWater", IE_Pressed, this, &ASoldierCharacter::DrinkWater);
-
-	PlayerInputComponent->BindAction("TakeOutWeapon", IE_Pressed, this, &ASoldierCharacter::PutWeaponOnBack);
-
-
-
+		bWantsToRepawn = true;
+		if (bWantsToRepawn == true)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Trying to respawn3"));
+			AAimMapGameModeBase* GM = Cast<AAimMapGameModeBase>(GetWorld()->GetAuthGameMode());
+			if (GM)
+			{
+				GM->RespawningPlayer();
+				this->Destroy();
+			}
+		}
+	}
 }
 void ASoldierCharacter::PutWeaponOnBack()
 {
@@ -989,22 +996,6 @@ void ASoldierCharacter::DyingAudioTrigger()
 	}
 }
 
-void ASoldierCharacter::ClearingHudAfterDeath()
-{
-	///***IF DEAD, DESTROY ACTOR AFTER 2 seconds ***///
-	if (bDied == true)
-	{
-		///zmienilem tutaj get world get firs player controller na this get controller
-		APlayerController* PC = Cast<APlayerController>(this->GetController());
-		if (PC)
-		{
-			this->DisableInput(PC);
-		}
-		FTimerHandle DeathTimer;
-		GetWorldTimerManager().SetTimer(DeathTimer, this, &ASoldierCharacter::OnDeath, 2.5f, false);
-	}
-}
-	
 void ASoldierCharacter::ShowingPickUpHud()
 {
 	//if (Role < ROLE_Authority)
@@ -1046,15 +1037,36 @@ void ASoldierCharacter::ShowingPickUpHud()
 
 void ASoldierCharacter::MoveForward(float Value)
 {
-	AddMovementInput(GetActorForwardVector()*Value);
+	if (bDied != true)
+	{
+		AddMovementInput(GetActorForwardVector()*Value);
+	}
 }
 void ASoldierCharacter::MoveRight(float Value)
 {
-	if (!IsSprinting)
+	if (bDied != true)
 	{
-		AddMovementInput(GetActorRightVector() * Value);
+		if (!IsSprinting)
+		{
+			AddMovementInput(GetActorRightVector() * Value);
+		}
 	}
 }
+void ASoldierCharacter::AddPichInput(float Value)
+{
+	if (bDied != true)
+	{
+		AddControllerPitchInput(Value);
+	}
+}
+void ASoldierCharacter::AddYawInput(float Value)
+{
+	if (bDied != true)
+	{
+		AddControllerYawInput(Value);
+	}
+}
+
 void ASoldierCharacter::BeginCrouch()
 {
 	if (Role < ROLE_Authority)
@@ -1145,7 +1157,7 @@ void ASoldierCharacter::ZoomOut()
 
 void ASoldierCharacter::StartFire()
 {
-	if (!IsSprinting && bWeaponOnBack == false)
+	if (!IsSprinting && bWeaponOnBack == false && bDied != true)
 	{
 		CharacterState = ECharacterState::Firing;
 
@@ -1272,7 +1284,7 @@ void ASoldierCharacter::Reload()
 	{
 		ServerReload();
 	}
-	if (CharacterState == ECharacterState::Idle && (SoldierCurrentClips > 0) && !IsZooming)
+	if (CharacterState == ECharacterState::Idle && (SoldierCurrentClips > 0) && !IsZooming && bDied != true)
 	{
 		if (AutomaticRifle)
 		{
@@ -1419,7 +1431,7 @@ void ASoldierCharacter::FindingGrenadeTransform()
 }
 void ASoldierCharacter::ThrowGrenade()
 {
-	if (AmountGrenades > 0)
+	if (AmountGrenades > 0 && bDied != true)
 	{
 		AmountGrenades--;
 		if (IsLocallyControlled())
@@ -1775,6 +1787,7 @@ void ASoldierCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	DOREPLIFETIME(ASoldierCharacter, STL);
 	DOREPLIFETIME(ASoldierCharacter, STR);
 	DOREPLIFETIME(ASoldierCharacter, isWeaponAttached);
+	DOREPLIFETIME(ASoldierCharacter, bWantsToRepawn);
 
 
 	

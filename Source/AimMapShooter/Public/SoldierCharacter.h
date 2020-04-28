@@ -212,8 +212,6 @@ protected:
 	///**STOP PLAY LOW HEALTH/DIE AUDIO **//
 	void DyingAudioTrigger();
 
-	void ClearingHudAfterDeath();
-
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerLineTraceItem();
 
@@ -281,6 +279,9 @@ protected:
 	//Character Movement//
 	void MoveForward(float Value);
 	void MoveRight(float Value);
+	void AddPichInput(float Value);
+	void AddYawInput(float Value);
+
 	void BeginCrouch();
 	void EndCrouch();
 
@@ -305,8 +306,6 @@ protected:
 	void ZoomOut();
 
 	void PickUp();
-
-	void OnDeath();
 
 	void WeaponInspectionOn();
 	void WeaponInspectionOff();
@@ -409,10 +408,13 @@ protected:
 	
 	class UStaticMeshComponent* MeshComp;
 
+	UFUNCTION(BlueprintCallable,Server,Reliable)
+	void ServerWantToRespawn();
+
 
 public:	
 
-
+	
 	///GRENADE///
 	void ThrowGrenade();
 	void SpawnGrenade(FVector STL, FRotator STR);
@@ -579,6 +581,7 @@ public:
 	UPROPERTY(BlueprintReadOnly, Replicated, Category = "Player")
 	bool isWeaponAttached;
 
+	//Weapon Sway
 	FRotator InitialWeaponRot;
 	UPROPERTY(BlueprintReadOnly)
 	FRotator FinalWeaponRot;
@@ -672,6 +675,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Survival items")
 	USoundCue* DrinkFromPondSound;
+
+	UPROPERTY(Replicated)
+	bool bWantsToRepawn;
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
