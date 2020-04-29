@@ -341,6 +341,8 @@ void ASoldierCharacter::Tick(float DeltaTime)
 
 	FindingGrenadeTransform();
 
+	Headbobbing();
+
 	///TIMELINE///
 	if (MyTimeline != NULL)
 	{
@@ -372,6 +374,7 @@ void ASoldierCharacter::Tick(float DeltaTime)
 		FinalWeaponRot = UKismetMathLibrary::RInterpTo(AutomaticRifle->SkelMeshComp->GetRelativeTransform().GetRotation().Rotator(), TempRotator, DeltaTime, SmoothAmount);
 	//	AutomaticRifle->SetActorRelativeRotation(mamyto);
 	}
+
 	
 }
 
@@ -824,6 +827,20 @@ void ASoldierCharacter::PickUp()
 			HoldingAttachmentState = EHoldingAttachment::Holo;
 			HoloEquipState = EHoloAttachment::Equipped;
 
+			TArray<AActor*> HoloScopes;
+			UGameplayStatics::GetAllActorsOfClass(this, HoloClass, HoloScopes);
+			for (int i = 0; i < HoloScopes.Num(); i++)
+			{
+				AHoloScope* HoloItr = Cast<AHoloScope>(HoloScopes[i]);
+				if (HoloItr)
+				{
+					if (this->IsOverlappingActor(HoloItr))
+					{
+						HoloItr->IsPickedUp = true;
+					}
+				}
+			}
+
 			FActorSpawnParameters SpawnParams;
 			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 			if (IsLocallyControlled())
@@ -846,6 +863,20 @@ void ASoldierCharacter::PickUp()
 			HoldingAttachmentState = EHoldingAttachment::Grip;
 			GripEquipState = EGripAttachment::Equipped;
 
+			TArray<AActor*> Grips;
+			UGameplayStatics::GetAllActorsOfClass(this, GripClass, Grips);
+			for (int i = 0; i < Grips.Num(); i++)
+			{
+				AGrip* GripItr = Cast<AGrip>(Grips[i]);
+				if (GripItr)
+				{
+					if (this->IsOverlappingActor(GripItr))
+					{
+						GripItr->IsPickedUp = true;
+					}
+				}
+			}
+
 			FActorSpawnParameters SpawnParams;
 			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 			if (IsLocallyControlled())
@@ -867,6 +898,20 @@ void ASoldierCharacter::PickUp()
 		{
 			HelmetEquipState = EHelmetAttachment::Equipped;
 
+			TArray<AActor*> Helemts;
+			UGameplayStatics::GetAllActorsOfClass(this, HelmetClass, Helemts);
+			for (int i = 0; i < Helemts.Num(); i++)
+			{
+				AHelmet* HelmetItr = Cast<AHelmet>(Helemts[i]);
+				if (HelmetItr)
+				{
+					if (this->IsOverlappingActor(HelmetItr))
+					{
+						HelmetItr->IsPickedUp = true;
+					}
+				}
+			}
+
 			FActorSpawnParameters SpawnParams;
 			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
@@ -884,6 +929,20 @@ void ASoldierCharacter::PickUp()
 		{
 			HeadsetEquipState = EHeadsetAttachment::Equipped;
 
+			TArray<AActor*> Headsets;
+			UGameplayStatics::GetAllActorsOfClass(this, HeadsetClass, Headsets);
+			for (int i = 0; i < Headsets.Num(); i++)
+			{
+				AHeadset* HeadsetItr = Cast<AHeadset>(Headsets[i]);
+				if (HeadsetItr)
+				{
+					if (this->IsOverlappingActor(HeadsetItr))
+					{
+						HeadsetItr->IsPickedUp = true;
+					}
+				}
+			}
+
 			FActorSpawnParameters SpawnParams;
 			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
@@ -893,8 +952,11 @@ void ASoldierCharacter::PickUp()
 				Headset->SetOwner(this);
 				Headset->MeshComp->SetRenderCustomDepth(false);
 				Headset->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, HeadsetSocket);
+				Headset->MeshComp->ToggleActive();
 				isHeadsetAttached = true;
 			}
+			///Destroy after picking up
+
 			UGameplayStatics::PlaySoundAtLocation(this, ItemsPickUp, GetActorLocation());
 		}
 		if (bLaserPickUp == true && LaserEquipState == ELaserAttachment::None)
@@ -903,6 +965,20 @@ void ASoldierCharacter::PickUp()
 
 			FActorSpawnParameters SpawnParams;
 			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+			TArray<AActor*> Lasers;
+			UGameplayStatics::GetAllActorsOfClass(this, LaserClass, Lasers);
+			for (int i = 0; i < Lasers.Num(); i++)
+			{
+				ALaser* LaserItr = Cast<ALaser>(Lasers[i]);
+				if (LaserItr)
+				{
+					if (this->IsOverlappingActor(LaserItr))
+					{
+						LaserItr->IsPickedUp = true;
+					}
+				}
+			}
 
 			if (Role<ROLE_Authority)
 			{
@@ -1097,7 +1173,7 @@ void ASoldierCharacter::EndCrouch()
 void ASoldierCharacter::ZoomIn()
 {
 	UCharacterMovementComponent* MoveComp = this->FindComponentByClass<UCharacterMovementComponent>();
-	if (MoveComp && !IsSprinting &&!IsInspecting &&!IsReloading)
+	if (MoveComp && !IsSprinting &&!IsInspecting &&!IsReloading &&bWeaponOnBack!=true)
 	{
 		//MoveComp->MaxWalkSpeed = 78.0f;
 		MoveComp->MaxWalkSpeed = 250.0f;
@@ -1276,6 +1352,30 @@ void ASoldierCharacter::SprintProgressBar()
 		
 	}
 
+}
+
+void ASoldierCharacter::Headbobbing()
+{
+	if (IsSprinting == true)
+	{
+		APlayerController* PC = Cast<APlayerController>(GetController());
+		if (PC)
+		{
+			PC->ClientPlayCameraShake(CameraSprintShake, 0.5f);
+		}
+	}
+	if (GetVelocity().Size() > 0)
+	{
+		if (IsSprinting == false)
+		{
+			APlayerController* PC = Cast<APlayerController>(GetController());
+			if (PC)
+			{
+				UE_LOG(LogTemp, Warning, TEXT("Play walk camera shake"));
+				PC->ClientPlayCameraShake(CameraSprintShake, 0.25f);
+			}
+		}
+	}
 }
 
 void ASoldierCharacter::Reload()

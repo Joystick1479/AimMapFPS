@@ -9,7 +9,7 @@
 AHeadset::AHeadset()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = false;
+	PrimaryActorTick.bCanEverTick = true;
 
 	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComp"));
 	RootComponent = MeshComp;
@@ -35,7 +35,7 @@ void AHeadset::NotifyActorBeginOverlap(AActor * OtherActor)
 	if (SoldierCharacter)
 	{
 		SoldierCharacter->bHeadsetPickUp = true;
-		SphereComp->ToggleActive();
+		//SphereComp->ToggleActive();
 	}
 }
 
@@ -47,10 +47,6 @@ void AHeadset::NotifyActorEndOverlap(AActor * OtherActor)
 	if (SoldierCharacter)
 	{
 		SoldierCharacter->bHeadsetPickUp = false;
-		if (SoldierCharacter->isHeadsetAttached == true)
-		{
-			this->Destroy();
-		}
 	}
 }
 
@@ -59,5 +55,9 @@ void AHeadset::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (IsPickedUp == true)
+	{
+		this->Destroy();
+	}
 }
 

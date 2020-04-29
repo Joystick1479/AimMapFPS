@@ -271,6 +271,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Replicated, Category = "Player")
 	TSubclassOf<ALaser> LaserClass;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Player")
+	TSubclassOf<UCameraShake> CameraSprintShake;
+
 	UPROPERTY(EditDefaultsOnly, Replicated, Category = "Weapon")
 	float ZoomingTime;
 
@@ -291,6 +294,9 @@ protected:
 	void SprintOn();
 	void SprintOff();
 	void SprintProgressBar();
+
+	void Headbobbing();
+
 	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly, Category = "Player")
 	float stamina;
 	FTimerHandle SprintTimerHandle;

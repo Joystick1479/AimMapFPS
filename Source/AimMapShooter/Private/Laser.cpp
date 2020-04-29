@@ -69,11 +69,6 @@ void ALaser::NotifyActorEndOverlap(AActor * OtherActor)
 	if (SoldierCharacter)
 	{
 		SoldierCharacter->bLaserPickUp = false;
-		if (SoldierCharacter->isLaserAttached == true)
-		{
-			this->Destroy();
-		}
-
 	}
 }
 
@@ -81,8 +76,10 @@ void ALaser::NotifyActorEndOverlap(AActor * OtherActor)
 void ALaser::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
 	StartLaser();
 	
+	if (IsPickedUp == true) this->Destroy();
 }
 
 

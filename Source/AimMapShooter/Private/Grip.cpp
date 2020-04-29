@@ -9,7 +9,7 @@
 AGrip::AGrip()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = false;
+	PrimaryActorTick.bCanEverTick = true;
 
 	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComp"));
 	RootComponent = MeshComp;
@@ -50,11 +50,6 @@ void AGrip::NotifyActorEndOverlap(AActor * OtherActor)
 	{
 		SoldierCharacter->bGripPickUp = false;
 
-		if (SoldierCharacter->isGripAttached == true)
-		{
-			this->Destroy();
-		}
-
 	}
 }
 
@@ -63,5 +58,9 @@ void AGrip::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (IsPickedUp == true)
+	{
+		this->Destroy();
+	}
 }
 
