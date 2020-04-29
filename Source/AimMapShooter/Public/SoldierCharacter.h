@@ -19,6 +19,7 @@ class USpringArmComponent;
 class AHelmet;
 class AHeadset;
 class ALaser;
+class AMagazine;
 class ARifle_3rd;
 class UCapsuleComponent;
 class UUserWidget;
@@ -162,6 +163,9 @@ protected:
 	AHeadset* Headset;
 
 	UPROPERTY(Replicated)
+	AMagazine* Magazine;
+
+	UPROPERTY(Replicated)
 	ALaser* Laser;
 
 	UPROPERTY(Replicated)
@@ -270,6 +274,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Replicated, Category = "Player")
 	TSubclassOf<ALaser> LaserClass;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Player")
+	TSubclassOf<AMagazine> MagazineClass;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Player")
 	TSubclassOf<UCameraShake> CameraSprintShake;
@@ -533,6 +540,9 @@ public:
 	///Bool for reloading///
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated, Category = "Reloading")
 	bool IsReloading;
+
+	bool bMagazinePickUp;
+
 
 	//* Bool if we can pickup Rifle *//
 	UPROPERTY(BlueprintReadWrite, Replicated, Category = "Player")

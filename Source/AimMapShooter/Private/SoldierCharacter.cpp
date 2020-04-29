@@ -32,6 +32,7 @@
 #include "Helmet.h"
 #include "Headset.h"
 #include "Laser.h"
+#include "Magazine.h"
 #include "3rdPersonMeshes/Rifle_3rd.h"
 
 #include "GameFramework/SpringArmComponent.h"
@@ -747,7 +748,7 @@ void ASoldierCharacter::TurnOnLaser()
 
 void ASoldierCharacter::IsTargetFromBack()
 {
-	FVector ActorForwardVector = this->GetActorForwardVector();
+	/*FVector ActorForwardVector = this->GetActorForwardVector();
 
 	TArray<AActor*> Target;
 	UGameplayStatics::GetAllActorsOfClass(this, SoldierChar, Target);
@@ -771,7 +772,7 @@ void ASoldierCharacter::IsTargetFromBack()
 				MultipleDamage = false;
 			}
 		}
-	}
+	}*/
 }
 
 void ASoldierCharacter::ServerPickUpItem_Implementation()
@@ -819,6 +820,8 @@ void ASoldierCharacter::PickUp()
 				Rifle_3rd->SetOwner(this);
 				Rifle_3rd->AttachToComponent(this->GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocket);
 			}
+
+			UGameplayStatics::PlaySoundAtLocation(this, ItemsPickUp, GetActorLocation());
 
 		}
 
@@ -995,6 +998,38 @@ void ASoldierCharacter::PickUp()
 				UGameplayStatics::PlaySoundAtLocation(this, ItemsPickUp, GetActorLocation());
 			}
 		}
+		if (bMagazinePickUp == true)
+		{
+
+			TArray<AActor*> Magazines;
+			UGameplayStatics::GetAllActorsOfClass(this, MagazineClass, Magazines);
+			for (int i = 0; i < Magazines.Num(); i++)
+			{
+				AMagazine* MagazineItr = Cast<AMagazine>(Magazines[i]);
+				if (MagazineItr)
+				{
+					if (this->IsOverlappingActor(MagazineItr))
+					{
+						MagazineItr->IsPickedUp = true;
+					}
+				}
+			}
+
+			//SoldierCurrentClips++;
+			TArray<AActor*> Rifles;
+			UGameplayStatics::GetAllActorsOfClass(this, StarterWeaponClass, Rifles);
+			for (int i = 0; i < Rifles.Num(); i++)
+			{
+				AAutomaticRifle* RiflesItr = Cast<AAutomaticRifle>(Rifles[i]);
+				if (RiflesItr)
+				{
+					RiflesItr->CurrentAmountOfClips++;
+				}
+			}
+
+
+			UGameplayStatics::PlaySoundAtLocation(this, ItemsPickUp, GetActorLocation());
+		}
 
 		///SURVIVAL STUFF///
 		if (bDrinkPickup == true)
@@ -1088,7 +1123,7 @@ void ASoldierCharacter::ShowingPickUpHud()
 				wPickUpvar = CreateWidget<UUserWidget>(PC, wPickUp);
 				if (wPickUpvar)
 				{
-					if ((bRiflePickUp || bHeadsetPickUp || bLaserPickUp || bHelmetPickUp || bGripPickUp || bHoloPickUp || bFoodPickup || bDrinkPickup || bDrinkFromPond) == true)
+					if ((bRiflePickUp || bHeadsetPickUp || bLaserPickUp || bHelmetPickUp || bGripPickUp || bHoloPickUp || bFoodPickup || bDrinkPickup || bDrinkFromPond || bMagazinePickUp) == true)
 					{
 						wPickUpvar->AddToViewport();
 					}
@@ -1294,7 +1329,7 @@ void ASoldierCharacter::SprintOn()
 	}
 	else if (stamina > 10 && IsSprinting == false)
 	{
-		if (IsZooming != true)
+		if (IsZooming != true && GetVelocity().Size()>0)
 		{
 			SprintProgressBar();
 			IsSprinting = true;
@@ -1371,7 +1406,6 @@ void ASoldierCharacter::Headbobbing()
 			APlayerController* PC = Cast<APlayerController>(GetController());
 			if (PC)
 			{
-				UE_LOG(LogTemp, Warning, TEXT("Play walk camera shake"));
 				PC->ClientPlayCameraShake(CameraSprintShake, 0.25f);
 			}
 		}

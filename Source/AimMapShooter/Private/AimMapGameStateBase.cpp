@@ -49,7 +49,7 @@ void AAimMapGameStateBase::BeginPlay()
 	//WidgetRef = CreateWidget<UTimerWidget>(World, TimerWidgetClass);
 	//WidgetRef->AddToViewport();
 
-	PayloadStatusHud();
+	//PayloadStatusHud();
 }
 
 void AAimMapGameStateBase::Tick(float DeltaTime)

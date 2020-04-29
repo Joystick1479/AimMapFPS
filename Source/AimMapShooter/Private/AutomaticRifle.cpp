@@ -527,13 +527,15 @@ void AAutomaticRifle::StopReload()
 
 void AAutomaticRifle::ReloadWeapon()
 {
-	
+	/*
 		int32 ClipDelta = FMath::Min(WeaponConfig.AmmoPerClip - CurrentAmmoInClip, CurrentAmmo - CurrentAmmoInClip);
 		if (ClipDelta > 0)
 		{
 			CurrentAmmoInClip += ClipDelta;
 			CurrentAmountOfClips--;
-		}
+		}*/
+		CurrentAmmoInClip = 20;
+		CurrentAmountOfClips--;
 
 		CurrentState = EWeaponState::Idle;
 		ReloadingState = EReloadingState::None;
