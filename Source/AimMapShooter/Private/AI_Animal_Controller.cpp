@@ -43,7 +43,51 @@ void AAI_Animal_Controller::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (IsRunning)
+	{
+		randomNumber = 0.35;
+	}
 
+
+	///If Fox is attacking, charge player immediately
+	if (DoOnce == false)
+	{
+		AAI_Animal_FOX* Fox = Cast<AAI_Animal_FOX>(GetPawn());
+		if (Fox)
+		{
+			if (Fox->IsAttacking == true)
+			{
+				FTimerDelegate DelegateFunc = FTimerDelegate::CreateUObject(this, &AAI_Animal_Controller::FastAttack, Fox);
+				GetWorldTimerManager().SetTimer(FastAttackTimer, DelegateFunc, 1.0f, false);
+				DoOnce = true;
+			}
+			else
+			{
+				GetWorldTimerManager().ClearTimer(FastAttackTimer);
+			}
+		}
+	}
+		
+	
+}
+void AAI_Animal_Controller::FastAttack(AAI_Animal_FOX* Fox)
+{
+	///Fast charge player nearby
+	UE_LOG(LogTemp, Warning, TEXT("Casting OK, Fox Is Attaking"));
+
+	GetWorldTimerManager().ClearTimer(TimerHandle);
+
+	auto MovementComponent = Fox->GetCharacterMovementComponent();
+	if (MovementComponent)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Found movementcomponent"));
+		MovementComponent->DisableMovement();
+		MovementComponent->StopActiveMovement();
+		MovementComponent->SetMovementMode(EMovementMode::MOVE_Walking);
+	}
+
+	GoToRandomWaypoint();
+	DoOnce = false;
 }
 
 AAI_Animal_FOX * AAI_Animal_Controller::GetControlledFox() const
@@ -53,12 +97,9 @@ AAI_Animal_FOX * AAI_Animal_Controller::GetControlledFox() const
 
 ATargetPoint * AAI_Animal_Controller::GetRandomWaypoint()
 {
-
-
-
+	///Don't repeat the same waypoint twice in a row.
 	index = FMath::RandRange(0, Waypoints.Num() - 1);
 	dupa.push(index);
-
 
 	if (!dupa.empty())
 	{
@@ -69,11 +110,7 @@ ATargetPoint * AAI_Animal_Controller::GetRandomWaypoint()
 		}
 	}
 
-
 	index2 = index;
-
-
-	
 
 	UE_LOG(LogTemp, Warning, TEXT("RandomWaypoint number is: %i"), index);
 
@@ -94,13 +131,15 @@ void AAI_Animal_Controller::GoToRandomWaypoint()
 		{
 			//GetWorldTimerManager().ClearTimer(TimerHandle);
 			auto Waypoint = GetRandomWaypoint();
-			FVector WaypointLocation = Waypoint->GetActorLocation();
-			FRotator LookDirection = UKismetMathLibrary::FindLookAtRotation(GetPawn()->GetActorLocation(), WaypointLocation);
-			GetPawn()->SetActorRotation(LookDirection);
-			IsMoving = true;
-			IsRunning = false;
-			MoveToActor(Waypoint);
-
+			if (Waypoint)
+			{
+				FVector WaypointLocation = Waypoint->GetActorLocation();
+				FRotator LookDirection = UKismetMathLibrary::FindLookAtRotation(GetPawn()->GetActorLocation(), WaypointLocation);
+				GetPawn()->SetActorRotation(LookDirection);
+				IsMoving = true;
+				IsRunning = false;
+				MoveToActor(Waypoint);
+			}
 		}
 		else if(Fox->IsAttacking == true)
 		{
@@ -112,8 +151,6 @@ void AAI_Animal_Controller::GoToRandomWaypoint()
 				ASoldierCharacter* SoldierChar = Cast<ASoldierCharacter>(Target[i]);
 				if (SoldierChar)
 				{
-					//GetWorldTimerManager().ClearTimer(TimerHandle);
-
 					FVector SoldierLocation = SoldierChar->GetActorLocation() - CorrectingVectorForSoldierHeight;
 					FRotator LookAtSoldier = UKismetMathLibrary::FindLookAtRotation(GetPawn()->GetActorLocation(), SoldierLocation);
 					GetPawn()->SetActorRotation(LookAtSoldier);
@@ -124,8 +161,6 @@ void AAI_Animal_Controller::GoToRandomWaypoint()
 			}
 		}
 	}
-	
-	
 }
 
 void AAI_Animal_Controller::Server_GoToRandomWaypoint_Implementation()
@@ -140,34 +175,21 @@ bool AAI_Animal_Controller::Server_GoToRandomWaypoint_Validate()
 void AAI_Animal_Controller::OnMoveCompleted(FAIRequestID RequestID, const FPathFollowingResult & Result)
 {
 	Super::OnMoveCompleted(RequestID, Result);
+
 	IsMoving = false;
 
-	auto randnomNumber = FMath::RandRange(1, 5);
+	randomNumber = FMath::RandRange(1, 5);
 
-	if (IsRunning)
-	{
-		randnomNumber = 1;
-	}
+	//if (IsRunning)
+	//{
+	//	randomNumber = 1;
+	//}
 
-	GetWorldTimerManager().SetTimer(TimerHandle, this, &AAI_Animal_Controller::GoToRandomWaypoint, randnomNumber, false);
-
-	/*AAI_Animal_FOX* Fox = Cast<AAI_Animal_FOX>(GetPawn());
-	if (Fox)
-	{
-		if (Fox->IsAttacking == true)
-		{
-			randnomNumber = 1;
-			UE_LOG(LogTemp, Warning, TEXT("FOX ATAKUUJEEE"));
-			GetWorldTimerManager().SetTimer(TestTimerHandle, this, &AAI_Animal_Controller::GoToRandomWaypoint, randnomNumber, false);
-		}
-		else
-		{
-			GetWorldTimerManager().SetTimer(TimerHandle, this, &AAI_Animal_Controller::GoToRandomWaypoint, randnomNumber, false);
-		}
-	}*/
+	GetWorldTimerManager().SetTimer(TimerHandle, this, &AAI_Animal_Controller::GoToRandomWaypoint, randomNumber, false);
 
 
 }
+
 void AAI_Animal_Controller::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	//This function tells us how we want to replicate things//

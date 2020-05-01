@@ -509,7 +509,7 @@ void ASoldierCharacter::EatFood()
 		}
 		amountOfFood--;
 
-		USurvivalComponent* SurvivalComp = this->FindComponentByClass<USurvivalComponent>();
+		//USurvivalComponent* SurvivalComp = this->FindComponentByClass<USurvivalComponent>();
 		if (SurvivalComp)
 		{
 			SurvivalComp->Food = SurvivalComp->Food + amountOfBoostFood;

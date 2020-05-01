@@ -62,4 +62,12 @@ public:
 	int32 index2;
 	std::stack<int> dupa;
 
+private:
+
+	int32 randomNumber;
+	bool DoOnce;
+	
+	FTimerHandle FastAttackTimer;
+	void FastAttack(AAI_Animal_FOX* Fox);
+
 };

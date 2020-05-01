@@ -601,9 +601,9 @@ public:
 	FRotator InitialWeaponRot;
 	UPROPERTY(BlueprintReadOnly)
 	FRotator FinalWeaponRot;
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
 	float SmoothAmount;
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
 	float LookAmount;
 	FName LookUp;
 	UPROPERTY(BlueprintReadWrite)

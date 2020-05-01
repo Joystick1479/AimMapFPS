@@ -35,6 +35,17 @@ AAI_Animal_FOX::AAI_Animal_FOX()
 	SetReplicates(true);
 }
 
+UCharacterMovementComponent * AAI_Animal_FOX::GetCharacterMovementComponent()
+{
+	UCharacterMovementComponent* MoveComp = this->FindComponentByClass<UCharacterMovementComponent>();
+	if (MoveComp)
+	{
+		return MoveComp;
+	}
+	
+	return nullptr;
+}
+
 // Called when the game starts or when spawned
 void AAI_Animal_FOX::BeginPlay()
 {
@@ -68,10 +79,6 @@ void AAI_Animal_FOX::Hearing()
 					MoveComp->MaxWalkSpeed = 150;
 				}
 			}
-		}
-		else
-		{
-			//IsAttacking = false;
 		}
 	}
 }
@@ -157,10 +164,8 @@ void AAI_Animal_FOX::Dying()
 			{
 				MoveComp->StopActiveMovement();
 				MoveComp->DisableMovement();
-				UE_LOG(LogTemp, Warning, TEXT("Fox ded2"));
 
 			}
-			UE_LOG(LogTemp, Warning, TEXT("Fox ded"));
 
 			GetWorldTimerManager().SetTimer(DeadTimer, this, &AAI_Animal_FOX::DestroyAfterDeath, 2.10f, false);
 			//this->Destroy();
@@ -193,7 +198,7 @@ void AAI_Animal_FOX::Tick(float DeltaTime)
 	if (AICont)
 	{
 		test1 = AICont->IsMoving;
-		UE_LOG(LogTemp, Warning, TEXT("Ismovingto: %i"), test1);
+		//UE_LOG(LogTemp, Warning, TEXT("Ismovingto: %i"), test1);
 		test2 = AICont->IsRunning;
 	}
 }
