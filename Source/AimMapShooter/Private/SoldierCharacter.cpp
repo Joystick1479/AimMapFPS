@@ -369,10 +369,10 @@ void ASoldierCharacter::Tick(float DeltaTime)
 	FRotator TempRotator = FRotator(InitialWeaponRot.Pitch - AlmostFinal.Pitch, AlmostFinal.Yaw + InitialWeaponRot.Yaw, InitialWeaponRot.Roll + AlmostFinal.Roll);
 	if (AutomaticRifle)
 	{
-		//float timeWorld = UGameplayStatics::GetWorldDeltaSeconds(GetWorld());
+		float timeWorld = UGameplayStatics::GetWorldDeltaSeconds(GetWorld());
 		//FRotator mamyto = UKismetMathLibrary::RLerp(AutomaticRifle->SkelMeshComp->GetRelativeTransform().GetRotation().Rotator(), TempRotator, timeWorld, false);
 		//FinalWeaponRot = UKismetMathLibrary::RLerp(AutomaticRifle->SkelMeshComp->GetRelativeTransform().GetRotation().Rotator(), TempRotator, timeWorld *SmoothAmount, false);
-		FinalWeaponRot = UKismetMathLibrary::RInterpTo(AutomaticRifle->SkelMeshComp->GetRelativeTransform().GetRotation().Rotator(), TempRotator, DeltaTime, SmoothAmount);
+		FinalWeaponRot = UKismetMathLibrary::RInterpTo(AutomaticRifle->SkelMeshComp->GetRelativeTransform().GetRotation().Rotator(), TempRotator, timeWorld, SmoothAmount);
 	//	AutomaticRifle->SetActorRelativeRotation(mamyto);
 	}
 
@@ -513,6 +513,10 @@ void ASoldierCharacter::EatFood()
 		if (SurvivalComp)
 		{
 			SurvivalComp->Food = SurvivalComp->Food + amountOfBoostFood;
+			if (SurvivalComp->Food > 100)
+			{
+				SurvivalComp->Food = 100;
+			}
 		}
 	}
 }
@@ -536,6 +540,10 @@ void ASoldierCharacter::DrinkWater()
 		if (SurvivalComp)
 		{
 			SurvivalComp->Drink = SurvivalComp->Drink + amountOfBoostDrink;
+			if (SurvivalComp->Drink > 100)
+			{
+				SurvivalComp->Drink = 100;
+			}
 		}
 	}
 }
