@@ -212,9 +212,7 @@ protected:
 
 	/////*** DISPLAYING HUD ****////
 	void ShowingPickUpHud();
-
-	///**STOP PLAY LOW HEALTH/DIE AUDIO **//
-	void DyingAudioTrigger();
+	FTimerHandle HudTimer;
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerLineTraceItem();
@@ -303,6 +301,7 @@ protected:
 	void SprintProgressBar();
 
 	void Headbobbing();
+	FTimerHandle HBobingTimer;
 
 	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly, Category = "Player")
 	float stamina;
@@ -432,6 +431,7 @@ public:
 	void ThrowGrenade();
 	void SpawnGrenade(FVector STL, FRotator STR);
 	void FindingGrenadeTransform();
+	FTimerHandle TransformHandle;
 	void Flashbang(float Distance, FVector FacingAngle);
 	void AngleFromFlash(FVector GrenadeLoc);
 	///Timeline for GRENADE//

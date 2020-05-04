@@ -23,6 +23,9 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 	bool IsAttacking;
 
+	UPROPERTY(BlueprintReadOnly)
+	bool bDied;
+
 	UCharacterMovementComponent* GetCharacterMovementComponent();
 
 protected:
@@ -46,8 +49,6 @@ protected:
 	void Dying();
 	void DestroyAfterDeath();
 
-	UPROPERTY(BlueprintReadOnly)
-	bool bDied;
 
 	FTimerHandle DeadTimer;
 

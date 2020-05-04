@@ -36,7 +36,6 @@ void AAI_Animal_Controller::BeginPlay()
 	}
 
 	index2 = -1;
-	
 }
 
 void AAI_Animal_Controller::Tick(float DeltaTime)
@@ -48,14 +47,13 @@ void AAI_Animal_Controller::Tick(float DeltaTime)
 		randomNumber = 0.35;
 	}
 
-
 	///If Fox is attacking, charge player immediately
 	if (DoOnce == false)
 	{
 		AAI_Animal_FOX* Fox = Cast<AAI_Animal_FOX>(GetPawn());
 		if (Fox)
 		{
-			if (Fox->IsAttacking == true)
+			if (Fox->IsAttacking == true && Fox->bDied == false)
 			{
 				FTimerDelegate DelegateFunc = FTimerDelegate::CreateUObject(this, &AAI_Animal_Controller::FastAttack, Fox);
 				GetWorldTimerManager().SetTimer(FastAttackTimer, DelegateFunc, 1.0f, false);
@@ -63,15 +61,16 @@ void AAI_Animal_Controller::Tick(float DeltaTime)
 			}
 			else
 			{
+				bAttacking = false;
 				GetWorldTimerManager().ClearTimer(FastAttackTimer);
 			}
 		}
 	}
-		
-	
 }
 void AAI_Animal_Controller::FastAttack(AAI_Animal_FOX* Fox)
 {
+	bAttacking = true;
+
 	///Fast charge player nearby
 	UE_LOG(LogTemp, Warning, TEXT("Casting OK, Fox Is Attaking"));
 
@@ -179,11 +178,6 @@ void AAI_Animal_Controller::OnMoveCompleted(FAIRequestID RequestID, const FPathF
 	IsMoving = false;
 
 	randomNumber = FMath::RandRange(1, 5);
-
-	//if (IsRunning)
-	//{
-	//	randomNumber = 1;
-	//}
 
 	GetWorldTimerManager().SetTimer(TimerHandle, this, &AAI_Animal_Controller::GoToRandomWaypoint, randomNumber, false);
 

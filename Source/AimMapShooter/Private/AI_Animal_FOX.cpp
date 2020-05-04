@@ -145,16 +145,21 @@ void AAI_Animal_FOX::Attacking()
 
 void AAI_Animal_FOX::DestroyAfterDeath()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Fox ded3"));
-	UE_LOG(LogTemp, Warning, TEXT("Fox ded4"));
 	this->Destroy();
 	GetWorldTimerManager().ClearTimer(DeadTimer);
 }
 void AAI_Animal_FOX::Dying()
 {
-	//UHealthComponent* HealthComp = this->FindComponentByClass<UHealthComponent>();
 	if (HealthComponent->Health == 0)
 	{
+		//Clearing attacking timer from AIController to kill the delay
+		AAI_Animal_Controller* AIController = Cast<AAI_Animal_Controller>(GetController());
+		if (AIController)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("AIController casting OK"));
+			FTimerHandle test = AIController->FastAttackTimer;
+			GetWorldTimerManager().ClearTimer(test);
+		}
 		if (DoOnce2 == false)
 		{
 			DoOnce2 = true;
@@ -164,11 +169,9 @@ void AAI_Animal_FOX::Dying()
 			{
 				MoveComp->StopActiveMovement();
 				MoveComp->DisableMovement();
-
 			}
 
 			GetWorldTimerManager().SetTimer(DeadTimer, this, &AAI_Animal_FOX::DestroyAfterDeath, 2.10f, false);
-			//this->Destroy();
 		}
 	}
 }
@@ -185,20 +188,10 @@ void AAI_Animal_FOX::Tick(float DeltaTime)
 	Attacking();
 
 	Dying();
-
-	//if (IsAttacking == true)
-	//{
-	//	UE_LOG(LogTemp, Warning, TEXT("Atakuje"));
-	//}
-	//else
-	//{
-	//	UE_LOG(LogTemp, Warning, TEXT("NIE Atakuje"));
-	//}
 	AAI_Animal_Controller* AICont = Cast<AAI_Animal_Controller>(this->GetController());
 	if (AICont)
 	{
 		test1 = AICont->IsMoving;
-		//UE_LOG(LogTemp, Warning, TEXT("Ismovingto: %i"), test1);
 		test2 = AICont->IsRunning;
 	}
 }

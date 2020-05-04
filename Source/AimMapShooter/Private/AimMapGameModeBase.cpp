@@ -62,7 +62,9 @@ void AAimMapGameModeBase::StartGame()
 	bUseSeamlessTravel = true;
 	//World->ServerTravel("/Game/FirstPersonBP/Maps/Map?listen");
 	//World->ServerTravel("/Game/AbandonedFactory/Maps/Warehouse_01_day/Main_Warehouse_01?listen");
-	World->ServerTravel("/Game/NaturePackage/Maps/Showcase2?listen");
+	//World->ServerTravel("/Game/NaturePackage/Maps/Showcase2?listen");
+	World->ServerTravel("/Game/FoliagePackV1/Maps/Demo_Landscape_A?listen");
+
 	
 }
 
@@ -75,7 +77,7 @@ void AAimMapGameModeBase::RestartGame()
 
 	bUseSeamlessTravel = true;
 	//World->ServerTravel("/Game/AbandonedFactory/Maps/Warehouse_01_day/Main_Warehouse_01?listen");
-	World->ServerTravel("/Game/NaturePackage/Maps/Showcase2?listen");
+	World->ServerTravel("/Game/FoliagePackV1/Maps/Demo_Landscape_A?listen");
 
 
 }

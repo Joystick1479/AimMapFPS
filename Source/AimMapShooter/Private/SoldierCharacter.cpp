@@ -201,23 +201,6 @@ void ASoldierCharacter::BeginPlay()
 			SceneCapture->AttachToComponent(SpringArmRender2, FAttachmentTransformRules::KeepRelativeTransform);
 		}
 	}
-
-	///**Getting weapon on begin play *//
-	///**Spawn weapmon for first person animation ///**
-	//FActorSpawnParameters SpawnParams;
-	//SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	//if(Role==ROLE_Authority)
-	//{
-	//	AutomaticRifle = GetWorld()->SpawnActor<AAutomaticRifle>(StarterWeaponClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
-	//	if (AutomaticRifle)
-	//	{
-	//		AutomaticRifle->SetOwner(this);
-	//		AutomaticRifle->AttachToComponent(FPPMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocket);
-	//		AutomaticRifle->SkelMeshComp->bOnlyOwnerSee = true;
-	//		AutomaticRifle->SkelMeshComp->SetAnimInstanceClass(AnimBp);
-	//	}
-	//}
-
 	HealthComp->OnHealthChanged.AddDynamic(this, &ASoldierCharacter::OnHealthChanged);
 
 	if (HealthComp)
@@ -234,6 +217,11 @@ void ASoldierCharacter::BeginPlay()
 	{
 		CameraComp->AttachToComponent(SpringArm, FAttachmentTransformRules::SnapToTargetIncludingScale);
 	}
+
+	///Calling these function on begin play with timers to avoid ticking
+	ShowingPickUpHud();
+	FindingGrenadeTransform();
+	Headbobbing();
 }
 
 
@@ -332,17 +320,17 @@ void ASoldierCharacter::Tick(float DeltaTime)
 	}
 
 	///***SHOWING/HIDING PICKUP HUD UI////
-	ShowingPickUpHud();
 
-	DyingAudioTrigger();
+	//ShowingPickUpHud();
+
 
 	//DefendObjectiveSound();
 
-	GameOverSound();
 
-	FindingGrenadeTransform();
 
-	Headbobbing();
+	//FindingGrenadeTransform();
+
+	//Headbobbing();
 
 	///TIMELINE///
 	if (MyTimeline != NULL)
@@ -363,20 +351,12 @@ void ASoldierCharacter::Tick(float DeltaTime)
 
 	//Weapon Sway
 	FRotator AlmostFinal = FRotator(temp2*LookAmount, temp1*LookAmount, temp1*LookAmount);
-	//FinalWeaponRot = AlmostFinal;
-
-	//FRotator TempRotator = FRotator(InitialWeaponRot.Pitch - FinalWeaponRot.Pitch, FinalWeaponRot.Yaw + InitialWeaponRot.Yaw, InitialWeaponRot.Roll + FinalWeaponRot.Roll);
 	FRotator TempRotator = FRotator(InitialWeaponRot.Pitch - AlmostFinal.Pitch, AlmostFinal.Yaw + InitialWeaponRot.Yaw, InitialWeaponRot.Roll + AlmostFinal.Roll);
 	if (AutomaticRifle)
 	{
 		float timeWorld = UGameplayStatics::GetWorldDeltaSeconds(GetWorld());
-		//FRotator mamyto = UKismetMathLibrary::RLerp(AutomaticRifle->SkelMeshComp->GetRelativeTransform().GetRotation().Rotator(), TempRotator, timeWorld, false);
-		//FinalWeaponRot = UKismetMathLibrary::RLerp(AutomaticRifle->SkelMeshComp->GetRelativeTransform().GetRotation().Rotator(), TempRotator, timeWorld *SmoothAmount, false);
 		FinalWeaponRot = UKismetMathLibrary::RInterpTo(AutomaticRifle->SkelMeshComp->GetRelativeTransform().GetRotation().Rotator(), TempRotator, timeWorld, SmoothAmount);
-	//	AutomaticRifle->SetActorRelativeRotation(mamyto);
 	}
-
-	
 }
 
 
@@ -1097,20 +1077,9 @@ void ASoldierCharacter::EndDrinkFromPond(APlayerController* PC)
 	if (SurvivalComp)
 	{
 		SurvivalComp->Drink = SurvivalComp->Drink + amountOfBoostDrink;
-	}
-}
-void ASoldierCharacter::DyingAudioTrigger()
-{
-	///** PLAYING/STOPPING SOUND WHEN LOW HEALTH/DEAD**//
-
-	if (IsLocallyControlled())
-	{
-		if (bDied == true)
+		if (SurvivalComp->Drink > 100)
 		{
-			if (AudioComp)
-			{
-				AudioComp->DestroyComponent();
-			}
+			SurvivalComp->Drink = 100;
 		}
 	}
 }
@@ -1121,6 +1090,7 @@ void ASoldierCharacter::ShowingPickUpHud()
 	//{
 	//	ServerShowingPickUpHud();
 	//}
+
 	if (IsLocallyControlled())
 	{
 		APlayerController* PC = GetWorld()->GetFirstPlayerController();
@@ -1152,6 +1122,8 @@ void ASoldierCharacter::ShowingPickUpHud()
 		}
 	}
 	
+	GetWorldTimerManager().SetTimer(HudTimer, this, &ASoldierCharacter::ShowingPickUpHud, 0.5f, false);
+
 }
 
 void ASoldierCharacter::MoveForward(float Value)
@@ -1418,6 +1390,9 @@ void ASoldierCharacter::Headbobbing()
 			}
 		}
 	}
+
+	GetWorldTimerManager().SetTimer(HBobingTimer, this, &ASoldierCharacter::Headbobbing, 0.1f, false);
+
 }
 
 void ASoldierCharacter::Reload()
@@ -1505,48 +1480,6 @@ void ASoldierCharacter::DefendObjectiveSound()
 		}
 	}
 }
-void ASoldierCharacter::GameOverSound()
-{
-	TArray<AActor*> HostEndGame;
-	UGameplayStatics::GetAllActorsOfClass(this, HostEndgameClass, HostEndGame);
-
-	for (int i = 0; i < HostEndGame.Num(); i++)
-	{
-		ABlueEndgame*New = Cast<ABlueEndgame>(HostEndGame[i]);
-		if (New)
-		{
-			if (New->BlueWins == true)
-			{
-				if (bStopSound == false)
-				{
-					bStopSound = true;
-					UGameplayStatics::PlaySound2D(this, GameOverAudio);
-					UE_LOG(LogTemp, Warning, TEXT("Tescik"));
-				}
-			}
-		}
-	}
-
-	TArray<AActor*> ClientEndGame;
-	UGameplayStatics::GetAllActorsOfClass(this, ClientEndgameClass, ClientEndGame);
-
-	for (int i = 0; i < ClientEndGame.Num(); i++)
-	{
-		ARedEndgame*New = Cast<ARedEndgame>(ClientEndGame[i]);
-		if (New)
-		{
-			if (New->RedWins == true)
-			{
-				if (bStopSound == false)
-				{
-					bStopSound = true;
-					UGameplayStatics::PlaySound2D(this, GameOverAudio);
-					UE_LOG(LogTemp, Warning, TEXT("Tescik"));
-				}
-			}
-		}
-	}
-}
 
 void ASoldierCharacter::NotifyActorBeginOverlap(AActor * OtherActor)
 {
@@ -1570,6 +1503,8 @@ void ASoldierCharacter::FindingGrenadeTransform()
 		STL = GrenadeStartLocation->GetComponentLocation();
 		STR = GrenadeStartLocation->GetComponentRotation();
 	}
+
+	GetWorldTimerManager().SetTimer(TransformHandle, this, &ASoldierCharacter::FindingGrenadeTransform, 0.5f, false);
 }
 void ASoldierCharacter::ThrowGrenade()
 {
@@ -1653,14 +1588,26 @@ void ASoldierCharacter::AngleFromFlash(FVector GrenadeLoc)
 
 void ASoldierCharacter::OnHealthChanged(UHealthComponent * OwningHealthComp, float Health, float HealthDelta, const UDamageType * DamageType, AController * InstigatedBy, AActor * DamageCauser)
 {
+	///TODO Destroy heartbeat sound death for client
 
 	if (Health <= 0.0f && !bDied)
 	{
+		if (IsLocallyControlled())
+		{
+			if (AudioComp)
+			{
+				AudioComp->DestroyComponent();
+			}
+		}
+
 		bDied = true;
 	}
 	if (HealthComp->Health <= 40.0f && bDied == false)
 	{
-		AudioComp->Play();
+		if (AudioComp)
+		{
+			AudioComp->Play();
+		}
 	}
 
 	AudioDamageComp->Play(0.0f);

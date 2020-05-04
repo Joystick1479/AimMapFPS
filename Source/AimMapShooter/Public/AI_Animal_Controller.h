@@ -58,16 +58,29 @@ public:
 	UPROPERTY(BlueprintReadOnly,Replicated)
 	bool IsRunning;
 	
+	//Don't take the same number twice in a row.
 	int32 index;
 	int32 index2;
 	std::stack<int> dupa;
+
+	FTimerHandle FastAttackTimer;
+
+	
+
+
+protected:
+
+	//For trigger animation
+	UPROPERTY(BlueprintReadOnly)
+	bool bAttacking;
 
 private:
 
 	int32 randomNumber;
 	bool DoOnce;
 	
-	FTimerHandle FastAttackTimer;
+
 	void FastAttack(AAI_Animal_FOX* Fox);
+
 
 };
