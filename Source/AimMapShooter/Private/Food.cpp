@@ -6,13 +6,15 @@
 #include "Components/StaticMeshComponent.h"
 #include "Components/SphereComponent.h"
 
+#include "TimerManager.h"
+
 #include "SoldierCharacter.h"
 
 // Sets default values
 AFood::AFood()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 
 	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComp"));
 	RootComponent = MeshComp;
@@ -25,7 +27,7 @@ AFood::AFood()
 void AFood::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	DestroyOnUse();
 }
 
 void AFood::NotifyActorBeginOverlap(AActor * OtherActor)
@@ -49,15 +51,20 @@ void AFood::NotifyActorEndOverlap(AActor * OtherActor)
 		SoldierCharacter->bFoodPickup = false;
 	}
 }
+void AFood::DestroyOnUse()
+{
+	if (IsPickedUp == true)
+	{
+		this->Destroy();
+	}
+
+	GetWorldTimerManager().SetTimer(DestroyTimer, this, &AFood::DestroyOnUse, 0.5f, false);
+}
 
 // Called every frame
 void AFood::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (IsPickedUp == true)
-	{
-		this->Destroy();
-	}
 }
 

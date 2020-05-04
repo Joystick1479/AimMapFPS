@@ -28,6 +28,9 @@ protected:
 	void NotifyActorBeginOverlap(AActor* OtherActor) override;
 	void NotifyActorEndOverlap(AActor* OtherActor) override;
 
+	void DestroyOnUse();
+	FTimerHandle DestroyTimer;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

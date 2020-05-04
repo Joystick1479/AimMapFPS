@@ -6,13 +6,15 @@
 #include "Components/StaticMeshComponent.h"
 #include "Components/SphereComponent.h"
 
+#include "TimerManager.h"
+
 #include "SoldierCharacter.h"
 
 // Sets default values
 AMagazine::AMagazine()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 
 	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComp"));
 	RootComponent = MeshComp;
@@ -25,6 +27,8 @@ AMagazine::AMagazine()
 void AMagazine::BeginPlay()
 {
 	Super::BeginPlay();
+
+	DestroyOnUse();
 	
 }
 
@@ -50,14 +54,21 @@ void AMagazine::NotifyActorEndOverlap(AActor * OtherActor)
 	}
 }
 
+void AMagazine::DestroyOnUse()
+{
+	if (IsPickedUp == true)
+	{
+		this->Destroy();
+	}
+
+	GetWorldTimerManager().SetTimer(DestroyTimer, this, &AMagazine::DestroyOnUse, 0.5f, false);
+
+}
+
 // Called every frame
 void AMagazine::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (IsPickedUp == true)
-	{
-		this->Destroy();
-	}
 }
 

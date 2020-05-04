@@ -34,6 +34,8 @@ protected:
 	void NotifyActorBeginOverlap(AActor* OtherActor);
 	void NotifyActorEndOverlap(AActor* OtherActor);
 
+	void DestroyOnUse();
+	FTimerHandle DestroyTimer;
 
 public:	
 	// Called every frame

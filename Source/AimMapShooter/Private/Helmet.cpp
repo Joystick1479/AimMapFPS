@@ -3,13 +3,16 @@
 
 #include "Components/StaticMeshComponent.h"
 #include "Components/SphereComponent.h"
+
+#include "TimerManager.h"
+
 #include "SoldierCharacter.h"
 
 // Sets default values
 AHelmet::AHelmet()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 
 	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComp"));
 	RootComponent = MeshComp;
@@ -26,6 +29,7 @@ void AHelmet::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	DestroyOnUse();
 }
 
 void AHelmet::NotifyActorBeginOverlap(AActor * OtherActor)
@@ -51,14 +55,20 @@ void AHelmet::NotifyActorEndOverlap(AActor * OtherActor)
 	}
 }
 
+void AHelmet::DestroyOnUse()
+{
+	if (IsPickedUp == true)
+	{
+		this->Destroy();
+	}
+
+	GetWorldTimerManager().SetTimer(DestroyTimer, this, &AHelmet::DestroyOnUse, 0.5f, false);
+}
+
 // Called every frame
 void AHelmet::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (IsPickedUp == true)
-	{
-		this->Destroy();
-	}
 }
 

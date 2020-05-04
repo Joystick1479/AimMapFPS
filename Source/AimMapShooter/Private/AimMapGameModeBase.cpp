@@ -174,7 +174,7 @@ void AAimMapGameModeBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	CheckIfGameOver();
+	//CheckIfGameOver();
 	
 }
 

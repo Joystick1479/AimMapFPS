@@ -10,7 +10,6 @@
 #include "Components/SceneCaptureComponent2D.h"
 #include "Components/SceneComponent.h" 
 #include "Components/TimelineComponent.h" 
-
 #include "Containers/EnumAsByte.h"
 
 #include "SpriteComponent.h"
@@ -61,7 +60,7 @@
 ASoldierCharacter::ASoldierCharacter()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 
 	HeadSocket = "HeadSocket";
 	WeaponSocket = "WeaponSocket";
@@ -222,9 +221,14 @@ void ASoldierCharacter::BeginPlay()
 	ShowingPickUpHud();
 	FindingGrenadeTransform();
 	Headbobbing();
+	GrenadeTimeline();
+	SprintSlowDown();
+	UpdateWeaponRotation();
+	UpdateRifleStatus();
+
+
+
 }
-
-
 
 void ASoldierCharacter::LineTraceItem()
 {
@@ -310,53 +314,8 @@ void ASoldierCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	//IsTargetFromBack();
 
-	if (AutomaticRifle)
-	{
-		SoldierCurrentAmmoInClip = AutomaticRifle->CurrentAmmoInClip;
-		SoldierCurrentAmmo = AutomaticRifle->CurrentAmmo;
-		SoldierCurrentClips = AutomaticRifle->CurrentAmountOfClips;
-	}
-
-	///***SHOWING/HIDING PICKUP HUD UI////
-
-	//ShowingPickUpHud();
-
-
-	//DefendObjectiveSound();
-
-
-
-	//FindingGrenadeTransform();
-
-	//Headbobbing();
-
-	///TIMELINE///
-	if (MyTimeline != NULL)
-	{
-		MyTimeline->TickComponent(DeltaTime, ELevelTick::LEVELTICK_TimeOnly, NULL);
-	}
-
-	////SLOW DOWN WHEN OUT OF STAMINA
-	if (stamina == 1)
-	{
-		IsSprinting = false;
-		UCharacterMovementComponent* MoveComp = this->FindComponentByClass<UCharacterMovementComponent>();
-		if (MoveComp)
-		{
-			MoveComp->MaxWalkSpeed = 300.0f;
-		}
-	}
-
-	//Weapon Sway
-	FRotator AlmostFinal = FRotator(temp2*LookAmount, temp1*LookAmount, temp1*LookAmount);
-	FRotator TempRotator = FRotator(InitialWeaponRot.Pitch - AlmostFinal.Pitch, AlmostFinal.Yaw + InitialWeaponRot.Yaw, InitialWeaponRot.Roll + AlmostFinal.Roll);
-	if (AutomaticRifle)
-	{
-		float timeWorld = UGameplayStatics::GetWorldDeltaSeconds(GetWorld());
-		FinalWeaponRot = UKismetMathLibrary::RInterpTo(AutomaticRifle->SkelMeshComp->GetRelativeTransform().GetRotation().Rotator(), TempRotator, timeWorld, SmoothAmount);
-	}
+	
 }
 
 
@@ -1369,6 +1328,22 @@ void ASoldierCharacter::SprintProgressBar()
 
 }
 
+void ASoldierCharacter::SprintSlowDown()
+{
+	////SLOW DOWN WHEN OUT OF STAMINA
+	if (stamina == 1)
+	{
+		IsSprinting = false;
+		UCharacterMovementComponent* MoveComp = this->FindComponentByClass<UCharacterMovementComponent>();
+		if (MoveComp)
+		{
+			MoveComp->MaxWalkSpeed = 300.0f;
+		}
+	}
+
+	GetWorldTimerManager().SetTimer(SlowDownSprintTimer, this, &ASoldierCharacter::SprintSlowDown, 0.5f, false);
+}
+
 void ASoldierCharacter::Headbobbing()
 {
 	if (IsSprinting == true)
@@ -1445,6 +1420,31 @@ void ASoldierCharacter::FireMode()
 	
 }
 
+void ASoldierCharacter::UpdateRifleStatus()
+{
+	if (AutomaticRifle)
+	{
+		SoldierCurrentAmmoInClip = AutomaticRifle->CurrentAmmoInClip;
+		SoldierCurrentAmmo = AutomaticRifle->CurrentAmmo;
+		SoldierCurrentClips = AutomaticRifle->CurrentAmountOfClips;
+	}
+
+	GetWorldTimerManager().SetTimer(UpdateRifleTimer, this, &ASoldierCharacter::UpdateRifleStatus, 0.05f, false);
+}
+void ASoldierCharacter::UpdateWeaponRotation()
+{
+	//Weapon Sway
+	FRotator AlmostFinal = FRotator(temp2*LookAmount, temp1*LookAmount, temp1*LookAmount);
+	FRotator TempRotator = FRotator(InitialWeaponRot.Pitch - AlmostFinal.Pitch, AlmostFinal.Yaw + InitialWeaponRot.Yaw, InitialWeaponRot.Roll + AlmostFinal.Roll);
+	if (AutomaticRifle)
+	{
+		float timeWorld = UGameplayStatics::GetWorldDeltaSeconds(GetWorld());
+		FinalWeaponRot = UKismetMathLibrary::RInterpTo(AutomaticRifle->SkelMeshComp->GetRelativeTransform().GetRotation().Rotator(), TempRotator, timeWorld, SmoothAmount);
+	}
+
+	GetWorldTimerManager().SetTimer(UpdateWRotTimer, this, &ASoldierCharacter::UpdateWeaponRotation, 0.05f, false);
+}
+
 void ASoldierCharacter::WeaponInspectionOn()
 {
 	if (IsInspecting != true)
@@ -1456,29 +1456,6 @@ void ASoldierCharacter::WeaponInspectionOn()
 void ASoldierCharacter::WeaponInspectionOff()
 {
 	IsInspecting = false;
-}
-
-void ASoldierCharacter::DefendObjectiveSound()
-{
-	TArray<AActor*> Payload;
-	UGameplayStatics::GetAllActorsOfClass(this, PayloadCharacterClass, Payload);
-	for (int i = 0; i < Payload.Num(); i++)
-	{
-		APayloadCharacter* PayloadChar = Cast<APayloadCharacter>(Payload[i]);
-		if (PayloadChar)
-		{
-			if (IsLocallyControlled())
-			{
-				if (this->IsOverlappingActor(PayloadChar) == false)
-				{
-					if (PayloadChar->ShouldPush == true)
-					{
-						UGameplayStatics::PlaySound2D(this, DefendObjective);
-					}
-				}
-			}
-		}
-	}
 }
 
 void ASoldierCharacter::NotifyActorBeginOverlap(AActor * OtherActor)
@@ -1505,6 +1482,16 @@ void ASoldierCharacter::FindingGrenadeTransform()
 	}
 
 	GetWorldTimerManager().SetTimer(TransformHandle, this, &ASoldierCharacter::FindingGrenadeTransform, 0.5f, false);
+}
+void ASoldierCharacter::GrenadeTimeline()
+{
+	if (MyTimeline != NULL)
+	{
+		float DeltaTime = UGameplayStatics::GetWorldDeltaSeconds(this);
+		MyTimeline->TickComponent(DeltaTime, ELevelTick::LEVELTICK_TimeOnly, NULL);
+	}
+
+	GetWorldTimerManager().SetTimer(TimelineHandle, this, &ASoldierCharacter::GrenadeTimeline, 0.5f, false);
 }
 void ASoldierCharacter::ThrowGrenade()
 {
@@ -1543,14 +1530,9 @@ void ASoldierCharacter::Flashbang(float Distance, FVector FacingAngle)
 				FlashAmount = 0.5f;
 			}
 			UKismetMaterialLibrary::SetScalarParameterValue(this, MaterialCollection, "Flash_Value", FlashAmount);
-			GetWorldTimerManager().SetTimer(Timer_Flash, this, &ASoldierCharacter::FlashTimeline, 1.0f);
+			GetWorldTimerManager().SetTimer(Timer_Flash, this, &ASoldierCharacter::PlayTimeline, 1.0f);
 		}
 	}
-}
-void ASoldierCharacter::FlashTimeline()
-{
-	PlayTimeline();
-	GetWorldTimerManager().ClearTimer(Timer_Flash);
 }
 void ASoldierCharacter::TimelineCallback(float interpolatedVal)
 {
@@ -1564,6 +1546,8 @@ void ASoldierCharacter::TimelineFinishedCallback()
 }
 void ASoldierCharacter::PlayTimeline()
 {
+	GetWorldTimerManager().ClearTimer(Timer_Flash);
+
 	if (MyTimeline != NULL)
 	{
 		MyTimeline->PlayFromStart();
@@ -1835,7 +1819,7 @@ void ASoldierCharacter::MulticastFlashbang_Implementation(FVector Facing)
 			FlashAmount = 0.5f;
 		}
 		UKismetMaterialLibrary::SetScalarParameterValue(this, MaterialCollection, "Flash_Value", FlashAmount);
-		GetWorldTimerManager().SetTimer(Timer_Flash, this, &ASoldierCharacter::FlashTimeline, 1.0f);
+		GetWorldTimerManager().SetTimer(Timer_Flash, this, &ASoldierCharacter::PlayTimeline, 1.0f);
 	}
 }
 

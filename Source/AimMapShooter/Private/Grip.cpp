@@ -3,13 +3,16 @@
 
 #include "Components/StaticMeshComponent.h"
 #include "Components/SphereComponent.h"
+
+#include "TimerManager.h"
+
 #include "SoldierCharacter.h"
 
 // Sets default values
 AGrip::AGrip()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 
 	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComp"));
 	RootComponent = MeshComp;
@@ -26,6 +29,7 @@ void AGrip::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	DestroyOnUse();
 }
 
 void AGrip::NotifyActorBeginOverlap(AActor * OtherActor)
@@ -53,14 +57,20 @@ void AGrip::NotifyActorEndOverlap(AActor * OtherActor)
 	}
 }
 
+void AGrip::DestroyOnUse()
+{
+	if (IsPickedUp == true)
+	{
+		this->Destroy();
+	}
+
+	GetWorldTimerManager().SetTimer(DestroyTimer, this, &AGrip::DestroyOnUse, 0.5f, false);
+}
+
 // Called every frame
 void AGrip::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (IsPickedUp == true)
-	{
-		this->Destroy();
-	}
 }
 

@@ -6,13 +6,15 @@
 #include "Components/StaticMeshComponent.h"
 #include "Components/SphereComponent.h"
 
+#include "TimerManager.h"
+
 #include "SoldierCharacter.h"
 
 // Sets default values
 ADrink::ADrink()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 
 	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComp"));
 	RootComponent = MeshComp;
@@ -26,6 +28,8 @@ ADrink::ADrink()
 void ADrink::BeginPlay()
 {
 	Super::BeginPlay();
+
+	DestroyOnUse();
 	
 }
 
@@ -53,14 +57,21 @@ void ADrink::NotifyActorEndOverlap(AActor * OtherActor)
 
 }
 
+void ADrink::DestroyOnUse()
+{
+	if (IsPickedUp == true)
+	{
+		this->Destroy();
+	}
+
+	GetWorldTimerManager().SetTimer(DestroyTimer, this, &ADrink::DestroyOnUse, 0.5f, false);
+}
+
 // Called every frame
 void ADrink::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (IsPickedUp == true)
-	{
-		this->Destroy();
-	}
+	
 }
 

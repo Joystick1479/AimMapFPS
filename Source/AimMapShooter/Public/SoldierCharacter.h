@@ -170,6 +170,8 @@ protected:
 
 	UPROPERTY(Replicated)
 	AHelmet* Helmet;
+
+
 	////***Replication stuff***///
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerPickUpItem();
@@ -299,6 +301,8 @@ protected:
 	void SprintOn();
 	void SprintOff();
 	void SprintProgressBar();
+	void SprintSlowDown();
+	FTimerHandle SlowDownSprintTimer;
 
 	void Headbobbing();
 	FTimerHandle HBobingTimer;
@@ -307,6 +311,9 @@ protected:
 	float stamina;
 	FTimerHandle SprintTimerHandle;
 	FTimerHandle SprintRestingTimerHandle;
+
+	void UpdateRifleStatus();
+	FTimerHandle UpdateRifleTimer;
 
 	void FireMode();
 
@@ -325,6 +332,9 @@ protected:
 	void PutWeaponOnBack();
 	bool bWeaponOnBack;
 	FTimerHandle InspectionTimer;
+
+	void UpdateWeaponRotation();
+	FTimerHandle UpdateWRotTimer;
 
 	UPROPERTY(BlueprintReadOnly)
 	bool IsInspecting;
@@ -411,8 +421,6 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "EndTarget")
 	TSubclassOf<ABlueEndgame> HostEndgameClass;
 
-	void DefendObjectiveSound();
-
 	void GameOverSound();
 
 
@@ -422,6 +430,11 @@ protected:
 
 	UFUNCTION(BlueprintCallable,Server,Reliable)
 	void ServerWantToRespawn();
+
+
+	///Grenade timeline
+	void GrenadeTimeline();
+	FTimerHandle TimelineHandle;
 
 
 public:	
@@ -435,7 +448,6 @@ public:
 	void Flashbang(float Distance, FVector FacingAngle);
 	void AngleFromFlash(FVector GrenadeLoc);
 	///Timeline for GRENADE//
-	void FlashTimeline();
 	UFUNCTION()
 	void TimelineCallback(float val);
 	UFUNCTION()

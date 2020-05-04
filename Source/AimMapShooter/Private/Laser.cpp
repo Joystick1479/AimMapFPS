@@ -7,6 +7,8 @@
 #include "SoldierCharacter.h"
 #include "AutomaticRifle.h"
 
+#include "TimerManager.h"
+
 #include "DrawDebugHelpers.h"
 
 #include "Components/PointLightComponent.h"
@@ -15,7 +17,7 @@
 ALaser::ALaser()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 
 	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComp"));
 	RootComponent = MeshComp;
@@ -43,6 +45,7 @@ void ALaser::BeginPlay()
 {
 	Super::BeginPlay();
 
+	DestroyOnUse();
 
 	
 }
@@ -77,9 +80,17 @@ void ALaser::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+
+}
+
+void ALaser::DestroyOnUse()
+{
 	StartLaser();
-	
+
 	if (IsPickedUp == true) this->Destroy();
+
+	GetWorldTimerManager().SetTimer(DestroyTimer, this, &ALaser::DestroyOnUse, 0.1f, false);
+
 }
 
 

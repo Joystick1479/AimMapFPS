@@ -45,9 +45,19 @@ protected:
 	TSubclassOf<ASoldierCharacter> SoldierChar;
 
 	void Hearing();
+	FTimerHandle HearingHandle;
+
 	void Attacking();
+	FTimerHandle AttackingHandle;
+
 	void Dying();
+	FTimerHandle DyingHandle;
+
 	void DestroyAfterDeath();
+
+	void UpdateFStatus();
+	FTimerHandle UpdateHandle;
+
 
 
 	FTimerHandle DeadTimer;

@@ -22,7 +22,7 @@
 AAI_Animal_FOX::AAI_Animal_FOX()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 
 	HearingSphere = CreateDefaultSubobject<USphereComponent>(TEXT("HearingSphere"));
 	HearingSphere->SetupAttachment(this->GetMesh());
@@ -50,6 +50,14 @@ UCharacterMovementComponent * AAI_Animal_FOX::GetCharacterMovementComponent()
 void AAI_Animal_FOX::BeginPlay()
 {
 	Super::BeginPlay();
+
+	Hearing();
+
+	Attacking();
+
+	Dying();
+
+	UpdateFStatus();
 	
 }
 
@@ -63,6 +71,10 @@ void AAI_Animal_FOX::Hearing()
 		if (SoldChar)
 		{
 			IsAttacking = HearingSphere->IsOverlappingActor(SoldChar);
+			if (SoldChar->bDied == true)
+			{
+				IsAttacking = false;
+			}
 			if (IsAttacking == true)
 			{
 				UCharacterMovementComponent* MoveComp = this->FindComponentByClass<UCharacterMovementComponent>();
@@ -81,6 +93,9 @@ void AAI_Animal_FOX::Hearing()
 			}
 		}
 	}
+
+
+	GetWorldTimerManager().SetTimer(HearingHandle, this, &AAI_Animal_FOX::Hearing, 1.0f, false);
 }
 
 void AAI_Animal_FOX::NotifyActorBeginOverlap(AActor * OtherActor)
@@ -110,13 +125,11 @@ void AAI_Animal_FOX::NotifyActorEndOverlap(AActor * OtherActor)
 	if (SoldierCharacter)
 	{
 		IsAttacking = false;
-		UE_LOG(LogTemp, Warning, TEXT("NieAtakuje"));
 	}
 }
 
 void AAI_Animal_FOX::Attacking()
 {
-
 	TArray<AActor*> Target;
 	UGameplayStatics::GetAllActorsOfClass(this, SoldierChar, Target);
 	for (int i = 0; i < Target.Num(); i++)
@@ -124,29 +137,34 @@ void AAI_Animal_FOX::Attacking()
 		ASoldierCharacter* SoldChar = Cast<ASoldierCharacter>(Target[i]);
 		if (SoldChar)
 		{
-			if (DamagingSphere->IsOverlappingActor(SoldChar) == true)
+			if (DamagingSphere->IsOverlappingActor(SoldChar) == true && SoldChar->bDied == false)
 			{
-				//OpenGate
-				if (DoOnce == false)
 				{
 					UGameplayStatics::ApplyDamage(SoldChar, 30.0f, nullptr, nullptr, nullptr);
-					DoOnce = true;
-					return;
 				}
-			}
-			else
-			{
-				//Reset gate
-				DoOnce = false;
 			}
 		}
 	}
+
+	GetWorldTimerManager().SetTimer(AttackingHandle, this, &AAI_Animal_FOX::Attacking, 0.45f, false);
+
 }
 
 void AAI_Animal_FOX::DestroyAfterDeath()
 {
 	this->Destroy();
 	GetWorldTimerManager().ClearTimer(DeadTimer);
+}
+void AAI_Animal_FOX::UpdateFStatus()
+{
+	AAI_Animal_Controller* AICont = Cast<AAI_Animal_Controller>(this->GetController());
+	if (AICont)
+	{
+		test1 = AICont->IsMoving;
+		test2 = AICont->IsRunning;
+	}
+
+	GetWorldTimerManager().SetTimer(UpdateHandle, this, &AAI_Animal_FOX::UpdateFStatus, 0.35f, false);
 }
 void AAI_Animal_FOX::Dying()
 {
@@ -156,7 +174,6 @@ void AAI_Animal_FOX::Dying()
 		AAI_Animal_Controller* AIController = Cast<AAI_Animal_Controller>(GetController());
 		if (AIController)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("AIController casting OK"));
 			FTimerHandle test = AIController->FastAttackTimer;
 			GetWorldTimerManager().ClearTimer(test);
 		}
@@ -170,10 +187,10 @@ void AAI_Animal_FOX::Dying()
 				MoveComp->StopActiveMovement();
 				MoveComp->DisableMovement();
 			}
-
 			GetWorldTimerManager().SetTimer(DeadTimer, this, &AAI_Animal_FOX::DestroyAfterDeath, 2.10f, false);
 		}
 	}
+	GetWorldTimerManager().SetTimer(DyingHandle, this, &AAI_Animal_FOX::Dying, 0.35f, false);
 }
 
 
@@ -182,18 +199,7 @@ void AAI_Animal_FOX::Dying()
 void AAI_Animal_FOX::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	Hearing();
-
-	Attacking();
-
-	Dying();
-	AAI_Animal_Controller* AICont = Cast<AAI_Animal_Controller>(this->GetController());
-	if (AICont)
-	{
-		test1 = AICont->IsMoving;
-		test2 = AICont->IsRunning;
-	}
+	
 }
 
 // Called to bind functionality to input
