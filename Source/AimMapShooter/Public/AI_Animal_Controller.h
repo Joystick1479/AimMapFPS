@@ -74,6 +74,9 @@ protected:
 	UPROPERTY(BlueprintReadOnly)
 	bool bAttacking;
 
+	void CheckIfChargePlayer();
+	FTimerHandle ChargeTimer;
+
 private:
 
 	int32 randomNumber;

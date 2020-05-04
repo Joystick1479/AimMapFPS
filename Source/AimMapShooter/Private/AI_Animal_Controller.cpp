@@ -36,18 +36,53 @@ void AAI_Animal_Controller::BeginPlay()
 	}
 
 	index2 = -1;
+
+	CheckIfChargePlayer();
 }
 
 void AAI_Animal_Controller::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	/*if (IsRunning)
+	{
+		randomNumber = 0.35;
+	}*/
+
+	//CheckIfChargePlayer();
+
+
+	///If Fox is attacking, charge player immediately
+
+	//if (DoOnce == false)
+	//{
+	//	AAI_Animal_FOX* Fox = Cast<AAI_Animal_FOX>(GetPawn());
+	//	if (Fox)
+	//	{
+	//		if (Fox->IsAttacking == true && Fox->bDied == false)
+	//		{
+	//			FTimerDelegate DelegateFunc = FTimerDelegate::CreateUObject(this, &AAI_Animal_Controller::FastAttack, Fox);
+	//			GetWorldTimerManager().SetTimer(FastAttackTimer, DelegateFunc, 1.0f, false);
+	//			DoOnce = true;
+	//		}
+	//		else
+	//		{
+	//			bAttacking = false;
+	//			GetWorldTimerManager().ClearTimer(FastAttackTimer);
+	//		}
+	//	}
+	//}
+
+
+}
+void AAI_Animal_Controller::CheckIfChargePlayer()
+{
+
 	if (IsRunning)
 	{
 		randomNumber = 0.35;
 	}
 
-	///If Fox is attacking, charge player immediately
 	if (DoOnce == false)
 	{
 		AAI_Animal_FOX* Fox = Cast<AAI_Animal_FOX>(GetPawn());
@@ -66,9 +101,12 @@ void AAI_Animal_Controller::Tick(float DeltaTime)
 			}
 		}
 	}
+
+	GetWorldTimerManager().SetTimer(ChargeTimer, this, &AAI_Animal_Controller::CheckIfChargePlayer, 0.3f, false);
 }
 void AAI_Animal_Controller::FastAttack(AAI_Animal_FOX* Fox)
 {
+
 	bAttacking = true;
 
 	///Fast charge player nearby
