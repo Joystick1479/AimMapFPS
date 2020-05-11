@@ -95,13 +95,6 @@ ASoldierCharacter::ASoldierCharacter()
 	AudioDamageComp = CreateDefaultSubobject<UAudioComponent>(TEXT("AudioDamageComp"));
 	AudioDamageComp->SetupAttachment(GetMesh());
 
-	// MINIMAP //
-	SpringArmRender2 = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmRender2"));
-	SceneCapture = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("SceneCaptureComp"));
-
-	GrenadeStartLocation = CreateDefaultSubobject<USceneComponent>(TEXT("SceneComponent"));
-	GrenadeStartLocation->SetupAttachment(this->GetRootComponent());
-
 	// TIMELINE//
 	static ConstructorHelpers::FObjectFinder<UCurveFloat> Curve(TEXT("/Game/Blueprints/Granates/C_MyCurve"));
 	check(Curve.Succeeded());
@@ -180,26 +173,6 @@ void ASoldierCharacter::BeginPlay()
 		MyTimeline->RegisterComponent();
 	}
 
-	/// MINIMAP ///
-	if (IsLocallyControlled())
-	{
-		if (SpringArmRender2)
-		{
-			SpringArmRender2->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform);
-		}
-		UPaperSpriteComponent* SpriteComp = this->FindComponentByClass<UPaperSpriteComponent>();
-		if (SpriteComp)
-		{
-			FRotator Rotator = FRotator(0, 90.0f, 0);
-			FVector Vector = FVector(0, 45.0f, 0);
-			SpriteComp->SetRelativeRotation(Rotator);
-			SpriteComp->SetRelativeLocation(Vector);
-		}
-		if (SceneCapture)
-		{
-			SceneCapture->AttachToComponent(SpringArmRender2, FAttachmentTransformRules::KeepRelativeTransform);
-		}
-	}
 	HealthComp->OnHealthChanged.AddDynamic(this, &ASoldierCharacter::OnHealthChanged);
 
 	if (HealthComp)
@@ -225,7 +198,7 @@ void ASoldierCharacter::BeginPlay()
 	SprintSlowDown();
 	UpdateWeaponRotation();
 	UpdateRifleStatus();
-
+	OutOfBreathSound();
 
 
 }
@@ -1344,6 +1317,27 @@ void ASoldierCharacter::SprintSlowDown()
 	GetWorldTimerManager().SetTimer(SlowDownSprintTimer, this, &ASoldierCharacter::SprintSlowDown, 0.5f, false);
 }
 
+void ASoldierCharacter::OutOfBreathSound()
+{
+	
+	if (IsLocallyControlled())
+	{
+		if (stamina < 10 && ResetBreath == false)
+		{
+			UGameplayStatics::PlaySound2D(this, OutOfBreath);
+			GetWorldTimerManager().SetTimer(OutOfBreathTimer, this, &ASoldierCharacter::OutOfBreathReset, 9.0f, false);
+			ResetBreath = true;
+		}
+	}
+
+	GetWorldTimerManager().SetTimer(UpdateBreath, this, &ASoldierCharacter::OutOfBreathSound, 1.0f, false);
+}
+
+void ASoldierCharacter::OutOfBreathReset()
+{
+	ResetBreath = false;
+}
+
 void ASoldierCharacter::Headbobbing()
 {
 	if (IsSprinting == true)
@@ -1864,4 +1858,18 @@ void ASoldierCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 
 
 	
+}
+
+void ASoldierCharacter::CalculatePrimeNumbers()
+{
+	ThreadingTest::CalculatePrimeNumbers(MaxPrime);
+
+	GLog->Log("--------------------------------------------------------------------");
+	GLog->Log("End of prime numbers calculation on game thread");
+	GLog->Log("--------------------------------------------------------------------");
+}
+
+void ASoldierCharacter::CalculatePrimeNumbersAsync()
+{
+	(new FAutoDeleteAsyncTask<PrimeCalculationAsyncTask>(MaxPrime))->StartBackgroundTask();
 }

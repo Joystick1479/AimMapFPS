@@ -121,12 +121,6 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "FPPMesh")
 	USkeletalMeshComponent* FPPMesh;
 
-	UPROPERTY(VisibleAnywhere, Category = "Minimap")
-	USpringArmComponent* SpringArmRender2;
-
-	UPROPERTY(VisibleAnywhere, Category = "Minimap")
-	class USceneCaptureComponent2D* SceneCapture;
-
 	UPROPERTY(EditAnywhere, Category = "AnimationWeapon")
 	TSubclassOf<UAnimInstance> AnimBp;
 
@@ -303,6 +297,11 @@ protected:
 	void SprintProgressBar();
 	void SprintSlowDown();
 	FTimerHandle SlowDownSprintTimer;
+	void OutOfBreathSound();
+	FTimerHandle OutOfBreathTimer;
+	FTimerHandle UpdateBreath;
+	void OutOfBreathReset();
+	bool ResetBreath;
 
 	void Headbobbing();
 	FTimerHandle HBobingTimer;
@@ -406,6 +405,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Sounds")
 	USoundCue* FiremodeSwitch;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Sounds")
+	USoundCue* OutOfBreath;
 
 	bool bStopSound;
 
@@ -713,4 +715,58 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+
+	//Implementing Multithreading test
+	UFUNCTION(BlueprintCallable, Category = "Multithreading")
+	void CalculatePrimeNumbers();
+
+	UFUNCTION(BlueprintCallable, Category = "Multithreading")
+	void CalculatePrimeNumbersAsync();
+
+	UPROPERTY(EditAnywhere, Category = MultiThreading)
+	int32 MaxPrime;
+};
+
+namespace ThreadingTest
+{
+	static void CalculatePrimeNumbers(int32 UpperLimit)
+	{
+		for (int32 i = 1; i <= UpperLimit; i++)
+		{
+			bool isPrime = true;
+			for (int32 j = 2; j <= i / 2; j++)
+			{
+				if (FMath::Fmod(i, j) == 0)
+				{
+					isPrime = false;
+					break;
+				}
+			}
+			if (isPrime) GLog->Log("Prime number #" + FString::FromInt(i) + ": " + FString::FromInt(i));
+		}
+	}
+}
+
+class PrimeCalculationAsyncTask : public FNonAbandonableTask
+{
+	int32 MaxPrime;
+
+public:
+	PrimeCalculationAsyncTask(int32 MaxPrime)
+	{
+		this->MaxPrime = MaxPrime;
+	}
+
+	FORCEINLINE TStatId GetStatId() const
+	{
+		RETURN_QUICK_DECLARE_CYCLE_STAT(PrimeCalculationAsyncTask, STATGROUP_ThreadPoolAsyncTasks);
+	}
+
+	void DoWork()
+	{
+		ThreadingTest::CalculatePrimeNumbers(MaxPrime);
+		GLog->Log("--------------------------------------------------------------------");
+		GLog->Log("End of prime numbers calculation on background thread");
+		GLog->Log("--------------------------------------------------------------------");
+	}
 };
