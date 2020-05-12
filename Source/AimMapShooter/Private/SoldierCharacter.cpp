@@ -1164,7 +1164,10 @@ void ASoldierCharacter::ZoomIn()
 			ARifle_3rd* HideIt = Cast<ARifle_3rd>(ThirdWeapon[i]);
 			if (HideIt)
 			{
-				HideIt->SkelMeshComp->SetHiddenInGame(true, false);
+				if (this == HideIt->GetOwner())
+				{
+					HideIt->SkelMeshComp->SetHiddenInGame(true, false);
+				}
 			}
 		}
 	}
