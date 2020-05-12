@@ -201,6 +201,16 @@ void ASoldierCharacter::BeginPlay()
 	OutOfBreathSound();
 
 
+
+	///CLAMP CAMERA
+	APlayerCameraManager * CameraManager = UGameplayStatics::GetPlayerCameraManager(this, 0);
+	if (CameraManager)
+	{
+		CameraManager->ViewPitchMax = 37.0f;
+		CameraManager->ViewPitchMin = -60.0f;
+	}
+
+
 }
 
 void ASoldierCharacter::LineTraceItem()
@@ -734,13 +744,15 @@ void ASoldierCharacter::PickUp()
 				}
 				
 			}
-			Rifle_3rd = GetWorld()->SpawnActor<ARifle_3rd>(ThirdWeaponClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
-			if (Rifle_3rd)
+			if (Role == ROLE_Authority)
 			{
-				Rifle_3rd->SetOwner(this);
-				Rifle_3rd->AttachToComponent(this->GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocket);
+				Rifle_3rd = GetWorld()->SpawnActor<ARifle_3rd>(ThirdWeaponClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
+				if (Rifle_3rd)
+				{
+					Rifle_3rd->SetOwner(this);
+					Rifle_3rd->AttachToComponent(this->GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocket);
+				}
 			}
-
 			UGameplayStatics::PlaySoundAtLocation(this, ItemsPickUp, GetActorLocation());
 
 		}
@@ -1119,19 +1131,13 @@ void ASoldierCharacter::EndCrouch()
 }
 void ASoldierCharacter::ZoomIn()
 {
+	///Hide 3rd person mesh
 	UCharacterMovementComponent* MoveComp = this->FindComponentByClass<UCharacterMovementComponent>();
-	if (MoveComp && !IsSprinting &&!IsInspecting &&!IsReloading &&bWeaponOnBack!=true)
+	if (MoveComp && !IsSprinting && !IsInspecting && !IsReloading &&bWeaponOnBack != true)
 	{
-		//MoveComp->MaxWalkSpeed = 78.0f;
 		MoveComp->MaxWalkSpeed = 250.0f;
-
 		if (!IsSprinting)
 		{
-			if (Role < ROLE_Authority)
-			{
-				ServerZoomIn();
-				//return;
-			}
 			IsZooming = true;
 
 			if (IsLocallyControlled())
@@ -1148,19 +1154,44 @@ void ASoldierCharacter::ZoomIn()
 			}
 		}
 	}
+
+	if (IsLocallyControlled())
+	{
+		TArray<AActor*> ThirdWeapon;
+		UGameplayStatics::GetAllActorsOfClass(this, ThirdWeaponClass, ThirdWeapon);
+		for (int i = 0; i < ThirdWeapon.Num(); i++)
+		{
+			ARifle_3rd* HideIt = Cast<ARifle_3rd>(ThirdWeapon[i]);
+			if (HideIt)
+			{
+				HideIt->SkelMeshComp->SetHiddenInGame(true, false);
+			}
+		}
+	}
 }
 void ASoldierCharacter::ZoomOut()
 {
+	///Make 3rd rifle visible
+	if (IsLocallyControlled())
+	{
+		TArray<AActor*> ThirdWeapon;
+		UGameplayStatics::GetAllActorsOfClass(this, ThirdWeaponClass, ThirdWeapon);
+		for (int i = 0; i < ThirdWeapon.Num(); i++)
+		{
+			ARifle_3rd* HideIt = Cast<ARifle_3rd>(ThirdWeapon[i]);
+			if (HideIt)
+			{
+				HideIt->SkelMeshComp->SetHiddenInGame(false, false);
+			}
+		}
+	}
+
 	UCharacterMovementComponent* MoveComp = this->FindComponentByClass<UCharacterMovementComponent>();
 	if (MoveComp)
 	{
 		MoveComp->MaxWalkSpeed = 300.0f;
 	}
-	if (Role < ROLE_Authority)
-	{
-		ServerZoomOut();
-		//return;
-	}
+
 	IsZooming = false;
 
 	if (IsLocallyControlled())
@@ -1175,7 +1206,6 @@ void ASoldierCharacter::ZoomOut()
 			}
 		}
 	}
-
 }
 
 void ASoldierCharacter::StartFire()
@@ -1711,22 +1741,6 @@ void ASoldierCharacter::ServerReload_Implementation()
 	Reload();
 }
 bool ASoldierCharacter::ServerReload_Validate()
-{
-	return true;
-}
-void ASoldierCharacter::ServerZoomIn_Implementation()
-{
-	ZoomIn();
-}
-bool ASoldierCharacter::ServerZoomIn_Validate()
-{
-	return true;
-}
-void ASoldierCharacter::ServerZoomOut_Implementation()
-{
-	ZoomOut();
-}
-bool ASoldierCharacter::ServerZoomOut_Validate()
 {
 	return true;
 }

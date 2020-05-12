@@ -144,7 +144,7 @@ protected:
 	UPROPERTY(Replicated)
 	AAutomaticRifle* AutomaticRifle;
 
-	UPROPERTY(Replicated)
+	//UPROPERTY(Replicated)
 	ARifle_3rd* Rifle_3rd;
 
 	UPROPERTY(Replicated)
@@ -172,12 +172,6 @@ protected:
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerReload();
-
-	UFUNCTION(Server, Reliable, WithValidation)
-	void ServerZoomIn();
-
-	UFUNCTION(Server, Reliable, WithValidation)
-	void ServerZoomOut();
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerSprintOn();
