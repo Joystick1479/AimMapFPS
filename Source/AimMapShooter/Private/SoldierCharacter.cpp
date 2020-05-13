@@ -199,7 +199,7 @@ void ASoldierCharacter::BeginPlay()
 	UpdateWeaponRotation();
 	UpdateRifleStatus();
 	OutOfBreathSound();
-
+	RagdollOnDeath();
 
 
 	///CLAMP CAMERA
@@ -375,6 +375,16 @@ void ASoldierCharacter::ServerWantToRespawn_Implementation()
 			}
 		}
 	}
+}
+void ASoldierCharacter::RagdollOnDeath()
+{
+	if (bDied == true && bDoRagdollOnce == false)
+	{
+		this->GetMesh()->SetSimulatePhysics(true);
+		bDoRagdollOnce = true;
+	}
+
+	GetWorldTimerManager().SetTimer(RagdollTimer, this, &ASoldierCharacter::RagdollOnDeath, 1.25f, false);
 }
 void ASoldierCharacter::PutWeaponOnBack()
 {

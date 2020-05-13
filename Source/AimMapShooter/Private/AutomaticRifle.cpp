@@ -455,6 +455,7 @@ void AAutomaticRifle::PlayImpactEffects(FVector ImpactPoint)
 		FVector ShotDirection = ImpactPoint - MuzzleLocation;
 		ShotDirection.Normalize();
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactEffect, ImpactPoint, ShotDirection.Rotation());
+		UGameplayStatics::PlaySoundAtLocation(this, HitImpactSound, ImpactPoint);
 	}
 }
 

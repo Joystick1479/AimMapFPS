@@ -283,6 +283,7 @@ protected:
 	void BeginCrouch();
 	void EndCrouch();
 
+	UFUNCTION(BlueprintCallable)
 	void StartFire();
 	void StopFire();
 
@@ -342,6 +343,10 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	UHealthComponent* HealthComp;
+
+	void RagdollOnDeath();
+	bool bDoRagdollOnce;
+	FTimerHandle RagdollTimer;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	USurvivalComponent* SurvivalComp;

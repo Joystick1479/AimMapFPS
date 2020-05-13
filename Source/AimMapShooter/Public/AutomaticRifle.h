@@ -234,6 +234,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Effects")
 	USoundCue* HitSound;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Effects")
+	USoundCue* HitImpactSound;
+
 	void PlayFireEffects(FVector EndLocation);
 
 	UPROPERTY(BlueprintReadOnly,Replicated)
