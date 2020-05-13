@@ -232,6 +232,9 @@ protected:
 	USoundCue* HeadshotSound;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Effects")
+	USoundCue* HelmetSound;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Effects")
 	USoundCue* HitSound;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Effects")

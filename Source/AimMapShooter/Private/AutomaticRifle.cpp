@@ -208,25 +208,10 @@ void AAutomaticRifle::Fire()
 					float ActualDamage = BaseDamage;
 					if (SurfaceType == SURFACE_HEAD)
 					{
-						TArray<AActor*> Target;
-						UGameplayStatics::GetAllActorsOfClass(this, SoldierHit, Target);
-						for (int i = 0; i < Target.Num(); i++)
-						{
-							ASoldierCharacter* TargetSoldier = Cast<ASoldierCharacter>(Target[i]);
-							if (Target[i] != this->GetOwner())
-							{
-								if (TargetSoldier->isHelmetAttached == true)
-								{
-									UE_LOG(LogTemp, Warning, TEXT("Reduced dmg - helmet on"));
-									ActualDamage *= 1.0f;
-								}
-								else
-								{
-									ActualDamage *= 4.0f;
-								}
-							}
-						}
+						ActualDamage *= 4.0f;
 						UGameplayStatics::PlaySoundAtLocation(GetWorld(), HeadshotSound, GetActorLocation());
+						UE_LOG(LogTemp, Warning, TEXT("Headshot"));
+
 					}
 					if (SurfaceType == SURFACE_CHEST)
 					{
@@ -255,26 +240,9 @@ void AAutomaticRifle::Fire()
 					}
 					if (SurfaceType == SURFACE_HELMET)
 					{
-						TArray<AActor*> Target;
-						UGameplayStatics::GetAllActorsOfClass(this, SoldierHit, Target);
-						for (int i = 0; i < Target.Num(); i++)
-						{
-							ASoldierCharacter* TargetSoldier = Cast<ASoldierCharacter>(Target[i]);
-							if (Target[i] != this->GetOwner())
-							{
-								if (TargetSoldier->isHelmetAttached == true)
-								{
-									UE_LOG(LogTemp, Warning, TEXT("Reduced dmg - helmet on"));
-									ActualDamage *= 1.0f;
-								}
-								else
-								{
-									ActualDamage *= 4.0f;
-								}
-							}
-						}
-						UGameplayStatics::PlaySoundAtLocation(GetWorld(), HeadshotSound, GetActorLocation());
-
+						//NO DAMAGE, HELMET BLOCKED THE DAMAGED AND PLAYED OTHER SOUND
+						UGameplayStatics::PlaySoundAtLocation(GetWorld(), HelmetSound, GetActorLocation());
+						UE_LOG(LogTemp, Warning, TEXT("Helmet Surface Detected"));
 					}
 					UGameplayStatics::ApplyPointDamage(HitActor, ActualDamage, ShotDirection, Hit, MyOwner->GetInstigatorController(), MyOwner, DamageType);
 					UseAmmo();
@@ -347,24 +315,7 @@ void AAutomaticRifle::Fire()
 					float ActualDamage = BaseDamage;
 					if (SurfaceType == SURFACE_HEAD)
 					{
-						TArray<AActor*> Target;
-						UGameplayStatics::GetAllActorsOfClass(this, SoldierHit, Target);
-						for (int i = 0; i < Target.Num(); i++)
-						{
-							ASoldierCharacter* TargetSoldier = Cast<ASoldierCharacter>(Target[i]);
-							if (Target[i] != this->GetOwner())
-							{
-								if (TargetSoldier->isHelmetAttached == true)
-								{
-									UE_LOG(LogTemp, Warning, TEXT("Reduced dmg - helmet on"));
-									ActualDamage *= 1.0f;
-								}
-								else
-								{
-									ActualDamage *= 4.0f;
-								}
-							}
-						}
+						ActualDamage *= 4.0f;
 						UGameplayStatics::PlaySoundAtLocation(GetWorld(), HeadshotSound, GetActorLocation());
 					}
 					if (SurfaceType == SURFACE_CHEST)
@@ -392,25 +343,7 @@ void AAutomaticRifle::Fire()
 					}
 					if (SurfaceType == SURFACE_HELMET)
 					{
-						TArray<AActor*> Target;
-						UGameplayStatics::GetAllActorsOfClass(this, SoldierHit, Target);
-						for (int i = 0; i < Target.Num(); i++)
-						{
-							ASoldierCharacter* TargetSoldier = Cast<ASoldierCharacter>(Target[i]);
-							if (Target[i] != this->GetOwner())
-							{
-								if (TargetSoldier->isHelmetAttached == true)
-								{
-									UE_LOG(LogTemp, Warning, TEXT("Reduced dmg - helmet on"));
-									ActualDamage *= 1.0f;
-								}
-								else
-								{
-									ActualDamage *= 4.0f;
-								}
-							}
-						}
-						UGameplayStatics::PlaySoundAtLocation(GetWorld(), HeadshotSound, GetActorLocation());
+						UGameplayStatics::PlaySoundAtLocation(GetWorld(), HelmetSound, GetActorLocation());
 					}
 					UGameplayStatics::ApplyPointDamage(HitActor, ActualDamage, ShotDirection, Hit, MyOwner->GetInstigatorController(), MyOwner, DamageType);
 					//PlayFireEffects(EndLocation);
