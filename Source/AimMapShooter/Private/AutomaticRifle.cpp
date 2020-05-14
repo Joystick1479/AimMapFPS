@@ -14,6 +14,7 @@
 #include "AimMapShooter.h"
 #include "PhysicalMaterials/PhysicalMaterial.h"
 #include "Laser.h"
+#include "Helmet.h"
 #include "Math/Vector.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Net/UnrealNetwork.h"
@@ -159,10 +160,7 @@ void AAutomaticRifle::Fire()
 	{
 		ServerFire();
 	}
-	//if (Role == ROLE_Authority)
-	//{
-	//	MulticastFire();
-	//}
+	
 	if (CurrentAmmoInClip > 0 && CurrentState != EWeaponState::Reloading)
 	{
 		CurrentState = EWeaponState::Firing;
@@ -198,27 +196,30 @@ void AAutomaticRifle::Fire()
 				if (GetWorld()->LineTraceSingleByChannel(Hit, StartLocation, EndLocation, ECollisionChannel::ECC_Destructible, QueryParams))
 				{
 
-					//DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::Red, false, 1.0f, 0, 1.0f);
-
 					PlayImpactEffects(Hit.ImpactPoint);
 
 					//*Applying damage*//
 					AActor* HitActor = Hit.GetActor();
 					EPhysicalSurface SurfaceType = UPhysicalMaterial::DetermineSurfaceType(Hit.PhysMaterial.Get());
 					float ActualDamage = BaseDamage;
+
+					HelmetTest = Cast<AHelmet>(HitActor);
+					if (HitActor == HelmetTest)
+					{
+						{
+							ServerHelmetHit(HelmetTest);
+						}
+					}
 					if (SurfaceType == SURFACE_HEAD)
 					{
 						ActualDamage *= 4.0f;
 						UGameplayStatics::PlaySoundAtLocation(GetWorld(), HeadshotSound, GetActorLocation());
-						UE_LOG(LogTemp, Warning, TEXT("Headshot"));
-
 					}
 					if (SurfaceType == SURFACE_CHEST)
 					{
 						if (SoldierChar->MultipleDamage == true)
 						{
 							ActualDamage *= 4.0f;
-							UE_LOG(LogTemp, Warning, TEXT("Multiple damage from back applied"));
 						}
 						else
 						{
@@ -242,7 +243,6 @@ void AAutomaticRifle::Fire()
 					{
 						//NO DAMAGE, HELMET BLOCKED THE DAMAGED AND PLAYED OTHER SOUND
 						UGameplayStatics::PlaySoundAtLocation(GetWorld(), HelmetSound, GetActorLocation());
-						UE_LOG(LogTemp, Warning, TEXT("Helmet Surface Detected"));
 					}
 					UGameplayStatics::ApplyPointDamage(HitActor, ActualDamage, ShotDirection, Hit, MyOwner->GetInstigatorController(), MyOwner, DamageType);
 					UseAmmo();
@@ -260,7 +260,7 @@ void AAutomaticRifle::Fire()
 				}
 			}
 		}
-		else
+		else if(SoldierChar->IsZooming == false)
 		{
 			///CHECK IF SHOULD MULTIPLE DAMAGE FROM BEHIND
 			SoldierChar->IsTargetFromBack();
@@ -277,11 +277,6 @@ void AAutomaticRifle::Fire()
 			{
 				FHitResult Hit;
 				FVector StartLocation = SkelMeshComp->GetSocketLocation(MuzzleSocket);
-			//	FRotator RotationCamera = SoldierChar->CameraComp->GetComponentRotation();
-			//	FVector ShotDirection = RotationCamera.Vector();
-
-				//FRotator Rotation = SkelMeshComp->GetSocketRotation(MuzzleSocket);
-				//FVector ShotDirection = Rotation.Vector();
 				FRotator temp;
 				MyOwner->GetActorEyesViewPoint(StartLocation, temp);
 
@@ -313,6 +308,14 @@ void AAutomaticRifle::Fire()
 					AActor* HitActor = Hit.GetActor();
 					EPhysicalSurface SurfaceType = UPhysicalMaterial::DetermineSurfaceType(Hit.PhysMaterial.Get());
 					float ActualDamage = BaseDamage;
+
+					HelmetTest = Cast<AHelmet>(HitActor);
+					if (HitActor == HelmetTest)
+					{
+						{
+							ServerHelmetHit(HelmetTest);
+						}
+					}
 					if (SurfaceType == SURFACE_HEAD)
 					{
 						ActualDamage *= 4.0f;
@@ -323,7 +326,6 @@ void AAutomaticRifle::Fire()
 						if (SoldierChar->MultipleDamage == true)
 						{
 							ActualDamage *= 4.0f;
-							UE_LOG(LogTemp, Warning, TEXT("Multiple damage from back applied"));
 						}
 						else
 						{
@@ -346,7 +348,6 @@ void AAutomaticRifle::Fire()
 						UGameplayStatics::PlaySoundAtLocation(GetWorld(), HelmetSound, GetActorLocation());
 					}
 					UGameplayStatics::ApplyPointDamage(HitActor, ActualDamage, ShotDirection, Hit, MyOwner->GetInstigatorController(), MyOwner, DamageType);
-					//PlayFireEffects(EndLocation);
 					UseAmmo();
 					PlayFireEffects(Hit.ImpactPoint);
 				}
@@ -476,6 +477,14 @@ void AAutomaticRifle::ReloadWeapon()
 
 		UE_LOG(LogTemp, Warning, TEXT("Reloaded"));
 		//LastReloadTime = GetWorld()->TimeSeconds;
+}
+
+void AAutomaticRifle::ServerHelmetHit_Implementation(AHelmet* HitActor)
+{
+	if (HitActor)
+	{
+		HitActor->NumberOfLives--;
+	}
 }
 void AAutomaticRifle::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {

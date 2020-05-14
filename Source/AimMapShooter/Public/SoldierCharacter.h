@@ -137,7 +137,6 @@ protected:
 
 	EHeadsetAttachment::Type HeadsetEquipState;
 	
-	EHelmetAttachment::Type HelmetEquipState;
 
 	ELaserAttachment::Type LaserEquipState;
 
@@ -439,6 +438,7 @@ protected:
 
 
 public:	
+	EHelmetAttachment::Type HelmetEquipState;
 
 	
 	///GRENADE///

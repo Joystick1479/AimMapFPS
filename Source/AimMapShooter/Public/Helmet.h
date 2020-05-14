@@ -34,9 +34,14 @@ protected:
 	void DestroyOnUse();
 	FTimerHandle DestroyTimer;
 
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	UPROPERTY(Replicated)
+	int32 NumberOfLives;
+
 
 	bool IsPickedUp;
 };

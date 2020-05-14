@@ -15,6 +15,7 @@ class USphereComponent;
 class UCameraShake;
 class ALaser;
 class UAnimSequence;
+class AHelmet;
 
 //Contains information of a single hitscan weapon line trace//
 USTRUCT()
@@ -244,6 +245,11 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly,Replicated)
 	bool bFireAnimation;
+
+	UFUNCTION(Server, Reliable)
+	void ServerHelmetHit(AHelmet*HitActor);
+
+	 AHelmet* HelmetTest;
 
 
 public:	
