@@ -610,20 +610,6 @@ public:
 	UPROPERTY(BlueprintReadOnly, Replicated, Category = "Player")
 	bool isWeaponAttached;
 
-	//Weapon Sway
-	FRotator InitialWeaponRot;
-	UPROPERTY(BlueprintReadOnly)
-	FRotator FinalWeaponRot;
-	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
-	float SmoothAmount;
-	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
-	float LookAmount;
-	FName LookUp;
-	UPROPERTY(BlueprintReadWrite)
-	float temp1;
-	UPROPERTY(BlueprintReadWrite)
-	float temp2;
-
 	UPROPERTY(BlueprintReadOnly, Category = "Player")
 	bool isLaserAttached;
 

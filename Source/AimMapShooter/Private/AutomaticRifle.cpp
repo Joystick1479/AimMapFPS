@@ -61,16 +61,6 @@ AAutomaticRifle::AAutomaticRifle()
 	SetReplicates(true);
 	NetUpdateFrequency = 66.0f;
 	MinNetUpdateFrequency = 33.0f;
-	
-	float  TestShots = 60 / RateOfFire;
-
-}
-
-
-void AAutomaticRifle::UseAmmo()
-{
-	CurrentAmmoInClip--;
-	CurrentAmmo--;
 
 }
 
@@ -91,12 +81,52 @@ void AAutomaticRifle::BeginPlay()
 	
 }
 
-// Called every frame
-void AAutomaticRifle::Tick(float DeltaTime)
+USkeletalMeshComponent* AAutomaticRifle::GetSkelMeshComp()
 {
-	Super::Tick(DeltaTime);
-
+	return this->SkelMeshComp;
 }
+
+UCameraComponent* AAutomaticRifle::GetCamera()
+{
+	return this->Camera;
+}
+
+FName AAutomaticRifle::GetMuzzleSocketName()
+{
+	return this->MuzzleSocket;
+}
+
+FName AAutomaticRifle::GetScopeSocketName()
+{
+	return this->ScopeSocket;
+}
+
+FName AAutomaticRifle::GetGripSocketName()
+{
+	return this->GripSocket;
+}
+
+FName AAutomaticRifle::GetLaserSocketName()
+{
+	return this->LaserSocket;
+}
+
+int32 AAutomaticRifle::GetCurrentAmmoInClip()
+{
+	return CurrentAmmoInClip;
+}
+
+int32 AAutomaticRifle::GetAllAmmo()
+{
+	return CurrentAmmo;
+}
+
+int32 AAutomaticRifle::GetCurrentAmountOfClips()
+{
+	return CurrentAmountOfClips;
+}
+
+
 
 void AAutomaticRifle::NotifyActorBeginOverlap(AActor* OtherActor)
 {
@@ -129,29 +159,6 @@ void AAutomaticRifle::StartFire()
 void AAutomaticRifle::StopFire()
 {
 	GetWorldTimerManager().ClearTimer(TimerHandle_TimeBetweenShots);
-}
-
-void AAutomaticRifle::ServerFire_Implementation()
-{
-	Fire();
-}
-bool AAutomaticRifle::ServerFire_Validate()
-{
-	return true;
-}
-void AAutomaticRifle::ServerStartReload_Implementation()
-{
-	StartReload();
-}
-bool AAutomaticRifle::ServerStartReload_Validate()
-{
-	return true;
-}
-void AAutomaticRifle::OnRep_HitScanTrace()
-{
-	// Play cosmetic FX//
-	PlayFireEffects(HitScanTrace.TraceTo);
-	PlayImpactEffects(HitScanTrace.TraceTo);
 }
 
 void AAutomaticRifle::Fire()
@@ -381,6 +388,11 @@ void AAutomaticRifle::Fire()
 	}
 	
 }
+void AAutomaticRifle::UseAmmo()
+{
+	CurrentAmmoInClip--;
+	CurrentAmmo--;
+}
 void AAutomaticRifle::PlayImpactEffects(FVector ImpactPoint)
 {
 	if (ImpactEffect)
@@ -462,13 +474,6 @@ void AAutomaticRifle::StopReload()
 
 void AAutomaticRifle::ReloadWeapon()
 {
-	/*
-		int32 ClipDelta = FMath::Min(WeaponConfig.AmmoPerClip - CurrentAmmoInClip, CurrentAmmo - CurrentAmmoInClip);
-		if (ClipDelta > 0)
-		{
-			CurrentAmmoInClip += ClipDelta;
-			CurrentAmountOfClips--;
-		}*/
 		CurrentAmmoInClip = 20;
 		CurrentAmountOfClips--;
 
@@ -476,9 +481,29 @@ void AAutomaticRifle::ReloadWeapon()
 		ReloadingState = EReloadingState::None;
 
 		UE_LOG(LogTemp, Warning, TEXT("Reloaded"));
-		//LastReloadTime = GetWorld()->TimeSeconds;
 }
-
+void AAutomaticRifle::ServerFire_Implementation()
+{
+	Fire();
+}
+bool AAutomaticRifle::ServerFire_Validate()
+{
+	return true;
+}
+void AAutomaticRifle::ServerStartReload_Implementation()
+{
+	StartReload();
+}
+bool AAutomaticRifle::ServerStartReload_Validate()
+{
+	return true;
+}
+void AAutomaticRifle::OnRep_HitScanTrace()
+{
+	// Play cosmetic FX//
+	PlayFireEffects(HitScanTrace.TraceTo);
+	PlayImpactEffects(HitScanTrace.TraceTo);
+}
 void AAutomaticRifle::ServerHelmetHit_Implementation(AHelmet* HitActor)
 {
 	if (HitActor)

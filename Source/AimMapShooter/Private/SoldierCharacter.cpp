@@ -68,7 +68,6 @@ ASoldierCharacter::ASoldierCharacter()
 	HelmetSocket = "HelmetSocket";
 	HeadsetSocket = "HeadsetSocket";
 	WeaponBackSocket = "WeaponBackSocket";
-	LookUp = "LookUp";
 
 	RootComponent = this->GetRootComponent();
 
@@ -135,9 +134,6 @@ ASoldierCharacter::ASoldierCharacter()
 	amountOfBoostFood = 40;
 	stamina = 100;
 
-
-	SmoothAmount = 8.0f;
-	LookAmount = 5.0f;
 }
 
 // Called when the game starts or when spawned
@@ -196,7 +192,7 @@ void ASoldierCharacter::BeginPlay()
 	Headbobbing();
 	GrenadeTimeline();
 	SprintSlowDown();
-	UpdateWeaponRotation();
+	//UpdateWeaponRotation();
 	UpdateRifleStatus();
 	OutOfBreathSound();
 	RagdollOnDeath();
@@ -298,7 +294,7 @@ void ASoldierCharacter::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 
-	
+	//UpdateWeaponRotation();
 }
 
 
@@ -746,13 +742,10 @@ void ASoldierCharacter::PickUp()
 				{
 					AutomaticRifle->SetOwner(this);
 					AutomaticRifle->AttachToComponent(FPPMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocket);
-					AutomaticRifle->SkelMeshComp->bOnlyOwnerSee = true;
-					AutomaticRifle->SkelMeshComp->SetAnimInstanceClass(AnimBp);
+					AutomaticRifle->GetSkelMeshComp()->bOnlyOwnerSee = true;
+					AutomaticRifle->GetSkelMeshComp()->SetAnimInstanceClass(AnimBp);
 					isWeaponAttached = true;
-					//Weapon Sway//
-					InitialWeaponRot = AutomaticRifle->SkelMeshComp->GetRelativeTransform().GetRotation().Rotator();
 				}
-				
 			}
 			if (Role == ROLE_Authority)
 			{
@@ -796,8 +789,8 @@ void ASoldierCharacter::PickUp()
 					HoloScope->SetOwner(this);
 					HoloScope->SkelMeshComp->bOnlyOwnerSee = true;
 					HoloScope->SkelMeshComp->SetRenderCustomDepth(false);
-					FName Socket = AutomaticRifle->ScopeSocket;
-					HoloScope->AttachToComponent(AutomaticRifle->SkelMeshComp, FAttachmentTransformRules::SnapToTargetNotIncludingScale, Socket);
+					FName Socket = AutomaticRifle->GetScopeSocketName();
+					HoloScope->AttachToComponent(AutomaticRifle->GetSkelMeshComp(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, Socket);
 					isHoloAttached = true;
 				}
 				UGameplayStatics::PlaySoundAtLocation(this, ItemsPickUp, GetActorLocation());
@@ -832,8 +825,8 @@ void ASoldierCharacter::PickUp()
 					Grip->SetOwner(this);
 					Grip->MeshComp->bOnlyOwnerSee = true;
 					Grip->MeshComp->SetRenderCustomDepth(false);
-					FName GSocket = AutomaticRifle->GripSocket;
-					Grip->AttachToComponent(AutomaticRifle->SkelMeshComp, FAttachmentTransformRules::SnapToTargetNotIncludingScale, GSocket);
+					FName GSocket = AutomaticRifle->GetGripSocketName();
+					Grip->AttachToComponent(AutomaticRifle->GetSkelMeshComp(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, GSocket);
 					isGripAttached = true;
 				}
 				UGameplayStatics::PlaySoundAtLocation(this, ItemsPickUp, GetActorLocation());
@@ -933,8 +926,8 @@ void ASoldierCharacter::PickUp()
 					Laser->SetOwner(this);
 					Laser->MeshComp->bOnlyOwnerSee = true;
 					Laser->MeshComp->SetRenderCustomDepth(false);
-					FName LSocket = AutomaticRifle->LaserSocket;
-					Laser->AttachToComponent(AutomaticRifle->SkelMeshComp, FAttachmentTransformRules::SnapToTargetNotIncludingScale, LSocket);
+					FName LSocket = AutomaticRifle->GetLaserSocketName();
+					Laser->AttachToComponent(AutomaticRifle->GetSkelMeshComp(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, LSocket);
 					isLaserAttached = true;
 				}
 				UGameplayStatics::PlaySoundAtLocation(this, ItemsPickUp, GetActorLocation());
@@ -957,7 +950,6 @@ void ASoldierCharacter::PickUp()
 				}
 			}
 
-			//SoldierCurrentClips++;
 			TArray<AActor*> Rifles;
 			UGameplayStatics::GetAllActorsOfClass(this, StarterWeaponClass, Rifles);
 			for (int i = 0; i < Rifles.Num(); i++)
@@ -965,7 +957,8 @@ void ASoldierCharacter::PickUp()
 				AAutomaticRifle* RiflesItr = Cast<AAutomaticRifle>(Rifles[i]);
 				if (RiflesItr)
 				{
-					RiflesItr->CurrentAmountOfClips++;
+					//TO DO
+					//RiflesItr->GetCurrentAmountOfClips() + 1;
 				}
 			}
 
@@ -1233,7 +1226,7 @@ void ASoldierCharacter::StartFire()
 		{
 			if (AutomaticRifle)
 			{
-				if (AutomaticRifle->CurrentAmmoInClip > 0 && AutomaticRifle->CurrentState != EWeaponState::Reloading)
+				if (AutomaticRifle->GetCurrentAmmoInClip() > 0 && AutomaticRifle->CurrentState != EWeaponState::Reloading)
 				{
 					bFireAnimation = true;
 				}
@@ -1244,7 +1237,7 @@ void ASoldierCharacter::StartFire()
 		{
 			if (AutomaticRifle)
 			{
-				if (AutomaticRifle->CurrentAmmoInClip > 0 && AutomaticRifle->CurrentState != EWeaponState::Reloading)
+				if (AutomaticRifle->GetCurrentAmmoInClip() > 0 && AutomaticRifle->CurrentState != EWeaponState::Reloading)
 				{
 					bFireAnimation = true;
 				}
@@ -1461,25 +1454,12 @@ void ASoldierCharacter::UpdateRifleStatus()
 {
 	if (AutomaticRifle)
 	{
-		SoldierCurrentAmmoInClip = AutomaticRifle->CurrentAmmoInClip;
-		SoldierCurrentAmmo = AutomaticRifle->CurrentAmmo;
-		SoldierCurrentClips = AutomaticRifle->CurrentAmountOfClips;
+		SoldierCurrentAmmoInClip = AutomaticRifle->GetCurrentAmmoInClip();
+		SoldierCurrentAmmo = AutomaticRifle->GetAllAmmo();
+		SoldierCurrentClips = AutomaticRifle->GetCurrentAmountOfClips();
 	}
 
 	GetWorldTimerManager().SetTimer(UpdateRifleTimer, this, &ASoldierCharacter::UpdateRifleStatus, 0.05f, false);
-}
-void ASoldierCharacter::UpdateWeaponRotation()
-{
-	//Weapon Sway
-	FRotator AlmostFinal = FRotator(temp2*LookAmount, temp1*LookAmount, temp1*LookAmount);
-	FRotator TempRotator = FRotator(InitialWeaponRot.Pitch - AlmostFinal.Pitch, AlmostFinal.Yaw + InitialWeaponRot.Yaw, InitialWeaponRot.Roll + AlmostFinal.Roll);
-	if (AutomaticRifle)
-	{
-		float timeWorld = UGameplayStatics::GetWorldDeltaSeconds(GetWorld());
-		FinalWeaponRot = UKismetMathLibrary::RInterpTo(AutomaticRifle->SkelMeshComp->GetRelativeTransform().GetRotation().Rotator(), TempRotator, timeWorld, SmoothAmount);
-	}
-
-	GetWorldTimerManager().SetTimer(UpdateWRotTimer, this, &ASoldierCharacter::UpdateWeaponRotation, 0.05f, false);
 }
 
 void ASoldierCharacter::WeaponInspectionOn()
