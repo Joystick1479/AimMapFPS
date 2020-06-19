@@ -18,10 +18,6 @@ public:
 	// Sets default values for this actor's properties
 	AHoloScope();
 
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-	USkeletalMeshComponent* SkelMeshComp;
-
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -30,6 +26,8 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	USphereComponent* SphereComp;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	USkeletalMeshComponent* SkelMeshComp;
 
 	void NotifyActorBeginOverlap(AActor* OtherActor);
 	void NotifyActorEndOverlap(AActor* OtherActor);
@@ -38,8 +36,7 @@ protected:
 	FTimerHandle DestroyTimer;
 
 public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+	USkeletalMeshComponent* GetSkelelMeshComp();
 
 	bool IsPickedUp;
 

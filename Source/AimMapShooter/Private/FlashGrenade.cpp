@@ -39,17 +39,17 @@ void AFlashGrenade::BeginPlay()
 
 	if (Role == ROLE_Authority)
 	{
-		FVector Impulse = MeshComp->GetForwardVector() * ImpulseForce;
-		FVector Impulse2 = UKismetMathLibrary::RandomUnitVector() * ImpulseForce2;
-		ThrowinGrenade(Impulse, Impulse2);
+		FVector ImpulseVector = MeshComp->GetForwardVector() * ImpulseForce;
+		FVector Impulse2Vector = UKismetMathLibrary::RandomUnitVector() * ImpulseForce2;
+		ThrowinGrenade(ImpulseVector, Impulse2Vector);
 	}
 }
 
-void AFlashGrenade::ThrowinGrenade(FVector Impulse, FVector Impulse2)
+void AFlashGrenade::ThrowinGrenade(FVector AddForce, FVector AddForce2)
 {
 	if (Role < ROLE_Authority)
 	{
-		ServerThrowinGrenade(Impulse, Impulse2);
+		ServerThrowinGrenade(AddForce, AddForce2);
 	}
 
 	PinPullSound();
@@ -120,11 +120,11 @@ void AFlashGrenade::ExplosionSound()
 	UGameplayStatics::PlaySoundAtLocation(this, ExplosionSoundCue, this->GetActorLocation(), 2.0f, 1.0f, 0.0f, SoundAttenuation);
 }
 
-void AFlashGrenade::ServerThrowinGrenade_Implementation(FVector Impulse, FVector Impulse2)
+void AFlashGrenade::ServerThrowinGrenade_Implementation(FVector ServerImpulseForce, FVector ServerImpulseForce2)
 {
-	ThrowinGrenade(Impulse, Impulse2);
+	ThrowinGrenade(ServerImpulseForce, ServerImpulseForce2);
 }
-bool AFlashGrenade::ServerThrowinGrenade_Validate(FVector Impulse, FVector Impulse2)
+bool AFlashGrenade::ServerThrowinGrenade_Validate(FVector ServerImpulseForce, FVector ServerImpulseForce2)
 {
 	return true;
 }
@@ -168,11 +168,11 @@ void AFlashGrenade::MulticastSpawnExplosionDecal_Implementation()
 
 	for (int i = 0; i < Character.Num(); i++)
 	{
-		ASoldierCharacter*New = Cast<ASoldierCharacter>(Character[i]);
-		if (New)
+		ASoldierCharacter* SoldierCharacter = Cast<ASoldierCharacter>(Character[i]);
+		if (SoldierCharacter)
 		{
-			float DistanceBetweenActors = FVector::Dist(this->GetActorLocation(), New->GetActorLocation());
-			New->Flashbang(DistanceBetweenActors, this->GetActorLocation());
+			float DistanceBetweenActors = FVector::Dist(this->GetActorLocation(), SoldierCharacter->GetActorLocation());
+			SoldierCharacter->Flashbang(DistanceBetweenActors, this->GetActorLocation());
 			Destroy();
 		}
 	}

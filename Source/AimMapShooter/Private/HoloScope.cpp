@@ -32,6 +32,11 @@ void AHoloScope::BeginPlay()
 
 }
 
+USkeletalMeshComponent* AHoloScope::GetSkelelMeshComp()
+{
+	return this->SkelMeshComp;
+}
+
 void AHoloScope::NotifyActorBeginOverlap(AActor * OtherActor)
 {
 	Super::NotifyActorBeginOverlap(OtherActor);
@@ -67,12 +72,4 @@ void AHoloScope::DestroyOnUse()
 	GetWorldTimerManager().SetTimer(DestroyTimer, this, &AHoloScope::DestroyOnUse, 0.5f, false);
 }
 
-// Called every frame
-void AHoloScope::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-	
-
-}
 

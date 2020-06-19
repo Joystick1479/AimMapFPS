@@ -77,6 +77,7 @@ void AAutomaticRifle::BeginPlay()
 		CurrentAmountOfClips = WeaponConfig.InitialClips;
 	}
 
+
 	TimeBetweenShots = 60 / RateOfFire;
 	
 }
@@ -172,15 +173,15 @@ void AAutomaticRifle::Fire()
 	{
 		CurrentState = EWeaponState::Firing;
 
-		ASoldierCharacter* SoldierChar = Cast<ASoldierCharacter>(GetOwner());
+		ASoldierCharacter* SoldierCharacter = Cast<ASoldierCharacter>(GetOwner());
 		ALaser* Laser = Cast<ALaser>(GetOwner());
-		if (SoldierChar->IsZooming == true)
+		if (SoldierCharacter->IsZooming == true)
 		{
 			///RECOIL
 			float PitchRandomVal = UKismetMathLibrary::RandomFloatInRange(-0.1, -0.5);
-			SoldierChar->AddControllerPitchInput(PitchRandomVal);
+			SoldierCharacter->AddControllerPitchInput(PitchRandomVal);
 			float YawRandomVal = UKismetMathLibrary::RandomFloatInRange(-0.2, 0.2);
-			SoldierChar->AddControllerYawInput(YawRandomVal);
+			SoldierCharacter->AddControllerYawInput(YawRandomVal);
 
 
 			AActor* MyOwner = GetOwner();
@@ -224,7 +225,7 @@ void AAutomaticRifle::Fire()
 					}
 					if (SurfaceType == SURFACE_CHEST)
 					{
-						if (SoldierChar->MultipleDamage == true)
+						if (SoldierCharacter->MultipleDamage == true)
 						{
 							ActualDamage *= 4.0f;
 						}
@@ -267,16 +268,16 @@ void AAutomaticRifle::Fire()
 				}
 			}
 		}
-		else if(SoldierChar->IsZooming == false)
+		else if(SoldierCharacter->IsZooming == false)
 		{
 			///CHECK IF SHOULD MULTIPLE DAMAGE FROM BEHIND
-			SoldierChar->IsTargetFromBack();
+			SoldierCharacter->IsTargetFromBack();
 
 			///RECOILD
 			float randomval = UKismetMathLibrary::RandomFloatInRange(-0.1, -0.5);
-			SoldierChar->AddControllerPitchInput(randomval);
+			SoldierCharacter->AddControllerPitchInput(randomval);
 			float YawRandomVal = UKismetMathLibrary::RandomFloatInRange(-0.2, 0.2);
-			SoldierChar->AddControllerYawInput(YawRandomVal);
+			SoldierCharacter->AddControllerYawInput(YawRandomVal);
 
 
 			AActor* MyOwner = GetOwner();
@@ -290,7 +291,7 @@ void AAutomaticRifle::Fire()
 				FRotator RotationCamera = temp;
 				FVector ShotDirection = RotationCamera.Vector();
 
-				if (SoldierChar->isGripAttached == true)
+				if (SoldierCharacter->isGripAttached == true)
 				{
 					BulletSpread = BulletSpreadGrip;
 				}
@@ -330,7 +331,7 @@ void AAutomaticRifle::Fire()
 					}
 					if (SurfaceType == SURFACE_CHEST)
 					{
-						if (SoldierChar->MultipleDamage == true)
+						if (SoldierCharacter->MultipleDamage == true)
 						{
 							ActualDamage *= 4.0f;
 						}
@@ -379,10 +380,10 @@ void AAutomaticRifle::Fire()
 
 	if (CurrentAmmoInClip == 0 && CurrentState!=EWeaponState::Reloading)
 	{
-		ASoldierCharacter* SoldierChar = Cast<ASoldierCharacter>(GetOwner());
-		if (SoldierChar)
+		ASoldierCharacter* SoldierCharacterAnimation = Cast<ASoldierCharacter>(GetOwner());
+		if (SoldierCharacterAnimation)
 		{
-			SoldierChar->bFireAnimation = false;
+			SoldierCharacterAnimation->bFireAnimation = false;
 		}
 		UGameplayStatics::PlaySoundAtLocation(GetWorld(), NoAmmoSound, GetActorLocation());
 	}
@@ -432,8 +433,8 @@ void AAutomaticRifle::PlayFireEffects(FVector EndLocation)
 		if (MyOwner->IsLocallyControlled())
 		{
 			APlayerController* PC = Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
-			ASoldierCharacter* SoldierChar = Cast<ASoldierCharacter>(GetOwner());
-			if (PC && SoldierChar->IsZooming == true)
+			ASoldierCharacter* SoldierCharacterOwner = Cast<ASoldierCharacter>(GetOwner());
+			if (PC && SoldierCharacterOwner->IsZooming == true)
 			{
 				PC->ClientPlayCameraShake(CameShakeZoomClass);
 			}
@@ -506,9 +507,10 @@ void AAutomaticRifle::OnRep_HitScanTrace()
 }
 void AAutomaticRifle::ServerHelmetHit_Implementation(AHelmet* HitActor)
 {
+	//TODO
 	if (HitActor)
 	{
-		HitActor->NumberOfLives--;
+		//HitActor->NumberOfLives--;
 	}
 }
 void AAutomaticRifle::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

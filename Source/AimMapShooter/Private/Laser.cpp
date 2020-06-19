@@ -102,21 +102,21 @@ void ALaser::StartLaser()
 			UE_LOG(LogTemp, Warning, TEXT("LOL"));
 			FName Socket = Rifle->GetMuzzleSocketName();
 			FHitResult Hit;
-			FVector StartLocation = MeshComp->GetSocketLocation(LaserSocket);
+			FVector StartSocketLocation = MeshComp->GetSocketLocation(LaserSocket);
 			FRotator Rotation = Rifle->GetSkelMeshComp()->GetSocketTransform(Socket).Rotator();
 			FVector ShotDirection = Rotation.Vector();
-			FVector EndLocation = StartLocation + (ShotDirection * 10000);
+			FVector EndSocketLocation = StartSocketLocation + (ShotDirection * 10000);
 			FCollisionQueryParams QueryParams;
 			QueryParams.AddIgnoredActor(this);
 			QueryParams.bTraceComplex = false;
 
-			if (GetWorld()->LineTraceSingleByChannel(Hit, StartLocation, EndLocation, ECollisionChannel::ECC_Visibility, QueryParams))
+			if (GetWorld()->LineTraceSingleByChannel(Hit, StartSocketLocation, EndSocketLocation, ECollisionChannel::ECC_Visibility, QueryParams))
 			{
 
-				DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::White, false, 1.0f, 0, 10.0f);
-				FVector StartLocation = Hit.TraceStart;
-				FVector EndLocation = Hit.Location;
-				FVector Laser = StartLocation - EndLocation;
+				DrawDebugLine(GetWorld(), StartSocketLocation, EndSocketLocation, FColor::White, false, 1.0f, 0, 10.0f);
+				FVector StartLaserLocation = Hit.TraceStart;
+				FVector EndLaserLocation = Hit.Location;
+				FVector Laser = StartLaserLocation - EndLaserLocation;
 				float LaserLentgh = Laser.Size() / LengthOfLaser;
 				FVector Last = FVector(LaserLentgh, ThickOfLaser, ThickOfLaser);
 				MeshComp2->SetWorldScale3D(Last);

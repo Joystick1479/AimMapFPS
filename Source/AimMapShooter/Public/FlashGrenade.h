@@ -40,7 +40,7 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	class UStaticMeshComponent* MeshComp;
 
-	void ThrowinGrenade(FVector Impulse, FVector Impulse2);
+	void ThrowinGrenade(FVector AddForce, FVector AddForce2);
 
 	void SpawnEffects();
 
@@ -58,7 +58,7 @@ private:
 
 	///MULTIPLAYER REPLICATION///
 	UFUNCTION(Server, Reliable, WithValidation)
-	void ServerThrowinGrenade(FVector Impulsee, FVector Impulse22);
+	void ServerThrowinGrenade(FVector ServerImpulseForce, FVector ServerImpulseForce2);
 
 	UFUNCTION(Server, Reliable)
 	void ServerPinPullSound();
@@ -99,8 +99,6 @@ private:
 
 	UPROPERTY()
 	AGrenadeDecal* GrenadeDecal;
-
-	ASoldierCharacter* New;
 
 	FTimerHandle TimerHandle_Explosion;
 

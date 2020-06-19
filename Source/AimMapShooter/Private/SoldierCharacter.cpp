@@ -122,7 +122,7 @@ ASoldierCharacter::ASoldierCharacter()
 	MinNetUpdateFrequency = 33.0f;
 
 	///// VAULTING /////
-	float MaxHeightForVault = 60;
+	MaxHeightForVault = 60;
 	isAllowClimbing = false;
 	isAbleToVault = false;
 
@@ -293,8 +293,6 @@ void ASoldierCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-
-	//UpdateWeaponRotation();
 }
 
 
@@ -571,11 +569,10 @@ void ASoldierCharacter::Vault()
 			UE_LOG(LogTemp, Warning, TEXT("Climb"));
 
 			///***Turning off collision when getting on the obstacle***//
-			UCapsuleComponent* CapsuleComponent = this->FindComponentByClass<UCapsuleComponent>();
-			if (CapsuleComponent)
+			UCapsuleComponent* CharCapsuleComponent = this->FindComponentByClass<UCapsuleComponent>();
+			if (CharCapsuleComponent)
 			{
-				CapsuleComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-
+				CharCapsuleComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 			}
 
 			//***Setting up flying movement when vaulting/climbing**//
@@ -604,11 +601,10 @@ void ASoldierCharacter::Vault()
 			GoVault = true;
 
 			///***Turning off collision when getting on the obstacle***//
-			UCapsuleComponent* CapsuleComponent = this->FindComponentByClass<UCapsuleComponent>();
-			if (CapsuleComponent)
+			UCapsuleComponent* CharCapsuleComponent = this->FindComponentByClass<UCapsuleComponent>();
+			if (CharCapsuleComponent)
 			{
-				CapsuleComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-
+				CharCapsuleComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 			}
 
 			//***Setting up flying movement when vaulting/climbing**//
@@ -650,10 +646,10 @@ void ASoldierCharacter::ResetVaultTimer()
 
 	GetWorld()->GetTimerManager().ClearTimer(TimerHandle_Vault);
 
-	UCapsuleComponent* CapsuleComponent = this->FindComponentByClass<UCapsuleComponent>();
-	if (CapsuleComponent)
+	UCapsuleComponent* CharCapsuleComponent = this->FindComponentByClass<UCapsuleComponent>();
+	if (CharCapsuleComponent)
 	{
-		CapsuleComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		CharCapsuleComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	}
 
 	UCharacterMovementComponent* CharMovement = this->FindComponentByClass<UCharacterMovementComponent>();
@@ -787,8 +783,8 @@ void ASoldierCharacter::PickUp()
 				if (HoloScope)
 				{
 					HoloScope->SetOwner(this);
-					HoloScope->SkelMeshComp->bOnlyOwnerSee = true;
-					HoloScope->SkelMeshComp->SetRenderCustomDepth(false);
+					HoloScope->GetSkelelMeshComp()->bOnlyOwnerSee = true;
+					HoloScope->GetSkelelMeshComp()->SetRenderCustomDepth(false);
 					FName Socket = AutomaticRifle->GetScopeSocketName();
 					HoloScope->AttachToComponent(AutomaticRifle->GetSkelMeshComp(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, Socket);
 					isHoloAttached = true;
@@ -845,7 +841,8 @@ void ASoldierCharacter::PickUp()
 				{
 					if (this->IsOverlappingActor(HelmetItr))
 					{
-						HelmetItr->IsPickedUp = true;
+						//TODO
+						//HelmetItr->IsPickedUp = true;
 					}
 				}
 			}
@@ -857,7 +854,7 @@ void ASoldierCharacter::PickUp()
 			if (Helmet)
 			{
 				Helmet->SetOwner(this);
-				Helmet->MeshComp->SetRenderCustomDepth(false);
+				Helmet->GetStaticMeshComponent()->SetRenderCustomDepth(false);
 				Helmet->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, HelmetSocket);
 				isHelmetAttached = true;
 			}
@@ -1521,7 +1518,7 @@ void ASoldierCharacter::ThrowGrenade()
 		}
 	}
 }
-void ASoldierCharacter::SpawnGrenade(FVector STL, FRotator STR)
+void ASoldierCharacter::SpawnGrenade(FVector StartingLocation, FRotator StartingRotation)
 {
 	if (Role < ROLE_Authority)
 	{
@@ -1534,7 +1531,7 @@ void ASoldierCharacter::SpawnGrenade(FVector STL, FRotator STR)
 	FlashGrenade = GetWorld()->SpawnActor<AFlashGrenade>(FlashGrenadeClass, STL, STR, SpawnParams);
 
 }
-void ASoldierCharacter::Flashbang(float Distance, FVector FacingAngle)
+void ASoldierCharacter::Flashbang(float ThrowDistance, FVector PlayerFacingAngle)
 {
 	if (IsLocallyControlled())
 	{
@@ -1619,24 +1616,20 @@ void ASoldierCharacter::OnFoodLow()
 	if (Role < ROLE_Authority)
 	{
 		ServerOnFoodLow();
-		//return;
 	}
 	if (SurvivalComp)
 	{
 		if (SurvivalComp->Food == 0)
 		{
-			UHealthComponent* HealthComp = this->FindComponentByClass<UHealthComponent>();
-			if (HealthComp)
+			UHealthComponent* HealthComponent = this->FindComponentByClass<UHealthComponent>();
+			if (HealthComponent)
 			{
-				if (HealthComp->Health > 0)
+				if (HealthComponent->Health > 0)
 				{
-					//UE_LOG(LogTemp, Warning, TEXT("Znalazlem healthcomp"));
-					HealthComp->Health = HealthComp->Health - 1;
+					HealthComponent->Health = HealthComp->Health - 1;
 				}
-
-				if (HealthComp->Health == 0) bDied = true;
+				if (HealthComponent->Health == 0) bDied = true;
 			}
-			//UE_LOG(LogTemp, Warning, TEXT("Food low!!!"));
 			GetWorldTimerManager().SetTimer(FoodLowTimer, this, &ASoldierCharacter::OnFoodLow, FreQOfDrainingHealthWhenLowFood, false);
 		}
 		if (SurvivalComp->Food > 0)
@@ -1654,24 +1647,19 @@ void ASoldierCharacter::OnDrinkLow()
 		return;
 	}
 
-	//USurvivalComponent* SurvComp = this->FindComponentByClass<USurvivalComponent>();
 	if (SurvivalComp)
 	{
 		if (SurvivalComp->Drink == 0)
 		{
-			UHealthComponent* HealthComp = this->FindComponentByClass<UHealthComponent>();
-			if (HealthComp)
+			UHealthComponent* HealthComponent = this->FindComponentByClass<UHealthComponent>();
+			if (HealthComponent)
 			{
-				if (HealthComp->Health > 0)
+				if (HealthComponent->Health > 0)
 				{
-					//UE_LOG(LogTemp, Warning, TEXT("Znalazlem healthcomp"));
-					HealthComp->Health = HealthComp->Health - 1;
+					HealthComponent->Health = HealthComp->Health - 1;
 				}
-
-				if (HealthComp->Health == 0) bDied = true;
-
+				if (HealthComponent->Health == 0) bDied = true;
 			}
-			//UE_LOG(LogTemp, Warning, TEXT("Drink low!!!"));
 			GetWorldTimerManager().SetTimer(DrinkLowTimer, this, &ASoldierCharacter::OnDrinkLow, FreQOfDrainingHealthWhenLowDrink, false);
 		}
 		if (SurvivalComp->Drink > 0)
@@ -1679,7 +1667,6 @@ void ASoldierCharacter::OnDrinkLow()
 			SurvivalComp->OnRep_Drink();
 		}
 	}
-
 }
 void ASoldierCharacter::ServerPutWeaponOnBack_Implementation()
 {

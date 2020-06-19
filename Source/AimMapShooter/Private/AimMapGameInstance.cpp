@@ -67,11 +67,12 @@ void UAimMapGameInstance::InGameLoadMenu()
 {
 	if (!ensure(InGameMenuClass != nullptr)) return;
 
-	UMenuWidget* Menu = CreateWidget<UMenuWidget>(this, InGameMenuClass);
-
-	Menu->Setup();
-
-	Menu->SetMenuInterface(this);
+	UMenuWidget* MainMenu = CreateWidget<UMenuWidget>(this, InGameMenuClass);
+	if (MainMenu)
+	{
+		MainMenu->Setup();
+		MainMenu->SetMenuInterface(this);
+	}
 
 }
 void UAimMapGameInstance::Host(FString ServerName)

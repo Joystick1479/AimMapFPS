@@ -37,14 +37,6 @@ APayloadCharacter::APayloadCharacter()
 	MeshComp2 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComp2"));
 	PhysicsComp = CreateDefaultSubobject<UPhysicsConstraintComponent>(TEXT("PhysicsComp"));
 
-	//UCapsuleComponent* CapsuleComp = this->GetCapsuleComponent();
-	//if (CapsuleComp)
-//	{
-		//MeshComp->SetupAttachment(CapsuleComp);
-	//	MeshComp2->SetupAttachment(CapsuleComp);
-		//PhysicsComp->SetupAttachment(CapsuleComp);
-	//}
-
 	AudioComp = CreateDefaultSubobject<UAudioComponent>(TEXT("AudioComp"));
 	SetReplicates(true);
 
@@ -179,8 +171,8 @@ void APayloadCharacter::PayloadMove(float DeltaTime)
 	/// PUSH LOGIC ///
 	if (ShouldPush == true)
 	{
-		FVector Translation = GetActorForwardVector() * ForceToPush * DeltaTime;
-		AddActorWorldOffset(Translation);
+		FVector MovePayload = GetActorForwardVector() * ForceToPush * DeltaTime;
+		AddActorWorldOffset(MovePayload);
 	}
 
 }

@@ -107,12 +107,14 @@ public:
 
 protected:
 
-	FName MuzzleSocket;
-	FName CameraSocket;
-	FName ScopeSocket;
-	FName GripSocket;
-	FName LaserSocket;
-	FName LaserSocketEnd;
+	//Start location of holographic sight//
+	FName LineSocket = "LineSocket";
+	FName MuzzleSocket = "MuzzleSocket";
+	FName CameraSocket = "CameraSocket";
+	FName ScopeSocket = "ScopeSocket";
+	FName GripSocket = "GripSocket";
+	FName LaserSocket = "LaserSocket";
+	FName LaserSocketEnd = "LaserSocketEnd";
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components", Replicated)
 	USkeletalMeshComponent* SkelMeshComp;
@@ -124,9 +126,6 @@ protected:
 	USphereComponent* SphereComp;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Player")
-	TSubclassOf<AAutomaticRifle> StarterWeaponClass;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Player")
 	TSubclassOf<UCameraShake> CameShakeHipClass;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Player")
@@ -136,8 +135,6 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "ActorHit")
 	TSubclassOf<ASoldierCharacter> SoldierHit;
 
-	//Start location of holographic sight//
-	FName LineSocket;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon", meta = (ClampMin = 0.0f))
 	float BulletSpreadGrip;
@@ -230,7 +227,6 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Animation reload")
 	UAnimSequence* AnimSeqReload;
 
-	AHelmet* HelmetTest;
 
 	///////****MUTLIPLAYER REPLICATION*****////
 	UFUNCTION(Server, Reliable, WithValidation)
@@ -248,10 +244,15 @@ protected:
 	UPROPERTY(ReplicatedUsing = OnRep_HitScanTrace)
 	FHitScanTrace HitScanTrace;
 
+	UPROPERTY(BlueprintReadOnly, Replicated)
+	bool bFireAnimation;
+
+private:
+
 	UPROPERTY(Replicated)
 	ASoldierCharacter* SoldierChar;
 
-	UPROPERTY(BlueprintReadOnly, Replicated)
-	bool bFireAnimation;
+	AHelmet* HelmetTest;
+
 	
 };

@@ -29,8 +29,6 @@ public:
 
 	FName LaserSocket;
 
-	AAutomaticRifle* Rifle;
-
 	ASoldierCharacter* SoldierChar;
 
 	void StartLaser();

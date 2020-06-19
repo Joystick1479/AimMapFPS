@@ -134,9 +134,6 @@ void AAimMapGameModeBase::RespawningPlayer()
 				AController* PC = Cast<AController>(SoldChar->GetController());
 				if(PC)
 				{
-					//FTimerHandle DeathTimer2;
-					/*FTimerDelegate DelegateFunc = FTimerDelegate::CreateUObject(this, &AAimMapGameModeBase::RestartPlayer, PC);
-					GetWorldTimerManager().SetTimer(DeathTimer2, DelegateFunc, 5.0f, false);*/
 					SpawnAndPossPawn(PC);
 				}
 			}

@@ -443,10 +443,10 @@ public:
 	
 	///GRENADE///
 	void ThrowGrenade();
-	void SpawnGrenade(FVector STL, FRotator STR);
+	void SpawnGrenade(FVector StartingLocation, FRotator StartingRotation);
 	void FindingGrenadeTransform();
 	FTimerHandle TransformHandle;
-	void Flashbang(float Distance, FVector FacingAngle);
+	void Flashbang(float ThrowDistance, FVector PlayerFacingAngle);
 	void AngleFromFlash(FVector GrenadeLoc);
 	///Timeline for GRENADE//
 	UFUNCTION()

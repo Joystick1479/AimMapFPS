@@ -20,7 +20,7 @@ public:
 	void Setup();
 	void TearDown();
 
-	void SetMenuInterface(IMainMenuInterface* MenuInterface);
+	void SetMenuInterface(IMainMenuInterface* MenuInterfacePtr);
 
 protected:
 	IMainMenuInterface* MenuInterface;

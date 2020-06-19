@@ -18,8 +18,6 @@ public:
 	// Sets default values for this actor's properties
 	AHelmet();
 
-	UPROPERTY(VisibleAnywhere, Category = "Components")
-	UStaticMeshComponent* MeshComp;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -27,21 +25,27 @@ protected:
 	void NotifyActorBeginOverlap(AActor* OtherActor);
 	void NotifyActorEndOverlap(AActor* OtherActor);
 
+	void DestroyOnUse();
 
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	USphereComponent* SphereComp;
 
-	void DestroyOnUse();
+	UPROPERTY(VisibleAnywhere, Category = "Components")
+	UStaticMeshComponent* MeshComp;
+
 	FTimerHandle DestroyTimer;
 
-
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
 	UPROPERTY(Replicated)
-	int32 NumberOfLives;
-
+	int32 NumberOfHits;
 
 	bool IsPickedUp;
+
+public:	
+
+	UStaticMeshComponent* GetStaticMeshComponent();
+
+	int32 GetNumberOfHits();
+
+	bool CheckIfPickedUp();
+
 };

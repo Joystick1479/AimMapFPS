@@ -32,9 +32,24 @@ void AHelmet::BeginPlay()
 {
 	Super::BeginPlay();
 
-	NumberOfLives = 2;
+	NumberOfHits = 2;
 	
 	DestroyOnUse();
+}
+
+UStaticMeshComponent* AHelmet::GetStaticMeshComponent()
+{
+	return this->MeshComp;
+}
+
+int32 AHelmet::GetNumberOfHits()
+{
+	return this->NumberOfHits;
+}
+
+bool AHelmet::CheckIfPickedUp()
+{
+	return IsPickedUp;
 }
 
 void AHelmet::NotifyActorBeginOverlap(AActor * OtherActor)
@@ -66,7 +81,7 @@ void AHelmet::DestroyOnUse()
 	{
 		this->Destroy();
 	}
-	if (NumberOfLives <= 0)
+	if (NumberOfHits <= 0)
 	{
 		ASoldierCharacter* SoldierCharacter = Cast<ASoldierCharacter>(this->GetOwner());
 		if (SoldierCharacter)
@@ -79,25 +94,11 @@ void AHelmet::DestroyOnUse()
 	GetWorldTimerManager().SetTimer(DestroyTimer, this, &AHelmet::DestroyOnUse, 0.5f, false);
 }
 
-
-
-// Called every frame
-void AHelmet::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-	//UE_LOG(LogTemp, Warning, TEXT("Number of lives: %i"), NumberOfLives);
-
-}
-
-
 void AHelmet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	//This function tells us how we want to replicate things//
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	//DOREPLIFETIME(AHelmet, NumberOfLives,COND_OwnerOnly);
-	DOREPLIFETIME_CONDITION(AHelmet, NumberOfLives, COND_OwnerOnly);
-
-
+	DOREPLIFETIME_CONDITION(AHelmet, NumberOfHits, COND_OwnerOnly);
 }

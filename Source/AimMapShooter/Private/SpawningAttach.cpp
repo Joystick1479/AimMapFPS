@@ -29,13 +29,6 @@ void ASpawningAttach::BeginPlay()
 {
 	Super::BeginPlay();
 
-
-	//Actors.Push(Holo);
-	//Actors.Push(Headset);
-	//Actors.Push(Helmet);
-	//Actors.Push(Grip);
-	//Actors.Push(Laser);
-
 	SpawnRandom();
 }
 
@@ -48,9 +41,6 @@ void ASpawningAttach::SpawnRandom()
 		ServerSpawnRandom();
 		return;
 	}
-	/*int32 range = Actors.Num();
-	UE_LOG(LogTemp, Warning, TEXT("Numbers: %i"), range);
-	int32 randomNumber = FMath::RandRange(0, range);*/
 	int32 range = 5;
 	int32 randomNumber = FMath::RandRange(0, range);
 
@@ -65,7 +55,7 @@ void ASpawningAttach::SpawnRandom()
 		if (Holo)
 		{
 			Holo->SetOwner(this);
-			Holo->SkelMeshComp->bOnlyOwnerSee = false;
+			Holo->GetSkelelMeshComp()->bOnlyOwnerSee = false;
 
 		}
 	}
@@ -76,7 +66,7 @@ void ASpawningAttach::SpawnRandom()
 		if (Helmet)
 		{
 			Helmet->SetOwner(this);
-			Helmet->MeshComp->bOnlyOwnerSee = false;
+			Helmet->GetStaticMeshComponent()->bOnlyOwnerSee = false;
 
 		}
 	}
@@ -112,7 +102,6 @@ void ASpawningAttach::SpawnRandom()
 			Grip->MeshComp->bOnlyOwnerSee = false;
 		}
 	}
-	
 
 }
 

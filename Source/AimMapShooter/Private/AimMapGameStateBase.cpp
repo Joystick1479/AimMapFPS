@@ -139,17 +139,17 @@ void AAimMapGameStateBase::UpdateTimerText(float Seconds)
 
 	if (WidgetRef)
 	{
-		UTextBlock* TextBlock = WidgetRef->Timer;
-		if (TextBlock)
+		UTextBlock* TimeTextBlock = WidgetRef->Timer;
+		if (TimeTextBlock)
 		{
-			TextBlock->SetText(FinalText);
+			TimeTextBlock->SetText(FinalText);
 		}
 		if (Minute == 0 && Second == 0)
 		{
-			if (TextBlock)
+			if (TimeTextBlock)
 			{
 				FText GameOverText = FText::FromString("Game over");
-				TextBlock->SetText(GameOverText);
+				TimeTextBlock->SetText(GameOverText);
 				IsTimeOver = true;
 				GetWorldTimerManager().SetTimer(TimerHandle, this, &AAimMapGameStateBase::GameRestart, 3.0f);
 			}

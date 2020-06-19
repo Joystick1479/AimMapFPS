@@ -36,7 +36,7 @@ void UMenuWidget::TearDown()
 
 }
 
-void UMenuWidget::SetMenuInterface(IMainMenuInterface* MenuInterface)
+void UMenuWidget::SetMenuInterface(IMainMenuInterface* MenuInterfacePtr)
 {
-	this->MenuInterface = MenuInterface;
+	this->MenuInterface = MenuInterfacePtr;
 }
