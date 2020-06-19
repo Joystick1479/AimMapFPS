@@ -11,7 +11,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 
-#include "SoldierCharacter.h"
+#include "Character/SoldierCharacter.h"
 #include "GrenadeDecal.h"
 
 #include "TimerManager.h" 

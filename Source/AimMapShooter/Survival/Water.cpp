@@ -4,7 +4,7 @@
 #include "Water.h"
 
 #include "Components/StaticMeshComponent.h"
-#include "SoldierCharacter.h"
+#include "Character/SoldierCharacter.h"
 
 // Sets default values
 AWater::AWater()

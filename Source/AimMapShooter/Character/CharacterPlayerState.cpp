@@ -5,7 +5,7 @@
 
 #include "Blueprint/UserWidget.h"
 
-#include "PayloadCharacter.h"
+#include "AI/PayloadCharacter.h"
 
 #include "Kismet/GameplayStatics.h"
 

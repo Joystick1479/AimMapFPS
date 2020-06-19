@@ -1,75 +1,76 @@
 // Fill out your copyright notice in the Description page of Project Settings.
-#include "HoloScope.h"
+#include "Grip.h"
 
-#include "Components/SkeletalMeshComponent.h"
+#include "Components/StaticMeshComponent.h"
 #include "Components/SphereComponent.h"
 
 #include "TimerManager.h"
 
-#include "SoldierCharacter.h"
+#include "Character/SoldierCharacter.h"
 
 // Sets default values
-AHoloScope::AHoloScope()
+AGrip::AGrip()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
 
-	SkelMeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkelalMeshComp"));
-	RootComponent = SkelMeshComp;
+	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComp"));
+	RootComponent = MeshComp;
 
 	SphereComp = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
-	SphereComp->SetupAttachment(SkelMeshComp);
+	SphereComp->SetupAttachment(MeshComp);
 
 	SetReplicates(true);
+
 }
 
 // Called when the game starts or when spawned
-void AHoloScope::BeginPlay()
+void AGrip::BeginPlay()
 {
 	Super::BeginPlay();
-
+	
 	DestroyOnUse();
-
 }
 
-USkeletalMeshComponent* AHoloScope::GetSkelelMeshComp()
-{
-	return this->SkelMeshComp;
-}
-
-void AHoloScope::NotifyActorBeginOverlap(AActor * OtherActor)
+void AGrip::NotifyActorBeginOverlap(AActor * OtherActor)
 {
 	Super::NotifyActorBeginOverlap(OtherActor);
 
 	ASoldierCharacter* SoldierCharacter = Cast<ASoldierCharacter>(OtherActor);
 	if (SoldierCharacter)
 	{
-		SoldierCharacter->bHoloPickUp = true;
+		SoldierCharacter->bGripPickUp = true;
 		SphereComp->ToggleActive();
-
 	}
 }
 
-void AHoloScope::NotifyActorEndOverlap(AActor * OtherActor)
+void AGrip::NotifyActorEndOverlap(AActor * OtherActor)
 {
+
 	Super::NotifyActorEndOverlap(OtherActor);
 
 	ASoldierCharacter* SoldierCharacter = Cast<ASoldierCharacter>(OtherActor);
 	if (SoldierCharacter)
 	{
-		SoldierCharacter->bHoloPickUp = false;
+		SoldierCharacter->bGripPickUp = false;
 
 	}
 }
 
-void AHoloScope::DestroyOnUse()
+void AGrip::DestroyOnUse()
 {
 	if (IsPickedUp == true)
 	{
 		this->Destroy();
 	}
 
-	GetWorldTimerManager().SetTimer(DestroyTimer, this, &AHoloScope::DestroyOnUse, 0.5f, false);
+	GetWorldTimerManager().SetTimer(DestroyTimer, this, &AGrip::DestroyOnUse, 0.5f, false);
 }
 
+// Called every frame
+void AGrip::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+}
 

@@ -4,8 +4,8 @@
 #include "Components/StaticMeshComponent.h"
 #include "Components/SphereComponent.h"
 
-#include "SoldierCharacter.h"
-#include "AutomaticRifle.h"
+#include "Character/SoldierCharacter.h"
+#include "Weapons/AutomaticRifle.h"
 
 #include "TimerManager.h"
 

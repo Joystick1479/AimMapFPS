@@ -7,7 +7,8 @@
 
 #include "TimerManager.h"
 
-#include "SoldierCharacter.h"
+#include "Character/SoldierCharacter.h"
+
 
 
 

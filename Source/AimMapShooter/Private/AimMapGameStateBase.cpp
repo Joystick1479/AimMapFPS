@@ -5,7 +5,7 @@
 
 #include "AimMapGameModeBase.h"
 
-#include "PayloadCharacter.h"
+#include "AI/PayloadCharacter.h"
 
 #include "TimerManager.h"
 

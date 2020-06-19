@@ -22,9 +22,7 @@
 #include "Blueprint/AIBlueprintHelperLibrary.h"
 #include "NavigationSystem.h"
 
-#include "SoldierCharacter.h"
-#include "BlueEndgame.h"
-#include "RedEndgame.h"
+#include "Character/SoldierCharacter.h"
 #include "AimMapGameModeBase.h"
 
 // Sets default values
@@ -93,7 +91,7 @@ void APayloadCharacter::PayloadMove(float DeltaTime)
 
 	//**MOVING PAYLOAD**//
 
-	TArray<AActor*> Characters;
+	/*TArray<AActor*> Characters;
 	UGameplayStatics::GetAllActorsOfClass(this, SoldierCharacterClass, Characters);
 	if (Characters.Num() > 1)
 	{
@@ -174,7 +172,7 @@ void APayloadCharacter::PayloadMove(float DeltaTime)
 		FVector MovePayload = GetActorForwardVector() * ForceToPush * DeltaTime;
 		AddActorWorldOffset(MovePayload);
 	}
-
+*/
 }
 
 // Called to bind functionality to input

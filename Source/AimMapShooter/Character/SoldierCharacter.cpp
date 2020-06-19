@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 #include "SoldierCharacter.h"
 #include "Camera/CameraComponent.h"
-#include "AutomaticRifle.h"
+#include "Weapons/AutomaticRifle.h"
 
 #include "Components/SkeletalMeshComponent.h"
 #include "Animation//AnimInstance.h"
@@ -12,26 +12,23 @@
 #include "Components/TimelineComponent.h" 
 #include "Containers/EnumAsByte.h"
 
-#include "SpriteComponent.h"
-#include "PaperSpriteComponent.h"
-
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Kismet/KismetMaterialLibrary.h"
 #include "Materials/MaterialParameterCollection.h"
 
-#include "HealthComponent.h"
-#include "SurvivalComponent.h"
+#include "Character/HealthComponent.h"
+#include "Survival/SurvivalComponent.h"
 
 #include "AimMapShooter.h"
 
-#include "HoloScope.h"
-#include "Grip.h"
-#include "Helmet.h"
-#include "Headset.h"
-#include "Laser.h"
-#include "Magazine.h"
+#include "WeaponAttachments/HoloScope.h"
+#include "WeaponAttachments/Grip.h"
+#include "WeaponAttachments/Helmet.h"
+#include "WeaponAttachments/Headset.h"
+#include "WeaponAttachments/Laser.h"
+#include "WeaponAttachments/Magazine.h"
 #include "3rdPersonMeshes/Rifle_3rd.h"
 
 #include "GameFramework/SpringArmComponent.h"
@@ -46,13 +43,11 @@
 #include "Components/AudioComponent.h"
 #include "Engine/EngineTypes.h"
 #include "GameFramework/Controller.h"
-#include "PayloadCharacter.h"
-#include "RedEndgame.h"
-#include "BlueEndgame.h"
-#include "FlashGrenade.h"
+#include "AI/PayloadCharacter.h"
+#include "Grenades/FlashGrenade.h"
 #include "Sound/SoundCue.h"
-#include "Drink.h"
-#include "Food.h"
+#include "Survival/Drink.h"
+#include "Survival/Food.h"
 #include "Survival/Water.h"
 #include "AimMapGameModeBase.h"
 

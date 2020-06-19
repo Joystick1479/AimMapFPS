@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "AutomaticRifle.h"
 #include "Laser.generated.h"
 
 class UStaticMeshComponent;

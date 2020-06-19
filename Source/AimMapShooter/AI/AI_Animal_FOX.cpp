@@ -7,15 +7,16 @@
 #include "Components/CapsuleComponent.h"
 #include "Kismet/GameplayStatics.h"
 
-#include "HealthComponent.h"
+#include "Character/HealthComponent.h"
+#include "Character/SoldierCharacter.h"
+
+#include "AI/AI_Animal_Controller.h"
 
 #include "TimerManager.h"
 
-#include "SoldierCharacter.h"
-
-#include "AI_Animal_Controller.h"
-
 #include "Net/UnrealNetwork.h"
+
+#include "GameFramework/CharacterMovementComponent.h" 
 
 
 // Sets default values

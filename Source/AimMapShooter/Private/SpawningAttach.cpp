@@ -3,12 +3,12 @@
 
 #include "SpawningAttach.h"
 
-#include "HoloScope.h"
-#include "Helmet.h"
-#include "Headset.h"
-#include "Grip.h"
-#include "Laser.h"
-#include "SoldierCharacter.h"
+#include "WeaponAttachments/HoloScope.h"
+#include "WeaponAttachments/Helmet.h"
+#include "WeaponAttachments/Headset.h"
+#include "WeaponAttachments/Grip.h"
+#include "WeaponAttachments/Laser.h"
+#include "Character/SoldierCharacter.h"
 
 #include "Particles/ParticleSystem.h"
 #include "Kismet/GameplayStatics.h"

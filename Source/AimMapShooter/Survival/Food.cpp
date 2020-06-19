@@ -1,17 +1,18 @@
 // Bartosz Jastrzebski
 
 
-#include "Drink.h"
+#include "Food.h"
 
 #include "Components/StaticMeshComponent.h"
 #include "Components/SphereComponent.h"
 
 #include "TimerManager.h"
 
-#include "SoldierCharacter.h"
+#include "Character/SoldierCharacter.h"
+
 
 // Sets default values
-ADrink::ADrink()
+AFood::AFood()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
@@ -21,57 +22,50 @@ ADrink::ADrink()
 
 	SphereComp = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
 	SphereComp->SetupAttachment(MeshComp);
-
 }
 
 // Called when the game starts or when spawned
-void ADrink::BeginPlay()
+void AFood::BeginPlay()
 {
 	Super::BeginPlay();
-
 	DestroyOnUse();
-	
 }
 
-void ADrink::NotifyActorBeginOverlap(AActor * OtherActor)
+void AFood::NotifyActorBeginOverlap(AActor * OtherActor)
 {
 	Super::NotifyActorBeginOverlap(OtherActor);
 
 	ASoldierCharacter* SoldierCharacter = Cast<ASoldierCharacter>(OtherActor);
 	if (SoldierCharacter)
 	{
-		SoldierCharacter->bDrinkPickup = true;
+		SoldierCharacter->bFoodPickup = true;
 	}
-
 }
 
-void ADrink::NotifyActorEndOverlap(AActor * OtherActor)
+void AFood::NotifyActorEndOverlap(AActor * OtherActor)
 {
 	Super::NotifyActorEndOverlap(OtherActor);
 
 	ASoldierCharacter* SoldierCharacter = Cast<ASoldierCharacter>(OtherActor);
 	if (SoldierCharacter)
 	{
-		SoldierCharacter->bDrinkPickup = false;
+		SoldierCharacter->bFoodPickup = false;
 	}
-
 }
-
-void ADrink::DestroyOnUse()
+void AFood::DestroyOnUse()
 {
 	if (IsPickedUp == true)
 	{
 		this->Destroy();
 	}
 
-	GetWorldTimerManager().SetTimer(DestroyTimer, this, &ADrink::DestroyOnUse, 0.5f, false);
+	GetWorldTimerManager().SetTimer(DestroyTimer, this, &AFood::DestroyOnUse, 0.5f, false);
 }
 
 // Called every frame
-void ADrink::Tick(float DeltaTime)
+void AFood::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	
 }
 

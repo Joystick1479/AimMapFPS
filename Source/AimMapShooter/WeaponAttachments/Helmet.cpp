@@ -8,7 +8,7 @@
 
 #include "Net/UnrealNetwork.h"
 
-#include "SoldierCharacter.h"
+#include "Character/SoldierCharacter.h"
 
 // Sets default values
 AHelmet::AHelmet()

@@ -1,17 +1,17 @@
 // Bartosz Jastrzebski
 
 
-#include "Food.h"
+#include "Magazine.h"
 
 #include "Components/StaticMeshComponent.h"
 #include "Components/SphereComponent.h"
 
 #include "TimerManager.h"
 
-#include "SoldierCharacter.h"
+#include "Character/SoldierCharacter.h"
 
 // Sets default values
-AFood::AFood()
+AMagazine::AMagazine()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
@@ -24,45 +24,49 @@ AFood::AFood()
 }
 
 // Called when the game starts or when spawned
-void AFood::BeginPlay()
+void AMagazine::BeginPlay()
 {
 	Super::BeginPlay();
+
 	DestroyOnUse();
+	
 }
 
-void AFood::NotifyActorBeginOverlap(AActor * OtherActor)
+void AMagazine::NotifyActorBeginOverlap(AActor * OtherActor)
 {
 	Super::NotifyActorBeginOverlap(OtherActor);
 
 	ASoldierCharacter* SoldierCharacter = Cast<ASoldierCharacter>(OtherActor);
 	if (SoldierCharacter)
 	{
-		SoldierCharacter->bFoodPickup = true;
+		SoldierCharacter->bMagazinePickUp = true;
 	}
 }
 
-void AFood::NotifyActorEndOverlap(AActor * OtherActor)
+void AMagazine::NotifyActorEndOverlap(AActor * OtherActor)
 {
 	Super::NotifyActorEndOverlap(OtherActor);
 
 	ASoldierCharacter* SoldierCharacter = Cast<ASoldierCharacter>(OtherActor);
 	if (SoldierCharacter)
 	{
-		SoldierCharacter->bFoodPickup = false;
+		SoldierCharacter->bMagazinePickUp = false;
 	}
 }
-void AFood::DestroyOnUse()
+
+void AMagazine::DestroyOnUse()
 {
 	if (IsPickedUp == true)
 	{
 		this->Destroy();
 	}
 
-	GetWorldTimerManager().SetTimer(DestroyTimer, this, &AFood::DestroyOnUse, 0.5f, false);
+	GetWorldTimerManager().SetTimer(DestroyTimer, this, &AMagazine::DestroyOnUse, 0.5f, false);
+
 }
 
 // Called every frame
-void AFood::Tick(float DeltaTime)
+void AMagazine::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 

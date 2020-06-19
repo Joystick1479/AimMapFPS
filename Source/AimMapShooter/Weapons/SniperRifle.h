@@ -14,12 +14,12 @@ class AIMMAPSHOOTER_API ASniperRifle : public AAutomaticRifle
 {
 	GENERATED_BODY()
 
+public:
+	ASniperRifle();
+
 private:
 
 	virtual void Tick(float DeltaTime) override;
 
 
-	ASniperRifle();
-
-	void Test();
 };

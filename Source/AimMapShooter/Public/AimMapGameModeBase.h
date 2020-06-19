@@ -6,8 +6,6 @@
 #include "GameFramework/GameModeBase.h"
 #include "AimMapGameModeBase.generated.h"
 
-class ARedEndgame;
-class ABlueEndgame;
 class ASoldierCharacter;
 class UUserWidget;
 class USoundCue;
@@ -26,7 +24,6 @@ public:
 	void PostLogin(APlayerController* NewPlayer) override;
 
 	void Logout(AController* Exiting) override;
-
 	
 	UPROPERTY(BlueprintReadWrite)
 	FString TeamName;
@@ -34,11 +31,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void RestartGame();
 
-	UFUNCTION(BlueprintCallable)
-	void CheckIfGameOver();
-
 	bool ShouldTimerOn;
-
 
 	UFUNCTION(BlueprintCallable)
 	void RespawningPlayer();
@@ -61,14 +54,7 @@ private:
 	ASoldierCharacter* Soldiero;
 
 	UPROPERTY(EditDefaultsOnly, Category = "EndTarget")
-	TSubclassOf<ABlueEndgame> BlueEndgameClass;
-
-	UPROPERTY(EditDefaultsOnly, Category = "EndTarget")
 	TSubclassOf<ASoldierCharacter> SoldierCharClass;
-
-	UPROPERTY(EditDefaultsOnly, Category = "EndTarget")
-	TSubclassOf<ARedEndgame> RedEndgameClass;
-
 
 	UPROPERTY(EditDefaultsOnly, Category = "GameOver")
 	TSubclassOf<UUserWidget> GameOverWidget;

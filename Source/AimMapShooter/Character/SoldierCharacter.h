@@ -26,10 +26,7 @@ class UUserWidget;
 class USoundCue;
 class UAudioComponent;
 class APayloadCharacter;
-class ARedEndgame;
-class ABlueEndgame;
 class AFlashGrenade;
-
 class UMinimapComponent;
 class UTimelineComponent;
 
@@ -414,12 +411,6 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Payload")
 	TSubclassOf<APayloadCharacter> PayloadCharacterClass;
-
-	UPROPERTY(EditDefaultsOnly, Category = "EndTarget")
-	TSubclassOf<ARedEndgame> ClientEndgameClass;
-
-	UPROPERTY(EditDefaultsOnly, Category = "EndTarget")
-	TSubclassOf<ABlueEndgame> HostEndgameClass;
 
 	void GameOverSound();
 

@@ -3,8 +3,10 @@
 
 #include "AI_Animal_Controller.h"
 
-#include "AI_Animal_FOX.h"
-#include "SoldierCharacter.h"
+#include "AI/AI_Animal_FOX.h"
+#include "Character/SoldierCharacter.h"
+
+#include "GameFramework/CharacterMovementComponent.h" 
 
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"

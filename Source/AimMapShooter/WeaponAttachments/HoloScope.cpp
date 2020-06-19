@@ -1,72 +1,75 @@
 // Fill out your copyright notice in the Description page of Project Settings.
-#include "Headset.h"
+#include "HoloScope.h"
 
-#include "Components/StaticMeshComponent.h"
+#include "Components/SkeletalMeshComponent.h"
 #include "Components/SphereComponent.h"
 
 #include "TimerManager.h"
 
-#include "SoldierCharacter.h"
+#include "Character/SoldierCharacter.h"
 
 // Sets default values
-AHeadset::AHeadset()
+AHoloScope::AHoloScope()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
 
-	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComp"));
-	RootComponent = MeshComp;
+	SkelMeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkelalMeshComp"));
+	RootComponent = SkelMeshComp;
 
 	SphereComp = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
-	SphereComp->SetupAttachment(MeshComp);
+	SphereComp->SetupAttachment(SkelMeshComp);
 
 	SetReplicates(true);
 }
 
 // Called when the game starts or when spawned
-void AHeadset::BeginPlay()
+void AHoloScope::BeginPlay()
 {
 	Super::BeginPlay();
+
 	DestroyOnUse();
+
 }
 
-void AHeadset::NotifyActorBeginOverlap(AActor * OtherActor)
+USkeletalMeshComponent* AHoloScope::GetSkelelMeshComp()
+{
+	return this->SkelMeshComp;
+}
+
+void AHoloScope::NotifyActorBeginOverlap(AActor * OtherActor)
 {
 	Super::NotifyActorBeginOverlap(OtherActor);
 
 	ASoldierCharacter* SoldierCharacter = Cast<ASoldierCharacter>(OtherActor);
 	if (SoldierCharacter)
 	{
-		SoldierCharacter->bHeadsetPickUp = true;
-		//SphereComp->ToggleActive();
+		SoldierCharacter->bHoloPickUp = true;
+		SphereComp->ToggleActive();
+
 	}
 }
 
-void AHeadset::NotifyActorEndOverlap(AActor * OtherActor)
+void AHoloScope::NotifyActorEndOverlap(AActor * OtherActor)
 {
 	Super::NotifyActorEndOverlap(OtherActor);
 
 	ASoldierCharacter* SoldierCharacter = Cast<ASoldierCharacter>(OtherActor);
 	if (SoldierCharacter)
 	{
-		SoldierCharacter->bHeadsetPickUp = false;
+		SoldierCharacter->bHoloPickUp = false;
+
 	}
 }
 
-void AHeadset::DestroyOnUse()
+void AHoloScope::DestroyOnUse()
 {
 	if (IsPickedUp == true)
 	{
 		this->Destroy();
 	}
 
-	GetWorldTimerManager().SetTimer(DestroyTimer, this, &AHeadset::DestroyOnUse, 0.5f, false);
+	GetWorldTimerManager().SetTimer(DestroyTimer, this, &AHoloScope::DestroyOnUse, 0.5f, false);
 }
 
-// Called every frame
-void AHeadset::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-}
 

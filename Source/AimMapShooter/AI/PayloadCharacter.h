@@ -6,8 +6,6 @@
 #include "GameFramework/Character.h"
 #include "PayloadCharacter.generated.h"
 
-class ABlueEndgame;
-class ARedEndgame;
 class ASoldierCharacter;
 
 UCLASS()
@@ -35,13 +33,6 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, Category = "Mesh")
 	class UPhysicsConstraintComponent* PhysicsComp;
-
-	UPROPERTY(EditDefaultsOnly, Category = "EndTarget")
-	TSubclassOf<ABlueEndgame> BlueEndgameClass;
-
-	UPROPERTY(EditDefaultsOnly, Category = "EndTarget")
-	TSubclassOf<ARedEndgame> RedEndgameClass;
-
 
 	UPROPERTY(EditDefaultsOnly, Category = "EndTarget")
 	TSubclassOf<ASoldierCharacter> SoldierCharacterClass;
