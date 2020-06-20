@@ -99,7 +99,7 @@ void ASpawningAttach::SpawnRandom()
 		if (Grip)
 		{
 			Grip->SetOwner(this);
-			Grip->MeshComp->bOnlyOwnerSee = false;
+			Grip->GetMeshComponent()->bOnlyOwnerSee = false;
 		}
 	}
 

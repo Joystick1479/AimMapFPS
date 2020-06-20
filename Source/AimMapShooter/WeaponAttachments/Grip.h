@@ -18,25 +18,29 @@ public:
 	// Sets default values for this actor's properties
 	AGrip();
 
-	UPROPERTY(VisibleAnywhere, Category = "Components")
-	UStaticMeshComponent* MeshComp;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	USphereComponent* SphereComp;
 
+	UPROPERTY(VisibleAnywhere, Category = "Components")
+	UStaticMeshComponent* MeshComp;
 
 	void NotifyActorBeginOverlap(AActor* OtherActor);
 	void NotifyActorEndOverlap(AActor* OtherActor);
 
 	void DestroyOnUse();
 	FTimerHandle DestroyTimer;
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
 
 	bool IsPickedUp;
+
+public:	
+
+	bool GetIfPickeditem();
+	void SetIfPickedItem(bool PickedUp);
+	UStaticMeshComponent* GetMeshComponent();
+	
+
 };

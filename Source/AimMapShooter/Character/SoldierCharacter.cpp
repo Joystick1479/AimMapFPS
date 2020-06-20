@@ -801,7 +801,7 @@ void ASoldierCharacter::PickUp()
 				{
 					if (this->IsOverlappingActor(GripItr))
 					{
-						GripItr->IsPickedUp = true;
+						GripItr->SetIfPickedItem(true);
 					}
 				}
 			}
@@ -814,8 +814,8 @@ void ASoldierCharacter::PickUp()
 				if (Grip)
 				{
 					Grip->SetOwner(this);
-					Grip->MeshComp->bOnlyOwnerSee = true;
-					Grip->MeshComp->SetRenderCustomDepth(false);
+					Grip->GetMeshComponent()->bOnlyOwnerSee = true;
+					Grip->GetMeshComponent()->SetRenderCustomDepth(false);
 					FName GSocket = AutomaticRifle->GetGripSocketName();
 					Grip->AttachToComponent(AutomaticRifle->GetSkelMeshComp(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, GSocket);
 					isGripAttached = true;

@@ -67,10 +67,16 @@ void AGrip::DestroyOnUse()
 	GetWorldTimerManager().SetTimer(DestroyTimer, this, &AGrip::DestroyOnUse, 0.5f, false);
 }
 
-// Called every frame
-void AGrip::Tick(float DeltaTime)
+bool AGrip::GetIfPickeditem()
 {
-	Super::Tick(DeltaTime);
-
+	return IsPickedUp;
+}
+void AGrip::SetIfPickedItem(bool PickedUp)
+{
+	IsPickedUp = PickedUp;
 }
 
+UStaticMeshComponent* AGrip::GetMeshComponent()
+{
+	return MeshComp;
+}
