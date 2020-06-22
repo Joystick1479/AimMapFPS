@@ -175,7 +175,7 @@ void AAutomaticRifle::Fire()
 
 		ASoldierCharacter* SoldierCharacter = Cast<ASoldierCharacter>(GetOwner());
 		ALaser* Laser = Cast<ALaser>(GetOwner());
-		if (SoldierCharacter->IsZooming == true)
+		if (SoldierCharacter->GetbZooming() == true)
 		{
 			///RECOIL
 			float PitchRandomVal = UKismetMathLibrary::RandomFloatInRange(-0.1, -0.5);
@@ -225,14 +225,8 @@ void AAutomaticRifle::Fire()
 					}
 					if (SurfaceType == SURFACE_CHEST)
 					{
-						if (SoldierCharacter->MultipleDamage == true)
-						{
-							ActualDamage *= 4.0f;
-						}
-						else
-						{
-							ActualDamage *= 2.0f;
-						}
+						ActualDamage *= 2.0f;
+
 						UGameplayStatics::PlaySoundAtLocation(GetWorld(), HitSound, GetActorLocation());
 					}
 					if (SurfaceType == SURFACE_LEG)
@@ -268,12 +262,9 @@ void AAutomaticRifle::Fire()
 				}
 			}
 		}
-		else if(SoldierCharacter->IsZooming == false)
+		else if(SoldierCharacter->GetbZooming() == false)
 		{
-			///CHECK IF SHOULD MULTIPLE DAMAGE FROM BEHIND
-			SoldierCharacter->IsTargetFromBack();
-
-			///RECOILD
+			///RECOIL
 			float randomval = UKismetMathLibrary::RandomFloatInRange(-0.1, -0.5);
 			SoldierCharacter->AddControllerPitchInput(randomval);
 			float YawRandomVal = UKismetMathLibrary::RandomFloatInRange(-0.2, 0.2);
@@ -291,7 +282,7 @@ void AAutomaticRifle::Fire()
 				FRotator RotationCamera = temp;
 				FVector ShotDirection = RotationCamera.Vector();
 
-				if (SoldierCharacter->isGripAttached == true)
+				if (SoldierCharacter->GetbGripAttached() == true)
 				{
 					BulletSpread = BulletSpreadGrip;
 				}
@@ -331,14 +322,8 @@ void AAutomaticRifle::Fire()
 					}
 					if (SurfaceType == SURFACE_CHEST)
 					{
-						if (SoldierCharacter->MultipleDamage == true)
-						{
-							ActualDamage *= 4.0f;
-						}
-						else
-						{
-							ActualDamage *= 2.0f;
-						}
+						ActualDamage *= 2.0f;
+
 						UGameplayStatics::PlaySoundAtLocation(GetWorld(), HitSound, GetActorLocation());
 					}
 					if (SurfaceType == SURFACE_LEG)
@@ -434,7 +419,7 @@ void AAutomaticRifle::PlayFireEffects(FVector EndLocation)
 		{
 			APlayerController* PC = Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
 			ASoldierCharacter* SoldierCharacterOwner = Cast<ASoldierCharacter>(GetOwner());
-			if (PC && SoldierCharacterOwner->IsZooming == true)
+			if (PC && SoldierCharacterOwner->GetbZooming() == true)
 			{
 				PC->ClientPlayCameraShake(CameShakeZoomClass);
 			}

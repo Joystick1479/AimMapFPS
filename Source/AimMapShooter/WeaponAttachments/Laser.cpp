@@ -2,12 +2,8 @@
 #include "Laser.h"
 
 #include "Components/StaticMeshComponent.h"
-#include "Components/SphereComponent.h"
 
-#include "Character/SoldierCharacter.h"
 #include "Weapons/AutomaticRifle.h"
-
-#include "TimerManager.h"
 
 #include "DrawDebugHelpers.h"
 
@@ -19,14 +15,8 @@ ALaser::ALaser()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
 
-	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComp"));
-	RootComponent = MeshComp;
-
 	MeshComp2 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComp2"));
 	MeshComp2->SetupAttachment(MeshComp);
-
-	SphereComp = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
-	SphereComp->SetupAttachment(MeshComp);
 
 	PointLight = CreateDefaultSubobject<UPointLightComponent>(TEXT("PointLightComp"));
 	PointLight->SetupAttachment(MeshComp);
@@ -39,60 +29,6 @@ ALaser::ALaser()
 	SetReplicates(true);
 	
 }
-
-// Called when the game starts or when spawned
-void ALaser::BeginPlay()
-{
-	Super::BeginPlay();
-
-	DestroyOnUse();
-
-	
-}
-
-void ALaser::NotifyActorBeginOverlap(AActor * OtherActor)
-{
-	Super::NotifyActorBeginOverlap(OtherActor);
-
-
-
-	ASoldierCharacter* SoldierCharacter = Cast<ASoldierCharacter>(OtherActor);
-	if (SoldierCharacter)
-	{
-		SoldierCharacter->bLaserPickUp = true;
-		SphereComp->ToggleActive();
-	}
-}
-
-void ALaser::NotifyActorEndOverlap(AActor * OtherActor)
-{
-	Super::NotifyActorEndOverlap(OtherActor);
-
-	ASoldierCharacter* SoldierCharacter = Cast<ASoldierCharacter>(OtherActor);
-	if (SoldierCharacter)
-	{
-		SoldierCharacter->bLaserPickUp = false;
-	}
-}
-
-// Called every frame
-void ALaser::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-
-}
-
-void ALaser::DestroyOnUse()
-{
-	StartLaser();
-
-	if (IsPickedUp == true) this->Destroy();
-
-	GetWorldTimerManager().SetTimer(DestroyTimer, this, &ALaser::DestroyOnUse, 0.1f, false);
-
-}
-
 
 void ALaser::StartLaser()
 {
@@ -132,5 +68,12 @@ void ALaser::StartLaser()
 	
 }
 
-
+UPointLightComponent* ALaser::GetPointLightComponent()
+{
+	return this->PointLight;
+}
+UStaticMeshComponent* ALaser::GetScalableMeshComponent()
+{
+	return this->MeshComp2;
+}
 

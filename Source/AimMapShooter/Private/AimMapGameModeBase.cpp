@@ -82,7 +82,7 @@ void AAimMapGameModeBase::RespawningPlayer()
 		ASoldierCharacter* SoldChar = Cast<ASoldierCharacter>(Target[i]);
 		if (SoldChar)
 		{
-			if (SoldChar->bDied == true && SoldChar->bWantsToRepawn == true)
+			if (SoldChar->GetbDied() == true && SoldChar->GetbWantToRespawn() == true)
 			{
 				AController* PC = Cast<AController>(SoldChar->GetController());
 				if(PC)

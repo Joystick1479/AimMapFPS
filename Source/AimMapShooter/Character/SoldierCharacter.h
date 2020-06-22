@@ -115,13 +115,6 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	UPROPERTY(VisibleAnywhere, Category = "FPPMesh")
-	USkeletalMeshComponent* FPPMesh;
-
-	UPROPERTY(EditAnywhere, Category = "AnimationWeapon")
-	TSubclassOf<UAnimInstance> AnimBp;
-
-
 	ECharacterState::Type CharacterState;
 
 	EHoldingWeapon::Type HoldingWeaponState;
@@ -133,77 +126,8 @@ protected:
 	EGripAttachment::Type GripEquipState;
 
 	EHeadsetAttachment::Type HeadsetEquipState;
-	
 
 	ELaserAttachment::Type LaserEquipState;
-
-	UPROPERTY(Replicated)
-	AAutomaticRifle* AutomaticRifle;
-
-	//UPROPERTY(Replicated)
-	ARifle_3rd* Rifle_3rd;
-
-	UPROPERTY(Replicated)
-	AHoloScope* HoloScope;
-
-	UPROPERTY(Replicated)
-	AGrip* Grip;
-
-	UPROPERTY(Replicated)
-	AHeadset* Headset;
-
-	UPROPERTY(Replicated)
-	AMagazine* Magazine;
-
-	UPROPERTY(Replicated)
-	ALaser* Laser;
-
-	UPROPERTY(Replicated)
-	AHelmet* Helmet;
-
-
-	////***Replication stuff***///
-	UFUNCTION(Server, Reliable, WithValidation)
-	void ServerPickUpItem();
-
-	UFUNCTION(Server, Reliable, WithValidation)
-	void ServerReload();
-
-	UFUNCTION(Server, Reliable, WithValidation)
-	void ServerSprintOn();
-	UFUNCTION(Server, Reliable, WithValidation)
-	void ServerSprintOff();
-
-	UFUNCTION(Server, Reliable, WithValidation)
-	void ServerVault();
-	UFUNCTION(Server, Reliable, WithValidation)
-	void ServerResetTimerVault();
-
-	UFUNCTION(Server, Reliable, WithValidation)
-	void ServerBeginCrouch();
-	UFUNCTION(Server, Reliable, WithValidation)
-	void ServerEndCrouch();
-
-	UFUNCTION(Server, Reliable, WithValidation)
-	void ServerShowingPickUpHud();
-
-	UFUNCTION(Server, Reliable, WithValidation)
-	void ServerTurnOnLaser();
-
-	UFUNCTION(Server, Reliable, WithValidation)
-	void ServerReloadingSound();
-
-	UFUNCTION(NetMulticast, Reliable)
-	void MulticastReloadingSound();
-
-	/////*** DISPLAYING HUD ****////
-	void ShowingPickUpHud();
-	FTimerHandle HudTimer;
-
-	UFUNCTION(Server, Reliable, WithValidation)
-	void ServerLineTraceItem();
-
-	void LineTraceItem();
 
 	//*Vaulting stuff//*
 	void Vault();
@@ -238,6 +162,19 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Replicated, Category = "Vaulting")
 	float MaxHeightForVault;
 
+	///Components/Actor classess
+	UPROPERTY(VisibleAnywhere, Category = "FPPMesh")
+	USkeletalMeshComponent* FPPMesh;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	UHealthComponent* HealthComp;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	USurvivalComponent* SurvivalComp;
+
+	UPROPERTY(EditAnywhere, Category = "AnimationWeapon")
+	TSubclassOf<UAnimInstance> AnimBp;
+
 	UPROPERTY(EditDefaultsOnly, Replicated, Category = "Player")
 	TSubclassOf<AAutomaticRifle> StarterWeaponClass;
 
@@ -262,69 +199,23 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Player")
 	TSubclassOf<AMagazine> MagazineClass;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Payload")
+	TSubclassOf<APayloadCharacter> PayloadCharacterClass;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Player")
 	TSubclassOf<UCameraShake> CameraSprintShake;
+
+	ARifle_3rd* Rifle_3rd;
 
 	UPROPERTY(EditDefaultsOnly, Replicated, Category = "Weapon")
 	float ZoomingTime;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player")
+	float stamina;
 
-
-	//Character Movement//
-	void MoveForward(float Value);
-	void MoveRight(float Value);
-	void AddPichInput(float Value);
-	void AddYawInput(float Value);
-
-	void BeginCrouch();
-	void EndCrouch();
-
-	UFUNCTION(BlueprintCallable)
-	void StartFire();
-	void StopFire();
-
-	void SprintOn();
-	void SprintOff();
-	void SprintProgressBar();
-	void SprintSlowDown();
-	FTimerHandle SlowDownSprintTimer;
-	void OutOfBreathSound();
-	FTimerHandle OutOfBreathTimer;
-	FTimerHandle UpdateBreath;
-	void OutOfBreathReset();
 	bool ResetBreath;
 
-	void Headbobbing();
-	FTimerHandle HBobingTimer;
-
-	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly, Category = "Player")
-	float stamina;
-	FTimerHandle SprintTimerHandle;
-	FTimerHandle SprintRestingTimerHandle;
-
-	void UpdateRifleStatus();
-	FTimerHandle UpdateRifleTimer;
-
-	void FireMode();
-
-	void Reload();
-	FTimerHandle ReloadTimer;
-	void StopReload();
-
-	void ZoomIn();
-	void ZoomOut();
-
-	void PickUp();
-
-	void WeaponInspectionOn();
-	void WeaponInspectionOff();
-
-	void PutWeaponOnBack();
 	bool bWeaponOnBack;
-	FTimerHandle InspectionTimer;
-
-	void UpdateWeaponRotation();
-	FTimerHandle UpdateWRotTimer;
 
 	UPROPERTY(BlueprintReadOnly)
 	bool IsInspecting;
@@ -332,48 +223,61 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "LineTrace")
 	float MaxUseDistance;
 
-	///HEALTH AND SURVIVAL COMPONENTS///
+	bool bDoRagdollOnce;
+
+	bool bStopSound;
+
+
+	//Character Movement//
+	void MoveForward(float Value);
+	void MoveRight(float Value);
+	void AddPichInput(float Value);
+	void AddYawInput(float Value);
+	void BeginCrouch();
+	void EndCrouch();
+
+	UFUNCTION(BlueprintCallable)
+	void StartFire();
+
+	void StopFire();
+	void SprintOn();
+	void SprintOff();
+	void SprintProgressBar();
+	void SprintSlowDown();
+	void OutOfBreathSound();
+	void OutOfBreathReset();
+	void Headbobbing();
+	void UpdateRifleStatus();
+	void FireMode();
+	void Reload();
+	void StopReload();
+	void ZoomIn();
+	void ZoomOut();
+	void PickUp();
+	void WeaponInspectionOn();
+	void WeaponInspectionOff();
+	void PutWeaponOnBack();
+	void UpdateWeaponRotation();
+	void RagdollOnDeath();
+	void DrinkWater();
+	void EatFood();
+	void EndDrinkFromPond(APlayerController* PC);
+	void GameOverSound();
+	void NotifyActorBeginOverlap(AActor * OtherActor);
+	void GrenadeTimeline();
+	void ShowingPickUpHud();
+	void LineTraceItem();
 
 	UFUNCTION()
 	void OnHealthChanged(UHealthComponent* OwningHealthComp, float Health, float HealthDelta, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-	UHealthComponent* HealthComp;
-
-	void RagdollOnDeath();
-	bool bDoRagdollOnce;
-	FTimerHandle RagdollTimer;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-	USurvivalComponent* SurvivalComp;
-
-	void EatFood();
-
-	void DrinkWater();
-
-	UFUNCTION(Server, Reliable, WithValidation)
-	void ServerEatFood();
-
-	UFUNCTION(Server, Reliable, WithValidation)
-	void ServerDrinkWater();
-
-	UFUNCTION(Server, Reliable, WithValidation)
-	void ServerPutWeaponOnBack();
-
-
-
-	void EndDrinkFromPond(APlayerController* PC);
-
-
-	/////*SOUNDS WHEN PICK UP OBJECTS***////
+	/////*SOUNDS***////
 
 	UPROPERTY(EditDefaultsOnly, Category = "Sounds")
 	USoundCue* RiflePickUp;
 
-
 	UPROPERTY(EditDefaultsOnly, Category = "Sounds")
 	USoundCue* ItemsPickUp;
-
 
 	UPROPERTY(EditDefaultsOnly, Category = "Sounds")
 	USoundCue* LowHealthSound;
@@ -381,13 +285,11 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "Sounds")
 	UAudioComponent* AudioComp;
 
-
 	UPROPERTY(VisibleAnywhere, Category = "Sounds")
 	UAudioComponent* AudioCompReload;
 
 	UPROPERTY(VisibleAnywhere, Category = "Sounds")
 	UAudioComponent* AudioDamageComp;
-
 
 	UPROPERTY(EditDefaultsOnly, Category = "Sounds")
 	USoundCue* EscortVehicle;
@@ -404,40 +306,107 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Sounds")
 	USoundCue* OutOfBreath;
 
-	bool bStopSound;
-
 	UPROPERTY(EditDefaultsOnly, Category = "FlashMaterial")
 	UMaterialParameterCollection* MaterialCollection;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Payload")
-	TSubclassOf<APayloadCharacter> PayloadCharacterClass;
-
-	void GameOverSound();
 
 
-	void NotifyActorBeginOverlap(AActor * OtherActor);
-	
-	class UStaticMeshComponent* MeshComp;
 
-	UFUNCTION(BlueprintCallable,Server,Reliable)
+	///Multiplayer Replication
+	UFUNCTION(BlueprintCallable, Server, Reliable)
 	void ServerWantToRespawn();
 
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerEatFood();
 
-	///Grenade timeline
-	void GrenadeTimeline();
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerDrinkWater();
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerPutWeaponOnBack();
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerPickUpItem();
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerReload();
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerSprintOn();
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerSprintOff();
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerVault();
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerResetTimerVault();
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerBeginCrouch();
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerEndCrouch();
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerShowingPickUpHud();
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerTurnOnLaser();
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerReloadingSound();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastReloadingSound();
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerLineTraceItem();
+
+
+	UPROPERTY(Replicated)
+	AAutomaticRifle* AutomaticRifle;
+
+	UPROPERTY(Replicated)
+	AHoloScope* HoloScope;
+
+	UPROPERTY(Replicated)
+	AGrip* Grip;
+
+	UPROPERTY(Replicated)
+	AHeadset* Headset;
+
+	UPROPERTY(Replicated)
+	AMagazine* Magazine;
+
+	UPROPERTY(Replicated)
+	ALaser* Laser;
+
+	UPROPERTY(Replicated)
+	AHelmet* Helmet;
+
+
+	///Timers
 	FTimerHandle TimelineHandle;
+	FTimerHandle HudTimer;
+	FTimerHandle UpdateWRotTimer;
+	FTimerHandle RagdollTimer;
+	FTimerHandle InspectionTimer;
+	FTimerHandle ReloadTimer;
+	FTimerHandle UpdateRifleTimer;
+	FTimerHandle SprintRestingTimerHandle;
+	FTimerHandle SprintTimerHandle;
+	FTimerHandle HBobingTimer;
+	FTimerHandle UpdateBreath;
+	FTimerHandle OutOfBreathTimer;
+	FTimerHandle SlowDownSprintTimer;
 
-
-public:	
-	EHelmetAttachment::Type HelmetEquipState;
-
-	
 	///GRENADE///
 	void ThrowGrenade();
 	void SpawnGrenade(FVector StartingLocation, FRotator StartingRotation);
 	void FindingGrenadeTransform();
 	FTimerHandle TransformHandle;
-	void Flashbang(float ThrowDistance, FVector PlayerFacingAngle);
 	void AngleFromFlash(FVector GrenadeLoc);
 	///Timeline for GRENADE//
 	UFUNCTION()
@@ -445,66 +414,59 @@ public:
 	UFUNCTION()
 	void TimelineFinishedCallback();
 	void PlayTimeline();
-
 	bool IsFacing;
 	float FlashAmount;
-	//UPROPERTY(Replicated)
 	float Distance;
-	//UPROPERTY(Replicated)
- 	FVector FacingAngle;
+	FVector FacingAngle;
 	UPROPERTY(Replicated)
-	FVector STL;
+		FVector STL;
 	UPROPERTY(Replicated)
-	FRotator STR;
+		FRotator STR;
 	UPROPERTY(EditDefaultsOnly)
-	int32 AmountGrenades;
+		int32 AmountGrenades;
 	UPROPERTY(VisibleAnywhere)
-	UTimelineComponent* MyTimeline;
+		UTimelineComponent* MyTimeline;
 	UPROPERTY()
-	UCurveFloat* FloatCurve;
+		UCurveFloat* FloatCurve;
 
 	UPROPERTY()
-	TEnumAsByte<ETimelineDirection::Type> TimelineDirection;
+		TEnumAsByte<ETimelineDirection::Type> TimelineDirection;
 
 	FTimerHandle Timer_Flash;
 
 	UPROPERTY(Replicated)
-	AFlashGrenade* FlashGrenade;
+		AFlashGrenade* FlashGrenade;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Grenade")
-	TSubclassOf<AFlashGrenade> FlashGrenadeClass;
-	
+		TSubclassOf<AFlashGrenade> FlashGrenadeClass;
+
 	///GRENADE REPLICATION///
 	UFUNCTION(Server, Reliable, WithValidation)
-	void ServerSpawnGrenade();
+		void ServerSpawnGrenade();
 
 	UFUNCTION(Server, Reliable)
-	void ServerFlashbang(FVector Facing);
+		void ServerFlashbang(FVector Facing);
 
 	UFUNCTION(Client, Reliable)
-	void MulticastFlashbang(FVector Facing);
-
-
+		void MulticastFlashbang(FVector Facing);
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Grenade")
-	class USceneComponent* GrenadeStartLocation;
+		class USceneComponent* GrenadeStartLocation;
 
 	UPROPERTY(BlueprintReadWrite, Replicated)
-	FString PlayerName;
+		FString PlayerName;
 
 	/// Variable for sprinting ///
 	float MaxWalkSpeed;
 
-	UPROPERTY(Replicated, BlueprintReadOnly, Category = "Player")
-	bool bDied;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated, Category = "Camera")
-	UCameraComponent* CameraComp;
+		UCameraComponent* CameraComp;
 
 	void TurnOnLaser();
 
 	UPROPERTY(VisibleAnywhere, Category = "Camera")
-	USpringArmComponent* SpringArm;
+		USpringArmComponent* SpringArm;
 
 	FName HeadSocket;
 	FName ArmSocket;
@@ -512,43 +474,175 @@ public:
 	FName HelmetSocket;
 	FName HeadsetSocket;
 	FName WeaponBackSocket;
-	
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated,Category = "Zoom")
-	bool IsZooming;
+
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated, Category = "Sprint")
-	bool IsSprinting;
+		bool IsSprinting;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Zoom")
-	bool IsSingleFire;
+		bool IsSingleFire;
 
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite,Replicated, Category = "Zoom")
-	bool IsFiring;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated, Category = "Zoom")
+		bool IsFiring;
 	///Bool for crouching///
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated, Category = "Crouch")
-	bool IsCrouching;
+		bool IsCrouching;
+
+
+
+	UPROPERTY(EditDefaultsOnly, Category = "Player")
+		TSubclassOf<ASoldierCharacter> SoldierChar;
+
+	UPROPERTY(EditDefaultsOnly, Replicated, Category = "Player")
+		TSubclassOf<UUserWidget> wPickUp;
+
+	UPROPERTY(Replicated)
+		UUserWidget* wPickUpvar;
+
+
+	UPROPERTY(EditDefaultsOnly, Replicated, Category = "Player")
+		TSubclassOf<UUserWidget> wAmmoCount;
+
+	UPROPERTY(Replicated)
+		UUserWidget* wAmmoCountvar;
+
+	UPROPERTY(EditDefaultsOnly, Replicated, Category = "Player")
+		TSubclassOf<UUserWidget> wHealthIndicator;
+
+	UPROPERTY(EditDefaultsOnly, Category = "widget")
+		TSubclassOf<UUserWidget> WidgetClass;
+
+	UPROPERTY(Replicated)
+		UUserWidget* wHealthIndicatorvar;
+
+	UPROPERTY(EditDefaultsOnly, Category = "widget")
+		TSubclassOf<UUserWidget> PickUpTestWidgetClass;
+
+	UPROPERTY(BlueprintReadOnly, Replicated, Category = "Player")
+		bool bRemoveHud;
+
+	UPROPERTY(BlueprintReadOnly, Replicated, Category = "Player")
+		bool isWeaponAttached;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Player")
+		bool isLaserAttached;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Player")
+		bool isHeadsetAttached;
+
+
+	UPROPERTY(BlueprintReadOnly, Category = "Player")
+		bool isHoloAttached;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Player")
+		bool isHelmetAttached;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Player")
+		bool isLaserON;
+	UPROPERTY(BlueprintReadOnly, Category = "Player")
+		int32 SoldierCurrentAmmoInClip;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Player")
+		int32 SoldierCurrentAmmo;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Player")
+		int32 SoldierCurrentClips;
+
+
+	///SURVIVAL///
+	UPROPERTY(EditDefaultsOnly, Category = "Survival")
+		float FreQOfDrainingHealthWhenLowFood;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Survival")
+		float FreQOfDrainingHealthWhenLowDrink;
+
+	UFUNCTION(Server, Reliable, WithValidation)
+		void ServerOnFoodLow();
+
+
+	UFUNCTION(Server, Reliable, WithValidation)
+		void ServerOnDrinkLow();
+
+	FTimerHandle FoodLowTimer;
+	FTimerHandle DrinkLowTimer;
+	FTimerHandle DrinkFromPondTimer;
+
+	UPROPERTY(BlueprintReadOnly)
+		float amountOfDrinks;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Survival items")
+		TSubclassOf<class ADrink> DrinkClass;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Survival items")
+		TSubclassOf<class AFood> FoodClass;
+
 
 
 	UPROPERTY(BlueprintReadOnly)
-	bool bFireAnimation;
+		float amountOfFood;
 
-	///Bool for BackTargeting ///
-	void IsTargetFromBack();
-	bool MultipleDamage;
+	UPROPERTY(EditDefaultsOnly, Category = "Survival items")
+		float amountOfBoostFood;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Player")
-	TSubclassOf<ASoldierCharacter> SoldierChar;
+	UPROPERTY(EditDefaultsOnly, Category = "Survival items")
+		float amountOfBoostDrink;
 
-	///Bool for reloading///
+	UPROPERTY(EditDefaultsOnly, Category = "Survival items")
+		USoundCue* EatFoodSound;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Survival items")
+		USoundCue* DrinkWaterSound;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Survival items")
+		USoundCue* DrinkFromPondSound;
+
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
+
+	// Called to bind functionality to input
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+
+	//Implementing Multithreading test
+	UFUNCTION(BlueprintCallable, Category = "Multithreading")
+		void CalculatePrimeNumbers();
+
+	UFUNCTION(BlueprintCallable, Category = "Multithreading")
+		void CalculatePrimeNumbersAsync();
+
+	UPROPERTY(EditAnywhere, Category = MultiThreading)
+		int32 MaxPrime;
+
+	//ZROBIONE
+
+	UPROPERTY(Replicated, BlueprintReadOnly, Category = "Player")
+	bool bDied;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated, Category = "Zoom")
+	bool bZooming;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Player")
+	bool bGripAttached;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated, Category = "Reloading")
-	bool IsReloading;
+	bool bReloading;
 
+	UPROPERTY(Replicated)
+	bool bWantsToRepawn;
+
+	
+
+public:	
+
+	//ZROBIONE
+	bool GetbDied();
+	bool GetbZooming();
+	bool GetbGripAttached();
+	bool GetbWantToRespawn();
+	//TODO
 	bool bMagazinePickUp;
 
-
-	//* Bool if we can pickup Rifle *//
 	UPROPERTY(BlueprintReadWrite, Replicated, Category = "Player")
 	bool bRiflePickUp;
 
@@ -567,141 +661,33 @@ public:
 	UPROPERTY(BlueprintReadOnly, Replicated, Category = "Player")
 	bool bLaserPickUp;
 
-
-
-	UPROPERTY(EditDefaultsOnly, Replicated,Category = "Player")
-	TSubclassOf<UUserWidget> wPickUp;
-
-	UPROPERTY(Replicated)
-	UUserWidget* wPickUpvar;
-
-
-	UPROPERTY(EditDefaultsOnly, Replicated, Category = "Player")
-	TSubclassOf<UUserWidget> wAmmoCount;
-
-	UPROPERTY(Replicated)
-	UUserWidget* wAmmoCountvar;
-
-	UPROPERTY(EditDefaultsOnly, Replicated, Category = "Player")
-	TSubclassOf<UUserWidget> wHealthIndicator;
-
-	UPROPERTY(EditDefaultsOnly, Category = "widget")
-	TSubclassOf<UUserWidget> WidgetClass;
-
-	UPROPERTY(Replicated)
-	UUserWidget* wHealthIndicatorvar;
-
-	UPROPERTY(EditDefaultsOnly, Category = "widget")
-	TSubclassOf<UUserWidget> PickUpTestWidgetClass;
-
-
-	UPROPERTY(BlueprintReadOnly, Replicated,Category = "Player")
-	bool bRemoveHud;
-
-	UPROPERTY(BlueprintReadOnly, Replicated, Category = "Player")
-	bool isWeaponAttached;
-
-	UPROPERTY(BlueprintReadOnly, Category = "Player")
-	bool isLaserAttached;
-
-	UPROPERTY(BlueprintReadOnly, Category = "Player")
-	bool isHeadsetAttached;
-
-	UPROPERTY(BlueprintReadOnly, Category = "Player")
-	bool isGripAttached;
-
-	UPROPERTY(BlueprintReadOnly, Category = "Player")
-	bool isHoloAttached;
-
-	UPROPERTY(BlueprintReadOnly, Category = "Player")
-	bool isHelmetAttached;
-
-	UPROPERTY(BlueprintReadOnly, Category = "Player")
-	bool isLaserON;
-
-	UPROPERTY(BlueprintReadOnly, Category = "Player")
-	int32 SoldierCurrentAmmoInClip;
-
-	UPROPERTY(BlueprintReadOnly, Category = "Player")
-	int32 SoldierCurrentAmmo;
-
-	UPROPERTY(BlueprintReadOnly, Category = "Player")
-	int32 SoldierCurrentClips;
-
-
-	///SURVIVAL///
-	UPROPERTY(EditDefaultsOnly, Category = "Survival")
-	float FreQOfDrainingHealthWhenLowFood;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Survival")
-	float FreQOfDrainingHealthWhenLowDrink;
-
-	UFUNCTION(Server, Reliable, WithValidation)
-	void ServerOnFoodLow();
-
-	void OnFoodLow();
-
-	UFUNCTION(Server, Reliable, WithValidation)
-	void ServerOnDrinkLow();
-
-	void OnDrinkLow();
-
-	FTimerHandle FoodLowTimer;
-	FTimerHandle DrinkLowTimer;
-	FTimerHandle DrinkFromPondTimer;
-
 	bool bDrinkPickup;
-	UPROPERTY(BlueprintReadOnly)
-	float amountOfDrinks;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Survival items")
-	TSubclassOf<class ADrink> DrinkClass;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Survival items")
-	TSubclassOf<class AFood> FoodClass;
 
 	bool bFoodPickup;
 
 	bool bDrinkFromPond;
 
+
+	EHelmetAttachment::Type HelmetEquipState;
+	void Flashbang(float ThrowDistance, FVector PlayerFacingAngle);
+
+
+	void OnFoodLow();
+	void OnDrinkLow();
+
 	UPROPERTY(BlueprintReadOnly)
-	float amountOfFood;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Survival items")
-	float amountOfBoostFood;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Survival items")
-	float amountOfBoostDrink;
-
-	UPROPERTY(EditDefaultsOnly,Category = "Survival items")
-	USoundCue* EatFoodSound;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Survival items")
-	USoundCue* DrinkWaterSound;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Survival items")
-	USoundCue* DrinkFromPondSound;
-
-	UPROPERTY(Replicated)
-	bool bWantsToRepawn;
-
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
-
-	//Implementing Multithreading test
-	UFUNCTION(BlueprintCallable, Category = "Multithreading")
-	void CalculatePrimeNumbers();
-
-	UFUNCTION(BlueprintCallable, Category = "Multithreading")
-	void CalculatePrimeNumbersAsync();
-
-	UPROPERTY(EditAnywhere, Category = MultiThreading)
-	int32 MaxPrime;
+	bool bFireAnimation;
+	
+	
 };
+
+
+
+
+
+
+
+
 
 namespace ThreadingTest
 {

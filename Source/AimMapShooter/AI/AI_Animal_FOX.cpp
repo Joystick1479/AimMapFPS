@@ -72,7 +72,7 @@ void AAI_Animal_FOX::Hearing()
 		if (SoldChar)
 		{
 			IsAttacking = HearingSphere->IsOverlappingActor(SoldChar);
-			if (SoldChar->bDied == true)
+			if (SoldChar->GetbDied() == true)
 			{
 				IsAttacking = false;
 			}
@@ -138,7 +138,7 @@ void AAI_Animal_FOX::Attacking()
 		ASoldierCharacter* SoldChar = Cast<ASoldierCharacter>(Target[i]);
 		if (SoldChar)
 		{
-			if (DamagingSphere->IsOverlappingActor(SoldChar) == true && SoldChar->bDied == false)
+			if (DamagingSphere->IsOverlappingActor(SoldChar) == true && SoldChar->GetbDied() == false)
 			{
 				{
 					UGameplayStatics::ApplyDamage(SoldChar, 30.0f, nullptr, nullptr, nullptr);

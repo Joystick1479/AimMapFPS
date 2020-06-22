@@ -55,7 +55,7 @@ void ASpawningAttach::SpawnRandom()
 		if (Holo)
 		{
 			Holo->SetOwner(this);
-			Holo->GetSkelelMeshComp()->bOnlyOwnerSee = false;
+			Holo->GetMeshComponent()->bOnlyOwnerSee = false;
 
 		}
 	}
@@ -66,8 +66,7 @@ void ASpawningAttach::SpawnRandom()
 		if (Helmet)
 		{
 			Helmet->SetOwner(this);
-			Helmet->GetStaticMeshComponent()->bOnlyOwnerSee = false;
-
+			Helmet->GetMeshComponent()->bOnlyOwnerSee = false;
 		}
 	}
 	if (randomNumber == 3)
@@ -77,7 +76,7 @@ void ASpawningAttach::SpawnRandom()
 		if (Headset)
 		{
 			Headset->SetOwner(this);
-			Headset->MeshComp->bOnlyOwnerSee = false;
+			Headset->GetMeshComponent()->bOnlyOwnerSee = false;
 
 		}
 	}
@@ -88,7 +87,7 @@ void ASpawningAttach::SpawnRandom()
 		if (Laser)
 		{
 			Laser->SetOwner(this);
-			Laser->MeshComp->bOnlyOwnerSee = false;
+			Laser->GetMeshComponent()->bOnlyOwnerSee = false;
 
 		}
 	}

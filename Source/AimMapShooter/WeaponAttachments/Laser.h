@@ -3,67 +3,41 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Actor.h"
+#include "WeaponAttachments/BaseAttachmentClass.h"
 #include "Laser.generated.h"
 
 class UStaticMeshComponent;
-class USphereComponent;
-class ASoldierCharacter;
-class AAutomaticRifle;
 class UPointLightComponent;
 
 UCLASS()
-class AIMMAPSHOOTER_API ALaser : public AActor
+class AIMMAPSHOOTER_API ALaser : public ABaseAttachmentClass
 {
 	GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
 	ALaser();
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly,Category = "Components")
-	UStaticMeshComponent* MeshComp;
-
-	UPROPERTY(VisibleAnywhere,BlueprintReadOnly, Category = "Components")
-	UStaticMeshComponent* MeshComp2;
-
-	FName LaserSocket;
-
-	ASoldierCharacter* SoldierChar;
-
-	void StartLaser();
-
-	UPROPERTY(VisibleAnywhere, Category = "Components")
-	UPointLightComponent* PointLight;
-
 	
 protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
 
-	void NotifyActorBeginOverlap(AActor* OtherActor);
-	void NotifyActorEndOverlap(AActor* OtherActor);
-
-	void DestroyOnUse();
-	FTimerHandle DestroyTimer;
+	FName LaserSocket;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Laser")
 	float LengthOfLaser;
 
-	UPROPERTY(VisibleAnywhere, Category = "Components")
-	USphereComponent* SphereComp;
-
 	UPROPERTY(EditDefaultsOnly, Category = "Laser")
 	double ThickOfLaser;
 
+	UPROPERTY(VisibleAnywhere, Category = "Components")
+	UPointLightComponent* PointLight;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	UStaticMeshComponent* MeshComp2;
 
-	//UPROPERTY(EditDefaultsOnly, Category = "Player")
-	//TSubclassOf<PointLight> PointLightClass;
+public:
 
+	UPointLightComponent* GetPointLightComponent();
+	UStaticMeshComponent* GetScalableMeshComponent();
 
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
-	bool IsPickedUp;
+	void StartLaser();
 };

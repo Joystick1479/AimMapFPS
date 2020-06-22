@@ -3,14 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Actor.h"
+#include "WeaponAttachments/BaseAttachmentClass.h"
 #include "HoloScope.generated.h"
 
-class USkeletalMeshComponent;
-class USphereComponent;
 
 UCLASS()
-class AIMMAPSHOOTER_API AHoloScope : public AActor
+class AIMMAPSHOOTER_API AHoloScope : public ABaseAttachmentClass
 {
 	GENERATED_BODY()
 	
@@ -18,27 +16,6 @@ public:
 	// Sets default values for this actor's properties
 	AHoloScope();
 
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
-
-	UPROPERTY(VisibleAnywhere, Category = "Components")
-	USphereComponent* SphereComp;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-	USkeletalMeshComponent* SkelMeshComp;
-
-	void NotifyActorBeginOverlap(AActor* OtherActor);
-	void NotifyActorEndOverlap(AActor* OtherActor);
-
-	void DestroyOnUse();
-	FTimerHandle DestroyTimer;
-
-public:	
-	USkeletalMeshComponent* GetSkelelMeshComp();
-
-	bool IsPickedUp;
 
 
 };

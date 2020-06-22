@@ -98,7 +98,7 @@ ASoldierCharacter::ASoldierCharacter()
 	ZoomingTime = 0.2f;
 
 	IsSingleFire = false;
-	IsReloading = false;
+	bReloading = false;
 
 	CharacterState = ECharacterState::Idle;
 	HoldingWeaponState = EHoldingWeapon::None;
@@ -130,7 +130,6 @@ ASoldierCharacter::ASoldierCharacter()
 	stamina = 100;
 
 }
-
 // Called when the game starts or when spawned
 void ASoldierCharacter::BeginPlay()
 {
@@ -197,13 +196,12 @@ void ASoldierCharacter::BeginPlay()
 	APlayerCameraManager * CameraManager = UGameplayStatics::GetPlayerCameraManager(this, 0);
 	if (CameraManager)
 	{
-		CameraManager->ViewPitchMax = 37.0f;
+		CameraManager->ViewPitchMax = 45.0f;
 		CameraManager->ViewPitchMin = -60.0f;
 	}
 
 
 }
-
 void ASoldierCharacter::LineTraceItem()
 {
 	//if (Role < ROLE_Authority)
@@ -212,84 +210,94 @@ void ASoldierCharacter::LineTraceItem()
 	//	//return;
 	//}
 
-	//	 FVector start_trace = CameraComp->GetComponentLocation();
-	//	 FVector direction = CameraComp->GetComponentRotation().Vector();
-	//	 FVector end_trace = start_trace + (direction* MaxUseDistance);
+		 FVector start_trace = CameraComp->GetComponentLocation();
+		 FVector direction = CameraComp->GetComponentRotation().Vector();
+		 FVector end_trace = start_trace + (direction* MaxUseDistance);
 
-	//	FCollisionQueryParams TraceParams(FName(TEXT("")), true, this);
-	//	TraceParams.bReturnPhysicalMaterial = false;
-	//	TraceParams.bTraceComplex = true;
-	//	TraceParams.AddIgnoredActor(this);
+		FCollisionQueryParams TraceParams(FName(TEXT("")), true, this);
+		TraceParams.bReturnPhysicalMaterial = false;
+		TraceParams.bTraceComplex = true;
+		TraceParams.AddIgnoredActor(this);
 
-	//	FHitResult Hit;
+		FHitResult Hit;
 
-		//	if (GetWorld()->LineTraceSingleByChannel(Hit, start_trace, end_trace, COLLISION_ITEMS, TraceParams) && HoldingWeaponState == EHoldingWeapon::None)
-		//	{
-		//		DrawDebugLine(GetWorld(), start_trace, end_trace, FColor::Red, false, 1.0f, 0, 1.0f);
-		//		bRiflePickUp = true;
-		//
-		//		AActor* WeaponHit = Hit.GetActor();
-		//	}
-			//else
-			//{
-			//	bRiflePickUp = false;
-		//	}
-		//	if (GetWorld()->LineTraceSingleByChannel(Hit, start_trace, end_trace, COLLISION_HOLO, TraceParams) && (HoldingWeaponState == EHoldingWeapon::A4 && isHoloAttached == false))
-		//	{
-		//		DrawDebugLine(GetWorld(), start_trace, end_trace, FColor::Green, false, 1.0f, 0, 1.0f);
-		//		bHoloPickUp = true;
-		//	}
-		//	else
-		//	{
-		//		bHoloPickUp = false;
-		//	}
-		//	if (GetWorld()->LineTraceSingleByChannel(Hit, start_trace, end_trace, COLLISION_GRIP, TraceParams) && (HoldingWeaponState == EHoldingWeapon::A4 && isGripAttached == false))
-		//	{
-		//		DrawDebugLine(GetWorld(), start_trace, end_trace, FColor::Blue, false, 1.0f, 0, 1.0f);
-		//		bGripPickUp = true;
-		//	}
-		//	else
-		//	{
-		//		bGripPickUp = false;
-		//	}
-		//	if (GetWorld()->LineTraceSingleByChannel(Hit, start_trace, end_trace, COLLISION_HELMET, TraceParams) && isHelmetAttached == false)
-		//	{
-		//		DrawDebugLine(GetWorld(), start_trace, end_trace, FColor::Blue, false, 1.0f, 0, 1.0f);
-		//		bHelmetPickUp = true;
-		//	}
-		//	else
-		//	{
-		//		bHelmetPickUp = false;
-		//	}
-		//	if (GetWorld()->LineTraceSingleByChannel(Hit, start_trace, end_trace, COLLISION_HEADSET, TraceParams) && isHeadsetAttached == false)
-		//	{
-		//		DrawDebugLine(GetWorld(), start_trace, end_trace, FColor::Black, false, 1.0f, 0, 1.0f);
-		//		bHeadsetPickUp = true;
-		//	}
-		//	else
-		//	{
-		//		bHeadsetPickUp = false;
-		//	}
-		//	if (GetWorld()->LineTraceSingleByChannel(Hit, start_trace, end_trace, COLLISION_LASER, TraceParams) && isLaserAttached == false && HoldingWeaponState == EHoldingWeapon::A4)
-		//	{
-		//		DrawDebugLine(GetWorld(), start_trace, end_trace, FColor::Orange, false, 1.0f, 0, 1.0f);
-		//		bLaserPickUp = true;
-		//	}
-		//	else
-		//	{
-		//		bLaserPickUp = false;
-		//	}
+			if (GetWorld()->LineTraceSingleByChannel(Hit, start_trace, end_trace, COLLISION_ITEMS, TraceParams))
+			{
+				DrawDebugLine(GetWorld(), start_trace, end_trace, FColor::Red, false, 1.0f, 0, 1.0f);
 		
+				AGrip* Grip = Cast<AGrip>(Hit.GetActor());
+				if (Grip && !Grip->GetIfPickeditem())
+				{
+					bGripPickUp = true;
+					if (GetWorld()->GetFirstPlayerController()->IsInputKeyDown("E"))
+					{
+						Grip->Destroy();
+					}
+				}
+				AHeadset* Headset = Cast<AHeadset>(Hit.GetActor());
+				if (Headset)
+				{
+					bHeadsetPickUp = true;
+					if (GetWorld()->GetFirstPlayerController()->IsInputKeyDown("E"))
+					{
+						Headset->Destroy();
+					}
+				}
+				AHelmet* Helmet = Cast<AHelmet>(Hit.GetActor());
+				if (Helmet)
+				{
+					bHelmetPickUp = true;
+					if (GetWorld()->GetFirstPlayerController()->IsInputKeyDown("E"))
+					{
+						Helmet->Destroy();
+					}
+				}
+				AHoloScope* HoloScope = Cast<AHoloScope>(Hit.GetActor());
+				if (HoloScope)
+				{
+					bHoloPickUp = true;
+					if (GetWorld()->GetFirstPlayerController()->IsInputKeyDown("E"))
+					{
+						HoloScope->Destroy();
+					}
+
+				}
+				ALaser* Laser = Cast<ALaser>(Hit.GetActor());
+				if (Laser)
+				{
+					bLaserPickUp = true;
+					if (GetWorld()->GetFirstPlayerController()->IsInputKeyDown("E"))
+					{
+						Laser->Destroy();
+					}
+				}
+				AMagazine* Magazine = Cast<AMagazine>(Hit.GetActor());
+				if (Magazine)
+				{
+					bMagazinePickUp = true;
+					if (GetWorld()->GetFirstPlayerController()->IsInputKeyDown("E"))
+					{
+						Magazine->Destroy();
+					}
+				}
+			}
+			else
+			{
+				bGripPickUp = false;
+				bMagazinePickUp = false;
+				bLaserPickUp = false;
+				bHoloPickUp = false;
+				bHelmetPickUp = false;
+				bHeadsetPickUp = false;
+			}
 	
 }
-
 // Called every frame
 void ASoldierCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+	LineTraceItem();
 }
-
 
 // Called to bind functionality to input
 void ASoldierCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -342,28 +350,6 @@ void ASoldierCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	
 
 
-}
-void ASoldierCharacter::ServerWantToRespawn_Implementation()
-{
-	///ASK SERVER TO RESPAWN
-	
-	UE_LOG(LogTemp, Warning, TEXT("Trying to respawn1"));
-	if (bDied == true)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Trying to respawn2"));
-
-		bWantsToRepawn = true;
-		if (bWantsToRepawn == true)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Trying to respawn3"));
-			AAimMapGameModeBase* GM = Cast<AAimMapGameModeBase>(GetWorld()->GetAuthGameMode());
-			if (GM)
-			{
-				GM->RespawningPlayer();
-				this->Destroy();
-			}
-		}
-	}
 }
 void ASoldierCharacter::RagdollOnDeath()
 {
@@ -468,23 +454,6 @@ void ASoldierCharacter::DrinkWater()
 		}
 	}
 }
-void ASoldierCharacter::ServerDrinkWater_Implementation()
-{
-	DrinkWater();
-}
-bool ASoldierCharacter::ServerDrinkWater_Validate()
-{
-	return true;
-}
-void ASoldierCharacter::ServerEatFood_Implementation()
-{
-	EatFood();
-}
-bool ASoldierCharacter::ServerEatFood_Validate()
-{
-	return true;
-}
-
 void ASoldierCharacter::Vault()
 {
 	if (Role < ROLE_Authority)
@@ -626,7 +595,6 @@ void ASoldierCharacter::Vault()
 			GoClimb = false;
 		}
 }
-
 void ASoldierCharacter::ResetVaultTimer()
 {
 	if (Role < ROLE_Authority)
@@ -659,7 +627,6 @@ void ASoldierCharacter::ResetVaultTimer()
 		PC->EnableInput(PC);
 	}
 }
-
 void ASoldierCharacter::TurnOnLaser()
 {
 	if (Role < ROLE_Authority)
@@ -668,47 +635,10 @@ void ASoldierCharacter::TurnOnLaser()
 	}
 	if (Laser)
 	{
-		Laser->MeshComp2->ToggleVisibility();
-		Laser->PointLight->ToggleVisibility();
+		Laser->GetScalableMeshComponent()->ToggleVisibility();
+		Laser->GetPointLightComponent()->ToggleVisibility();
+		Laser->StartLaser();
 	}
-}
-
-void ASoldierCharacter::IsTargetFromBack()
-{
-	/*FVector ActorForwardVector = this->GetActorForwardVector();
-
-	TArray<AActor*> Target;
-	UGameplayStatics::GetAllActorsOfClass(this, SoldierChar, Target);
-	for (int i = 0; i < Target.Num(); i++)
-	{
-		ASoldierCharacter* SoldChar = Cast<ASoldierCharacter>(Target[i]);
-		if (SoldChar)
-		{
-			FVector TargetLocation = SoldChar->GetActorLocation();
-			FVector DiffVector = (TargetLocation - ActorForwardVector);
-			FVector NormalizedDiffVector = UKismetMathLibrary::Normal(DiffVector);
-			float DotProduct = UKismetMathLibrary::Dot_VectorVector(NormalizedDiffVector, ActorForwardVector);
-			if (DotProduct > 0.55 && DotProduct < 0.999)
-			{
-				UE_LOG(LogTemp, Warning, TEXT("Staying behind opponent back"));
-				MultipleDamage = true;
-			}
-			else
-			{
-				UE_LOG(LogTemp, Warning, TEXT("NOT staying behind opponent back"));
-				MultipleDamage = false;
-			}
-		}
-	}*/
-}
-
-void ASoldierCharacter::ServerPickUpItem_Implementation()
-{
-	PickUp();
-}
-bool ASoldierCharacter::ServerPickUpItem_Validate()
-{
-	return true;
 }
 void ASoldierCharacter::PickUp()
 {
@@ -716,7 +646,6 @@ void ASoldierCharacter::PickUp()
 		if (Role < ROLE_Authority)
 		{
 			ServerPickUpItem();
-			//return;
 		}
 		
 		if (bRiflePickUp == true && HoldingWeaponState==EHoldingWeapon::None)
@@ -756,91 +685,50 @@ void ASoldierCharacter::PickUp()
 			HoldingAttachmentState = EHoldingAttachment::Holo;
 			HoloEquipState = EHoloAttachment::Equipped;
 
-			TArray<AActor*> HoloScopes;
-			UGameplayStatics::GetAllActorsOfClass(this, HoloClass, HoloScopes);
-			for (int i = 0; i < HoloScopes.Num(); i++)
-			{
-				AHoloScope* HoloItr = Cast<AHoloScope>(HoloScopes[i]);
-				if (HoloItr)
-				{
-					if (this->IsOverlappingActor(HoloItr))
-					{
-						HoloItr->IsPickedUp = true;
-					}
-				}
-			}
-
 			FActorSpawnParameters SpawnParams;
 			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-			if (IsLocallyControlled())
+			
+			HoloScope = GetWorld()->SpawnActor<AHoloScope>(HoloClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
+			if (HoloScope)
 			{
-				HoloScope = GetWorld()->SpawnActor<AHoloScope>(HoloClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
-				if (HoloScope)
-				{
-					HoloScope->SetOwner(this);
-					HoloScope->GetSkelelMeshComp()->bOnlyOwnerSee = true;
-					HoloScope->GetSkelelMeshComp()->SetRenderCustomDepth(false);
-					FName Socket = AutomaticRifle->GetScopeSocketName();
-					HoloScope->AttachToComponent(AutomaticRifle->GetSkelMeshComp(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, Socket);
-					isHoloAttached = true;
-				}
-				UGameplayStatics::PlaySoundAtLocation(this, ItemsPickUp, GetActorLocation());
+				HoloScope->SetOwner(this);
+				HoloScope->GetMeshComponent()->bOnlyOwnerSee = true;
+				HoloScope->GetMeshComponent()->SetRenderCustomDepth(false);
+				FName Socket = AutomaticRifle->GetScopeSocketName();
+				HoloScope->AttachToComponent(AutomaticRifle->GetSkelMeshComp(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, Socket);
+				HoloScope->GetSphereComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+				isHoloAttached = true;
+
 			}
+			UGameplayStatics::PlaySoundAtLocation(this, ItemsPickUp, GetActorLocation());
+			
 		}
 		if (bGripPickUp == true && HoldingWeaponState == EHoldingWeapon::A4 && GripEquipState == EGripAttachment::None)
 		{
 			HoldingAttachmentState = EHoldingAttachment::Grip;
 			GripEquipState = EGripAttachment::Equipped;
 
-			TArray<AActor*> Grips;
-			UGameplayStatics::GetAllActorsOfClass(this, GripClass, Grips);
-			for (int i = 0; i < Grips.Num(); i++)
-			{
-				AGrip* GripItr = Cast<AGrip>(Grips[i]);
-				if (GripItr)
-				{
-					if (this->IsOverlappingActor(GripItr))
-					{
-						GripItr->SetIfPickedItem(true);
-					}
-				}
-			}
-
 			FActorSpawnParameters SpawnParams;
 			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-			if (IsLocallyControlled())
+
+
+			Grip = GetWorld()->SpawnActor<AGrip>(GripClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
+			if (Grip)
 			{
-				Grip = GetWorld()->SpawnActor<AGrip>(GripClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
-				if (Grip)
-				{
-					Grip->SetOwner(this);
-					Grip->GetMeshComponent()->bOnlyOwnerSee = true;
-					Grip->GetMeshComponent()->SetRenderCustomDepth(false);
-					FName GSocket = AutomaticRifle->GetGripSocketName();
-					Grip->AttachToComponent(AutomaticRifle->GetSkelMeshComp(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, GSocket);
-					isGripAttached = true;
-				}
-				UGameplayStatics::PlaySoundAtLocation(this, ItemsPickUp, GetActorLocation());
+				Grip->SetOwner(this);
+				Grip->GetMeshComponent()->bOnlyOwnerSee = true;
+				Grip->GetMeshComponent()->SetRenderCustomDepth(false);
+				FName GSocket = AutomaticRifle->GetGripSocketName();
+				Grip->AttachToComponent(AutomaticRifle->GetSkelMeshComp(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, GSocket);
+				Grip->GetSphereComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+				bGripAttached = true;
 			}
+			UGameplayStatics::PlaySoundAtLocation(this, ItemsPickUp, GetActorLocation());
+
 		}
 		if (bHelmetPickUp == true && HelmetEquipState==EHelmetAttachment::None)
 		{
 			HelmetEquipState = EHelmetAttachment::Equipped;
-
-			TArray<AActor*> Helemts;
-			UGameplayStatics::GetAllActorsOfClass(this, HelmetClass, Helemts);
-			for (int i = 0; i < Helemts.Num(); i++)
-			{
-				AHelmet* HelmetItr = Cast<AHelmet>(Helemts[i]);
-				if (HelmetItr)
-				{
-					if (this->IsOverlappingActor(HelmetItr))
-					{
-						//TODO
-						//HelmetItr->IsPickedUp = true;
-					}
-				}
-			}
 
 			FActorSpawnParameters SpawnParams;
 			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
@@ -849,8 +737,9 @@ void ASoldierCharacter::PickUp()
 			if (Helmet)
 			{
 				Helmet->SetOwner(this);
-				Helmet->GetStaticMeshComponent()->SetRenderCustomDepth(false);
+				Helmet->GetMeshComponent()->SetRenderCustomDepth(false);
 				Helmet->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, HelmetSocket);
+				Helmet->GetSphereComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 				isHelmetAttached = true;
 			}
 			UGameplayStatics::PlaySoundAtLocation(this, ItemsPickUp, GetActorLocation());
@@ -859,20 +748,6 @@ void ASoldierCharacter::PickUp()
 		{
 			HeadsetEquipState = EHeadsetAttachment::Equipped;
 
-			TArray<AActor*> Headsets;
-			UGameplayStatics::GetAllActorsOfClass(this, HeadsetClass, Headsets);
-			for (int i = 0; i < Headsets.Num(); i++)
-			{
-				AHeadset* HeadsetItr = Cast<AHeadset>(Headsets[i]);
-				if (HeadsetItr)
-				{
-					if (this->IsOverlappingActor(HeadsetItr))
-					{
-						HeadsetItr->IsPickedUp = true;
-					}
-				}
-			}
-
 			FActorSpawnParameters SpawnParams;
 			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
@@ -880,9 +755,10 @@ void ASoldierCharacter::PickUp()
 			if (Headset)
 			{
 				Headset->SetOwner(this);
-				Headset->MeshComp->SetRenderCustomDepth(false);
+				Headset->GetMeshComponent()->SetRenderCustomDepth(false);
 				Headset->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, HeadsetSocket);
-				Headset->MeshComp->ToggleActive();
+				Headset->GetMeshComponent()->ToggleActive();
+				Headset->GetSphereComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 				isHeadsetAttached = true;
 			}
 			///Destroy after picking up
@@ -896,51 +772,25 @@ void ASoldierCharacter::PickUp()
 			FActorSpawnParameters SpawnParams;
 			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-			TArray<AActor*> Lasers;
-			UGameplayStatics::GetAllActorsOfClass(this, LaserClass, Lasers);
-			for (int i = 0; i < Lasers.Num(); i++)
+			
+			Laser = GetWorld()->SpawnActor<ALaser>(LaserClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
+			if (Laser)
 			{
-				ALaser* LaserItr = Cast<ALaser>(Lasers[i]);
-				if (LaserItr)
-				{
-					if (this->IsOverlappingActor(LaserItr))
-					{
-						LaserItr->IsPickedUp = true;
-					}
-				}
-			}
+				Laser->SetOwner(this);
+				Laser->GetMeshComponent()->bOnlyOwnerSee = true;
+				Laser->GetMeshComponent()->SetRenderCustomDepth(false);
+				FName LSocket = AutomaticRifle->GetLaserSocketName();
+				Laser->AttachToComponent(AutomaticRifle->GetSkelMeshComp(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, LSocket);
+				Laser->GetSphereComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
-			if (Role<ROLE_Authority)
-			{
-				Laser = GetWorld()->SpawnActor<ALaser>(LaserClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
-				if (Laser)
-				{
-					Laser->SetOwner(this);
-					Laser->MeshComp->bOnlyOwnerSee = true;
-					Laser->MeshComp->SetRenderCustomDepth(false);
-					FName LSocket = AutomaticRifle->GetLaserSocketName();
-					Laser->AttachToComponent(AutomaticRifle->GetSkelMeshComp(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, LSocket);
-					isLaserAttached = true;
-				}
-				UGameplayStatics::PlaySoundAtLocation(this, ItemsPickUp, GetActorLocation());
+				isLaserAttached = true;
+				UE_LOG(LogTemp, Warning, TEXT("Laser spawn"));
 			}
+			UGameplayStatics::PlaySoundAtLocation(this, ItemsPickUp, GetActorLocation());
+			
 		}
 		if (bMagazinePickUp == true)
 		{
-
-			TArray<AActor*> Magazines;
-			UGameplayStatics::GetAllActorsOfClass(this, MagazineClass, Magazines);
-			for (int i = 0; i < Magazines.Num(); i++)
-			{
-				AMagazine* MagazineItr = Cast<AMagazine>(Magazines[i]);
-				if (MagazineItr)
-				{
-					if (this->IsOverlappingActor(MagazineItr))
-					{
-						MagazineItr->IsPickedUp = true;
-					}
-				}
-			}
 
 			TArray<AActor*> Rifles;
 			UGameplayStatics::GetAllActorsOfClass(this, StarterWeaponClass, Rifles);
@@ -1022,7 +872,6 @@ void ASoldierCharacter::EndDrinkFromPond(APlayerController* PC)
 		}
 	}
 }
-
 void ASoldierCharacter::ShowingPickUpHud()
 {
 	//if (Role < ROLE_Authority)
@@ -1064,7 +913,6 @@ void ASoldierCharacter::ShowingPickUpHud()
 	GetWorldTimerManager().SetTimer(HudTimer, this, &ASoldierCharacter::ShowingPickUpHud, 0.5f, false);
 
 }
-
 void ASoldierCharacter::MoveForward(float Value)
 {
 	if (bDied != true)
@@ -1096,7 +944,6 @@ void ASoldierCharacter::AddYawInput(float Value)
 		AddControllerYawInput(Value);
 	}
 }
-
 void ASoldierCharacter::BeginCrouch()
 {
 	if (Role < ROLE_Authority)
@@ -1128,12 +975,12 @@ void ASoldierCharacter::ZoomIn()
 {
 	///Hide 3rd person mesh
 	UCharacterMovementComponent* MoveComp = this->FindComponentByClass<UCharacterMovementComponent>();
-	if (MoveComp && !IsSprinting && !IsInspecting && !IsReloading &&bWeaponOnBack != true)
+	if (MoveComp && !IsSprinting && !IsInspecting && !bReloading &&bWeaponOnBack != true)
 	{
 		MoveComp->MaxWalkSpeed = 250.0f;
 		if (!IsSprinting)
 		{
-			IsZooming = true;
+			bZooming = true;
 
 			if (IsLocallyControlled())
 			{
@@ -1190,7 +1037,7 @@ void ASoldierCharacter::ZoomOut()
 		MoveComp->MaxWalkSpeed = 300.0f;
 	}
 
-	IsZooming = false;
+	bZooming = false;
 
 	if (IsLocallyControlled())
 	{
@@ -1205,7 +1052,6 @@ void ASoldierCharacter::ZoomOut()
 		}
 	}
 }
-
 void ASoldierCharacter::StartFire()
 {
 	if (!IsSprinting && bWeaponOnBack == false && bDied != true)
@@ -1238,7 +1084,6 @@ void ASoldierCharacter::StartFire()
 		}
 	}
 }
-
 void ASoldierCharacter::StopFire()
 {
 	CharacterState = ECharacterState::Idle;
@@ -1251,7 +1096,6 @@ void ASoldierCharacter::StopFire()
 		AutomaticRifle->StopFire();
 	}
 }
-
 void ASoldierCharacter::SprintOn()
 {
 	if (Role < ROLE_Authority)
@@ -1269,7 +1113,7 @@ void ASoldierCharacter::SprintOn()
 	}
 	else if (stamina > 10 && IsSprinting == false)
 	{
-		if (IsZooming != true && GetVelocity().Size()>0)
+		if (bZooming != true && GetVelocity().Size()>0)
 		{
 			SprintProgressBar();
 			IsSprinting = true;
@@ -1282,7 +1126,6 @@ void ASoldierCharacter::SprintOn()
 	}
 
 }
-
 void ASoldierCharacter::SprintOff()
 {
 
@@ -1301,7 +1144,6 @@ void ASoldierCharacter::SprintOff()
 	}
 	
 }
-
 void ASoldierCharacter::SprintProgressBar()
 {
 	if (IsSprinting == true)
@@ -1328,7 +1170,6 @@ void ASoldierCharacter::SprintProgressBar()
 	}
 
 }
-
 void ASoldierCharacter::SprintSlowDown()
 {
 	////SLOW DOWN WHEN OUT OF STAMINA
@@ -1344,7 +1185,6 @@ void ASoldierCharacter::SprintSlowDown()
 
 	GetWorldTimerManager().SetTimer(SlowDownSprintTimer, this, &ASoldierCharacter::SprintSlowDown, 0.5f, false);
 }
-
 void ASoldierCharacter::OutOfBreathSound()
 {
 	
@@ -1360,12 +1200,10 @@ void ASoldierCharacter::OutOfBreathSound()
 
 	GetWorldTimerManager().SetTimer(UpdateBreath, this, &ASoldierCharacter::OutOfBreathSound, 1.0f, false);
 }
-
 void ASoldierCharacter::OutOfBreathReset()
 {
 	ResetBreath = false;
 }
-
 void ASoldierCharacter::Headbobbing()
 {
 	if (IsSprinting == true)
@@ -1391,19 +1229,18 @@ void ASoldierCharacter::Headbobbing()
 	GetWorldTimerManager().SetTimer(HBobingTimer, this, &ASoldierCharacter::Headbobbing, 0.1f, false);
 
 }
-
 void ASoldierCharacter::Reload()
 {
 	if (Role < ROLE_Authority)
 	{
 		ServerReload();
 	}
-	if (CharacterState == ECharacterState::Idle && (SoldierCurrentClips > 0) && !IsZooming && bDied != true)
+	if (CharacterState == ECharacterState::Idle && (SoldierCurrentClips > 0) && !bZooming && bDied != true)
 	{
 		if (AutomaticRifle)
 		{
 			CharacterState = ECharacterState::Reloading;
-			IsReloading = true;
+			bReloading = true;
 			AutomaticRifle->StartReload();
 		//	AudioCompReload->Activate(true);
 		//	ServerReloadingSound();
@@ -1411,18 +1248,16 @@ void ASoldierCharacter::Reload()
 		}
 	}
 }
-
 void ASoldierCharacter::StopReload()
 {
 	if (CharacterState == ECharacterState::Reloading)
 	{
 		CharacterState = ECharacterState::Idle;
-		IsReloading = false;
+		bReloading = false;
 		//AudioCompReload->Deactivate();
 		GetWorldTimerManager().ClearTimer(ReloadTimer);
 	}
 }
-
 void ASoldierCharacter::FireMode()
 {
 	//* NO SWITCHING FIRE MODES WHEN FIRING *//
@@ -1441,7 +1276,6 @@ void ASoldierCharacter::FireMode()
 	UGameplayStatics::PlaySoundAtLocation(GetWorld(), FiremodeSwitch, this->GetActorLocation());
 	
 }
-
 void ASoldierCharacter::UpdateRifleStatus()
 {
 	if (AutomaticRifle)
@@ -1453,7 +1287,6 @@ void ASoldierCharacter::UpdateRifleStatus()
 
 	GetWorldTimerManager().SetTimer(UpdateRifleTimer, this, &ASoldierCharacter::UpdateRifleStatus, 0.05f, false);
 }
-
 void ASoldierCharacter::WeaponInspectionOn()
 {
 	if (IsInspecting != true)
@@ -1466,22 +1299,26 @@ void ASoldierCharacter::WeaponInspectionOff()
 {
 	IsInspecting = false;
 }
-
 void ASoldierCharacter::NotifyActorBeginOverlap(AActor * OtherActor)
 {
-	bool DoOnce;
-	DoOnce = false;
-	APayloadCharacter* Payload = Cast<APayloadCharacter>(OtherActor);
-	if (Payload)
+	/*APlayerController* PC = Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
+	if (PC)
 	{
-		if (IsLocallyControlled() && DoOnce == false)
+		if (PC->IsInputKeyDown("E"))
 		{
-			DoOnce = true;
-			UGameplayStatics::PlaySound2D(this, EscortVehicle);
-		}
-	}
-}
+			AGrip* Grip = Cast<AGrip>(OtherActor);
+			if (Grip)
+			{
+				UE_LOG(LogTemp, Warning, TEXT("Cast Grip sucesfull"));
+				bGripPickUp = true;
+				Grip->Destroy();
 
+			}
+		}
+		
+	}*/
+	
+}
 void ASoldierCharacter::FindingGrenadeTransform()
 {
 	if (GrenadeStartLocation)
@@ -1562,7 +1399,6 @@ void ASoldierCharacter::PlayTimeline()
 		MyTimeline->PlayFromStart();
 	}
 }
-
 void ASoldierCharacter::AngleFromFlash(FVector GrenadeLoc)
 {
 	if (IsLocallyControlled())
@@ -1578,7 +1414,6 @@ void ASoldierCharacter::AngleFromFlash(FVector GrenadeLoc)
 		}
 	}
 }
-
 void ASoldierCharacter::OnHealthChanged(UHealthComponent * OwningHealthComp, float Health, float HealthDelta, const UDamageType * DamageType, AController * InstigatedBy, AActor * DamageCauser)
 {
 	///TODO Destroy heartbeat sound death for client
@@ -1605,7 +1440,6 @@ void ASoldierCharacter::OnHealthChanged(UHealthComponent * OwningHealthComp, flo
 
 	AudioDamageComp->Play(0.0f);
 }
-
 void ASoldierCharacter::OnFoodLow()
 {
 	if (Role < ROLE_Authority)
@@ -1662,6 +1496,69 @@ void ASoldierCharacter::OnDrinkLow()
 			SurvivalComp->OnRep_Drink();
 		}
 	}
+}
+bool ASoldierCharacter::GetbDied()
+{
+	return bDied;
+}
+bool ASoldierCharacter::GetbZooming()
+{
+	return bZooming;
+}
+bool ASoldierCharacter::GetbGripAttached()
+{
+	return bGripAttached;
+}
+bool ASoldierCharacter::GetbWantToRespawn()
+{
+	return bWantsToRepawn;
+}
+
+void ASoldierCharacter::ServerDrinkWater_Implementation()
+{
+	DrinkWater();
+}
+bool ASoldierCharacter::ServerDrinkWater_Validate()
+{
+	return true;
+}
+void ASoldierCharacter::ServerEatFood_Implementation()
+{
+	EatFood();
+}
+bool ASoldierCharacter::ServerEatFood_Validate()
+{
+	return true;
+}
+void ASoldierCharacter::ServerWantToRespawn_Implementation()
+{
+	///ASK SERVER TO RESPAWN
+
+	UE_LOG(LogTemp, Warning, TEXT("Trying to respawn1"));
+	if (bDied == true)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Trying to respawn2"));
+
+		bWantsToRepawn = true;
+		if (bWantsToRepawn == true)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Trying to respawn3"));
+			AAimMapGameModeBase* GM = Cast<AAimMapGameModeBase>(GetWorld()->GetAuthGameMode());
+			if (GM)
+			{
+				GM->RespawningPlayer();
+				this->Destroy();
+			}
+		}
+	}
+}
+void ASoldierCharacter::ServerPickUpItem_Implementation()
+{
+	PickUp();
+}
+bool ASoldierCharacter::ServerPickUpItem_Validate()
+{
+	return true;
 }
 void ASoldierCharacter::ServerPutWeaponOnBack_Implementation()
 {
@@ -1805,7 +1702,6 @@ void ASoldierCharacter::MulticastFlashbang_Implementation(FVector Facing)
 		GetWorldTimerManager().SetTimer(Timer_Flash, this, &ASoldierCharacter::PlayTimeline, 1.0f);
 	}
 }
-
 void ASoldierCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	//This function tells us how we want to replicate things//
@@ -1813,9 +1709,9 @@ void ASoldierCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 
 	DOREPLIFETIME(ASoldierCharacter, AutomaticRifle);
 
-	DOREPLIFETIME(ASoldierCharacter,IsReloading);
+	DOREPLIFETIME(ASoldierCharacter, bReloading);
 	DOREPLIFETIME(ASoldierCharacter, IsFiring);
-	DOREPLIFETIME(ASoldierCharacter, IsZooming);
+	DOREPLIFETIME(ASoldierCharacter, bZooming);
 	DOREPLIFETIME(ASoldierCharacter, ClimbAnim);
 	DOREPLIFETIME(ASoldierCharacter, VaultAnim);
 	DOREPLIFETIME(ASoldierCharacter, isAllowClimbing);
@@ -1848,7 +1744,6 @@ void ASoldierCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 
 	
 }
-
 void ASoldierCharacter::CalculatePrimeNumbers()
 {
 	ThreadingTest::CalculatePrimeNumbers(MaxPrime);
@@ -1857,7 +1752,6 @@ void ASoldierCharacter::CalculatePrimeNumbers()
 	GLog->Log("End of prime numbers calculation on game thread");
 	GLog->Log("--------------------------------------------------------------------");
 }
-
 void ASoldierCharacter::CalculatePrimeNumbersAsync()
 {
 	(new FAutoDeleteAsyncTask<PrimeCalculationAsyncTask>(MaxPrime))->StartBackgroundTask();
