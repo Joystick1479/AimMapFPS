@@ -224,7 +224,16 @@ void ASoldierCharacter::LineTraceItem()
 			if (GetWorld()->LineTraceSingleByChannel(Hit, start_trace, end_trace, COLLISION_ITEMS, TraceParams))
 			{
 				DrawDebugLine(GetWorld(), start_trace, end_trace, FColor::Red, false, 1.0f, 0, 1.0f);
-		
+				
+				AAutomaticRifle* Rifle = Cast<AAutomaticRifle>(Hit.GetActor());
+				if (Rifle)
+				{
+					bRiflePickUp = true;
+					if (GetWorld()->GetFirstPlayerController()->IsInputKeyDown("E"))
+					{
+						Rifle->Destroy();
+					}
+				}
 				AGrip* Grip = Cast<AGrip>(Hit.GetActor());
 				if (Grip && !Grip->GetIfPickeditem())
 				{
@@ -289,6 +298,7 @@ void ASoldierCharacter::LineTraceItem()
 				bHoloPickUp = false;
 				bHelmetPickUp = false;
 				bHeadsetPickUp = false;
+				bRiflePickUp = false;
 			}
 	
 }
@@ -657,13 +667,15 @@ void ASoldierCharacter::PickUp()
 			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 			if (Role == ROLE_Authority)
 			{
-				AutomaticRifle = GetWorld()->SpawnActor<AAutomaticRifle>(StarterWeaponClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
+				AutomaticRifle = GetWorld()->SpawnActor<AAutomaticRifle>(AutoRifleClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
 				if (AutomaticRifle)
 				{
 					AutomaticRifle->SetOwner(this);
 					AutomaticRifle->AttachToComponent(FPPMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocket);
 					AutomaticRifle->GetSkelMeshComp()->bOnlyOwnerSee = true;
 					AutomaticRifle->GetSkelMeshComp()->SetAnimInstanceClass(AnimBp);
+					AutomaticRifle->GetSphereComp()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
 					isWeaponAttached = true;
 				}
 			}
@@ -793,15 +805,15 @@ void ASoldierCharacter::PickUp()
 		{
 
 			TArray<AActor*> Rifles;
-			UGameplayStatics::GetAllActorsOfClass(this, StarterWeaponClass, Rifles);
+			//UGameplayStatics::GetAllActorsOfClass(this, StarterWeaponClass, Rifles);
 			for (int i = 0; i < Rifles.Num(); i++)
 			{
-				AAutomaticRifle* RiflesItr = Cast<AAutomaticRifle>(Rifles[i]);
-				if (RiflesItr)
-				{
-					//TO DO
-					//RiflesItr->GetCurrentAmountOfClips() + 1;
-				}
+				//AAutomaticRifle* RiflesItr = Cast<AAutomaticRifle>(Rifles[i]);
+				//if (RiflesItr)
+				//{
+				//	//TO DO
+				//	//RiflesItr->GetCurrentAmountOfClips() + 1;
+				//}
 			}
 
 
@@ -1242,8 +1254,8 @@ void ASoldierCharacter::Reload()
 			CharacterState = ECharacterState::Reloading;
 			bReloading = true;
 			AutomaticRifle->StartReload();
-		//	AudioCompReload->Activate(true);
-		//	ServerReloadingSound();
+			AudioCompReload->Activate(true);
+			ServerReloadingSound();
 			GetWorldTimerManager().SetTimer(ReloadTimer, this, &ASoldierCharacter::StopReload, 2.167f, false);
 		}
 	}
@@ -1280,9 +1292,9 @@ void ASoldierCharacter::UpdateRifleStatus()
 {
 	if (AutomaticRifle)
 	{
-		SoldierCurrentAmmoInClip = AutomaticRifle->GetCurrentAmmoInClip();
-		SoldierCurrentAmmo = AutomaticRifle->GetAllAmmo();
-		SoldierCurrentClips = AutomaticRifle->GetCurrentAmountOfClips();
+		//SoldierCurrentAmmoInClip = AutomaticRifle->GetCurrentAmmoInClip();
+		//SoldierCurrentAmmo = AutomaticRifle->GetAllAmmo();
+		//SoldierCurrentClips = AutomaticRifle->GetCurrentAmountOfClips();
 	}
 
 	GetWorldTimerManager().SetTimer(UpdateRifleTimer, this, &ASoldierCharacter::UpdateRifleStatus, 0.05f, false);
@@ -1301,22 +1313,7 @@ void ASoldierCharacter::WeaponInspectionOff()
 }
 void ASoldierCharacter::NotifyActorBeginOverlap(AActor * OtherActor)
 {
-	/*APlayerController* PC = Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
-	if (PC)
-	{
-		if (PC->IsInputKeyDown("E"))
-		{
-			AGrip* Grip = Cast<AGrip>(OtherActor);
-			if (Grip)
-			{
-				UE_LOG(LogTemp, Warning, TEXT("Cast Grip sucesfull"));
-				bGripPickUp = true;
-				Grip->Destroy();
-
-			}
-		}
-		
-	}*/
+	
 	
 }
 void ASoldierCharacter::FindingGrenadeTransform()

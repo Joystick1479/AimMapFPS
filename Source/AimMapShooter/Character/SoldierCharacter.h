@@ -176,7 +176,7 @@ protected:
 	TSubclassOf<UAnimInstance> AnimBp;
 
 	UPROPERTY(EditDefaultsOnly, Replicated, Category = "Player")
-	TSubclassOf<AAutomaticRifle> StarterWeaponClass;
+	TSubclassOf<AAutomaticRifle> AutoRifleClass;
 
 	UPROPERTY(EditDefaultsOnly, Replicated, Category = "Player")
 	TSubclassOf<ARifle_3rd> ThirdWeaponClass;
