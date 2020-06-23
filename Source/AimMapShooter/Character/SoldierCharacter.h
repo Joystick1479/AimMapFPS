@@ -29,6 +29,9 @@ class APayloadCharacter;
 class AFlashGrenade;
 class UMinimapComponent;
 class UTimelineComponent;
+class ASniperRifle;
+class ABaseWeaponClass;
+class ABaseAttachmentClass;
 
 
 namespace ECharacterState
@@ -179,6 +182,9 @@ protected:
 	TSubclassOf<AAutomaticRifle> AutoRifleClass;
 
 	UPROPERTY(EditDefaultsOnly, Replicated, Category = "Player")
+	TSubclassOf<ASniperRifle> SniperRifleClass;
+
+	UPROPERTY(EditDefaultsOnly, Replicated, Category = "Player")
 	TSubclassOf<ARifle_3rd> ThirdWeaponClass;
 
 	UPROPERTY(EditDefaultsOnly, Replicated, Category = "Player")
@@ -253,7 +259,11 @@ protected:
 	void StopReload();
 	void ZoomIn();
 	void ZoomOut();
-	void PickUp();
+
+	void PickUp(ABaseWeaponClass* Weapons,ABaseAttachmentClass* Attachments);
+	bool bAttachmentPickUp;
+	bool bWeaponPickUp;
+
 	void WeaponInspectionOn();
 	void WeaponInspectionOff();
 	void PutWeaponOnBack();
@@ -263,7 +273,6 @@ protected:
 	void EatFood();
 	void EndDrinkFromPond(APlayerController* PC);
 	void GameOverSound();
-	void NotifyActorBeginOverlap(AActor * OtherActor);
 	void GrenadeTimeline();
 	void ShowingPickUpHud();
 	void LineTraceItem();
@@ -326,7 +335,7 @@ protected:
 	void ServerPutWeaponOnBack();
 
 	UFUNCTION(Server, Reliable, WithValidation)
-	void ServerPickUpItem();
+	void ServerPickUpItem(ABaseWeaponClass* Weapons, ABaseAttachmentClass* Attachments);
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerReload();
@@ -366,26 +375,25 @@ protected:
 
 
 	UPROPERTY(Replicated)
+	ASniperRifle* SniperRifle;
+
+	UPROPERTY(Replicated)
 	AAutomaticRifle* AutomaticRifle;
 
-	UPROPERTY(Replicated)
 	AHoloScope* HoloScope;
 
-	UPROPERTY(Replicated)
 	AGrip* Grip;
 
-	UPROPERTY(Replicated)
 	AHeadset* Headset;
 
-	UPROPERTY(Replicated)
 	AMagazine* Magazine;
 
-	UPROPERTY(Replicated)
 	ALaser* Laser;
 
-	UPROPERTY(Replicated)
 	AHelmet* Helmet;
 
+	UPROPERTY(Replicated)
+	ABaseWeaponClass* CurrentWeapon;
 
 	///Timers
 	FTimerHandle TimelineHandle;
@@ -666,6 +674,8 @@ public:
 	bool bFoodPickup;
 
 	bool bDrinkFromPond;
+
+	bool bSniperPickUp;
 
 
 	EHelmetAttachment::Type HelmetEquipState;

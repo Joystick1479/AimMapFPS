@@ -1,7 +1,9 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 #include "SoldierCharacter.h"
 #include "Camera/CameraComponent.h"
+
 #include "Weapons/AutomaticRifle.h"
+#include "Weapons/SniperRifle.h"
 
 #include "Components/SkeletalMeshComponent.h"
 #include "Animation//AnimInstance.h"
@@ -186,7 +188,6 @@ void ASoldierCharacter::BeginPlay()
 	Headbobbing();
 	GrenadeTimeline();
 	SprintSlowDown();
-	//UpdateWeaponRotation();
 	UpdateRifleStatus();
 	OutOfBreathSound();
 	RagdollOnDeath();
@@ -225,83 +226,36 @@ void ASoldierCharacter::LineTraceItem()
 			{
 				DrawDebugLine(GetWorld(), start_trace, end_trace, FColor::Red, false, 1.0f, 0, 1.0f);
 				
-				AAutomaticRifle* Rifle = Cast<AAutomaticRifle>(Hit.GetActor());
-				if (Rifle)
+				ABaseWeaponClass* WeaponClass = Cast<ABaseWeaponClass>(Hit.GetActor());
+				if (WeaponClass)
 				{
-					bRiflePickUp = true;
+					bWeaponPickUp = true;
 					if (GetWorld()->GetFirstPlayerController()->IsInputKeyDown("E"))
 					{
-						Rifle->Destroy();
+						PickUp(WeaponClass, nullptr);
+						//WeaponClass->Destroy();
 					}
 				}
-				AGrip* Grip = Cast<AGrip>(Hit.GetActor());
-				if (Grip && !Grip->GetIfPickeditem())
-				{
-					bGripPickUp = true;
-					if (GetWorld()->GetFirstPlayerController()->IsInputKeyDown("E"))
-					{
-						Grip->Destroy();
-					}
-				}
-				AHeadset* Headset = Cast<AHeadset>(Hit.GetActor());
-				if (Headset)
-				{
-					bHeadsetPickUp = true;
-					if (GetWorld()->GetFirstPlayerController()->IsInputKeyDown("E"))
-					{
-						Headset->Destroy();
-					}
-				}
-				AHelmet* Helmet = Cast<AHelmet>(Hit.GetActor());
-				if (Helmet)
-				{
-					bHelmetPickUp = true;
-					if (GetWorld()->GetFirstPlayerController()->IsInputKeyDown("E"))
-					{
-						Helmet->Destroy();
-					}
-				}
-				AHoloScope* HoloScope = Cast<AHoloScope>(Hit.GetActor());
-				if (HoloScope)
-				{
-					bHoloPickUp = true;
-					if (GetWorld()->GetFirstPlayerController()->IsInputKeyDown("E"))
-					{
-						HoloScope->Destroy();
-					}
 
-				}
-				ALaser* Laser = Cast<ALaser>(Hit.GetActor());
-				if (Laser)
+				ABaseAttachmentClass* AttachmentClass = Cast<ABaseAttachmentClass>(Hit.GetActor());
+				if(AttachmentClass)
 				{
-					bLaserPickUp = true;
+					bAttachmentPickUp = true;
 					if (GetWorld()->GetFirstPlayerController()->IsInputKeyDown("E"))
 					{
-						Laser->Destroy();
-					}
-				}
-				AMagazine* Magazine = Cast<AMagazine>(Hit.GetActor());
-				if (Magazine)
-				{
-					bMagazinePickUp = true;
-					if (GetWorld()->GetFirstPlayerController()->IsInputKeyDown("E"))
-					{
-						Magazine->Destroy();
+						PickUp(nullptr,AttachmentClass);
+						//AttachmentClass->Destroy();
 					}
 				}
 			}
 			else
 			{
-				bGripPickUp = false;
-				bMagazinePickUp = false;
-				bLaserPickUp = false;
-				bHoloPickUp = false;
-				bHelmetPickUp = false;
-				bHeadsetPickUp = false;
-				bRiflePickUp = false;
+				bWeaponPickUp = false;
+				bAttachmentPickUp = false;
 			}
 	
 }
+
 // Called every frame
 void ASoldierCharacter::Tick(float DeltaTime)
 {
@@ -337,7 +291,7 @@ void ASoldierCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
 		PlayerInputComponent->BindAction("FireMode", IE_Pressed, this, &ASoldierCharacter::FireMode);
 
-		PlayerInputComponent->BindAction("PickUp", IE_Pressed, this, &ASoldierCharacter::PickUp);
+		//PlayerInputComponent->BindAction("PickUp", IE_Pressed, this, &ASoldierCharacter::PickUp);
 
 		PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &ASoldierCharacter::SprintOn);
 		PlayerInputComponent->BindAction("Sprint", IE_Released, this, &ASoldierCharacter::SprintOff);
@@ -382,9 +336,9 @@ void ASoldierCharacter::PutWeaponOnBack()
 		/// TO DO NIE WOLNO STRZELAC JAK NA PLECACH BRON
 
 		///Put weapon on back for 3rd person and hide weapon for 1st person///
-		if (this->AutomaticRifle)
+		if (this->CurrentWeapon)
 		{
-			this->AutomaticRifle->SetActorHiddenInGame(true);
+			this->CurrentWeapon->SetActorHiddenInGame(true);
 		}
 		if (Rifle_3rd)
 		{
@@ -394,12 +348,12 @@ void ASoldierCharacter::PutWeaponOnBack()
 		isWeaponAttached = false;
 		bWeaponOnBack = true;
 	}
-	else if (HoldingWeaponState == EHoldingWeapon::A4 && bWeaponOnBack == true)
+	else if (HoldingWeaponState == EHoldingWeapon::A4 || HoldingWeaponState == EHoldingWeapon::Sniper && bWeaponOnBack == true)
 	{
 		///Put weapon on back//
-		if (this->AutomaticRifle)
+		if (this->CurrentWeapon)
 		{
-			this->AutomaticRifle->SetActorHiddenInGame(false);
+			this->CurrentWeapon->SetActorHiddenInGame(false);
 		}
 		if (Rifle_3rd)
 		{
@@ -650,226 +604,297 @@ void ASoldierCharacter::TurnOnLaser()
 		Laser->StartLaser();
 	}
 }
-void ASoldierCharacter::PickUp()
+void ASoldierCharacter::PickUp(ABaseWeaponClass* Weapons, ABaseAttachmentClass* Attachments)
 {
 
 		if (Role < ROLE_Authority)
 		{
-			ServerPickUpItem();
+			ServerPickUpItem(Weapons,Attachments);
+		}
+
+		AAutomaticRifle* AutoRifle = Cast<AAutomaticRifle>(Weapons);
+		if (AutoRifle)
+		{
+			if (HoldingWeaponState == EHoldingWeapon::None)
+			{
+				HoldingWeaponState = EHoldingWeapon::A4;
+
+				FActorSpawnParameters SpawnParams;
+				SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+				if (Role == ROLE_Authority)
+				{
+					AutomaticRifle = GetWorld()->SpawnActor<AAutomaticRifle>(AutoRifleClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
+					if (AutomaticRifle)
+					{
+						AutomaticRifle->SetOwner(this);
+						AutomaticRifle->AttachToComponent(FPPMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocket);
+						AutomaticRifle->GetSkelMeshComp()->bOnlyOwnerSee = true;
+						AutomaticRifle->GetSkelMeshComp()->SetAnimInstanceClass(AnimBp);
+						AutomaticRifle->GetSphereComp()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+						CurrentWeapon = AutomaticRifle;
+						isWeaponAttached = true;
+						AutoRifle->Destroy();
+					}
+				}
+			}
+			
+		}
+		ASniperRifle* SniperWeapon = Cast<ASniperRifle>(Weapons);
+		if (SniperWeapon)
+		{
+			if (HoldingWeaponState == EHoldingWeapon::None)
+			{
+				HoldingWeaponState = EHoldingWeapon::Sniper;
+
+				FActorSpawnParameters SpawnParams;
+				SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+				if (Role == ROLE_Authority)
+				{
+					SniperRifle = GetWorld()->SpawnActor<ASniperRifle>(SniperRifleClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
+					if (SniperRifle)
+					{
+						SniperRifle->SetOwner(this);
+						SniperRifle->AttachToComponent(FPPMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocket);
+						SniperRifle->GetSkelMeshComp()->bOnlyOwnerSee = true;
+						SniperRifle->GetSkelMeshComp()->SetAnimInstanceClass(AnimBp);
+						SniperRifle->GetSphereComp()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+						CurrentWeapon = SniperRifle;
+						isWeaponAttached = true;
+						SniperWeapon->Destroy();
+					}
+				}
+				UGameplayStatics::PlaySoundAtLocation(this, ItemsPickUp, GetActorLocation());
+
+			}
+		}
+		AHoloScope * HoloAttachment = Cast<AHoloScope>(Attachments);
+		if (HoloAttachment)
+		{
+			if ((HoldingWeaponState == EHoldingWeapon::A4 || HoldingWeaponState == EHoldingWeapon::Sniper) && HoloEquipState == EHoloAttachment::None)
+			{
+				HoldingAttachmentState = EHoldingAttachment::Holo;
+				HoloEquipState = EHoloAttachment::Equipped;
+
+				FActorSpawnParameters SpawnParams;
+				SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+				HoloScope = GetWorld()->SpawnActor<AHoloScope>(HoloClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
+				if (HoloScope)
+				{
+					HoloScope->SetOwner(this);
+					HoloScope->GetMeshComponent()->bOnlyOwnerSee = true;
+					HoloScope->GetMeshComponent()->SetRenderCustomDepth(false);
+					if (CurrentWeapon)
+					{
+						FName Socket = CurrentWeapon->GetScopeSocketName();
+						HoloScope->AttachToComponent(CurrentWeapon->GetSkelMeshComp(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, Socket);
+					}
+					HoloScope->GetSphereComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+					isHoloAttached = true;
+					HoloAttachment->Destroy();
+				}
+				UGameplayStatics::PlaySoundAtLocation(this, ItemsPickUp, GetActorLocation());
+			}
+		}
+		AGrip* GripAttachment = Cast<AGrip>(Attachments);
+		if (GripAttachment)
+		{
+			if ((HoldingWeaponState == EHoldingWeapon::A4 || HoldingWeaponState == EHoldingWeapon::Sniper) && GripEquipState == EGripAttachment::None)
+			{
+				HoldingAttachmentState = EHoldingAttachment::Grip;
+				GripEquipState = EGripAttachment::Equipped;
+
+				FActorSpawnParameters SpawnParams;
+				SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+				Grip = GetWorld()->SpawnActor<AGrip>(GripClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
+				if (Grip)
+				{
+					Grip->SetOwner(this);
+					Grip->GetMeshComponent()->bOnlyOwnerSee = true;
+					Grip->GetMeshComponent()->SetRenderCustomDepth(false);
+					if (CurrentWeapon)
+					{
+						FName GSocket = CurrentWeapon->GetGripSocketName();
+						Grip->AttachToComponent(CurrentWeapon->GetSkelMeshComp(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, GSocket);
+					}
+					Grip->GetSphereComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+					bGripAttached = true;
+					GripAttachment->Destroy();
+				}
+				UGameplayStatics::PlaySoundAtLocation(this, ItemsPickUp, GetActorLocation());
+			}
+		}
+		ALaser* LaserAttachment = Cast<ALaser>(Attachments);
+		if (LaserAttachment)
+		{
+			if (LaserEquipState == ELaserAttachment::None)
+			{
+				LaserEquipState = ELaserAttachment::Equipped;
+
+				FActorSpawnParameters SpawnParams;
+				SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+				Laser = GetWorld()->SpawnActor<ALaser>(LaserClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
+				if (Laser)
+				{
+					Laser->SetOwner(this);
+					Laser->GetMeshComponent()->bOnlyOwnerSee = true;
+					Laser->GetMeshComponent()->SetRenderCustomDepth(false);
+					if (CurrentWeapon)
+					{
+						FName LSocket = CurrentWeapon->GetLaserSocketName();
+						Laser->AttachToComponent(CurrentWeapon->GetSkelMeshComp(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, LSocket);
+					}
+					Laser->GetSphereComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+					isLaserAttached = true;
+					LaserAttachment->Destroy();
+				}
+				UGameplayStatics::PlaySoundAtLocation(this, ItemsPickUp, GetActorLocation());
+			}
+		}
+		AHelmet* HelmetAttachment = Cast<AHelmet>(Attachments);
+		if (HelmetAttachment)
+		{
+			if (HelmetEquipState == EHelmetAttachment::None)
+			{
+				HelmetEquipState = EHelmetAttachment::Equipped;
+
+				FActorSpawnParameters SpawnParams;
+				SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+				Helmet = GetWorld()->SpawnActor<AHelmet>(HelmetClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
+				if (Helmet)
+				{
+					Helmet->SetOwner(this);
+					Helmet->GetMeshComponent()->SetRenderCustomDepth(false);
+					Helmet->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, HelmetSocket);
+					Helmet->GetSphereComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+					isHelmetAttached = true;
+					HelmetAttachment->Destroy();
+				}
+				UGameplayStatics::PlaySoundAtLocation(this, ItemsPickUp, GetActorLocation());
+			}
+				
+		}
+		AHeadset* HeadsetAttachment = Cast<AHeadset>(Attachments);
+		if (HeadsetAttachment)
+		{
+			if (HeadsetEquipState == EHeadsetAttachment::None)
+			{
+				HeadsetEquipState = EHeadsetAttachment::Equipped;
+
+				FActorSpawnParameters SpawnParams;
+				SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+				Headset = GetWorld()->SpawnActor<AHeadset>(HeadsetClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
+				if (Headset)
+				{
+					Headset->SetOwner(this);
+					Headset->GetMeshComponent()->SetRenderCustomDepth(false);
+					Headset->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, HeadsetSocket);
+					Headset->GetMeshComponent()->ToggleActive();
+					Headset->GetSphereComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+					isHeadsetAttached = true;
+					HeadsetAttachment->Destroy();
+				}
+				UGameplayStatics::PlaySoundAtLocation(this, ItemsPickUp, GetActorLocation());
+			}
 		}
 		
-		if (bRiflePickUp == true && HoldingWeaponState==EHoldingWeapon::None)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Test"));
-			HoldingWeaponState = EHoldingWeapon::A4;
 
-			FActorSpawnParameters SpawnParams;
-			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-			if (Role == ROLE_Authority)
-			{
-				AutomaticRifle = GetWorld()->SpawnActor<AAutomaticRifle>(AutoRifleClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
-				if (AutomaticRifle)
-				{
-					AutomaticRifle->SetOwner(this);
-					AutomaticRifle->AttachToComponent(FPPMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocket);
-					AutomaticRifle->GetSkelMeshComp()->bOnlyOwnerSee = true;
-					AutomaticRifle->GetSkelMeshComp()->SetAnimInstanceClass(AnimBp);
-					AutomaticRifle->GetSphereComp()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		
+		//	if (Role == ROLE_Authority)
+		//	{
+		//		Rifle_3rd = GetWorld()->SpawnActor<ARifle_3rd>(ThirdWeaponClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
+		//		if (Rifle_3rd)
+		//		{
+		//			Rifle_3rd->SetOwner(this);
+		//			Rifle_3rd->AttachToComponent(this->GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocket);
+		//		}
+		//	}
+		//	UGameplayStatics::PlaySoundAtLocation(this, ItemsPickUp, GetActorLocation());
 
-					isWeaponAttached = true;
-				}
-			}
-			if (Role == ROLE_Authority)
-			{
-				Rifle_3rd = GetWorld()->SpawnActor<ARifle_3rd>(ThirdWeaponClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
-				if (Rifle_3rd)
-				{
-					Rifle_3rd->SetOwner(this);
-					Rifle_3rd->AttachToComponent(this->GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocket);
-				}
-			}
-			UGameplayStatics::PlaySoundAtLocation(this, ItemsPickUp, GetActorLocation());
+		//	/*if (Role == ROLE_Authority)
+		//	{
+		//		Rifle_3rd = GetWorld()->SpawnActor<ARifle_3rd>(ThirdWeaponClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
+		//		if (Rifle_3rd)
+		//		{
+		//			Rifle_3rd->SetOwner(this);
+		//			Rifle_3rd->AttachToComponent(this->GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocket);
+		//		}
+		//	}*/
+		//	UGameplayStatics::PlaySoundAtLocation(this, ItemsPickUp, GetActorLocation());
+		//if (bMagazinePickUp == true)
+		//{
 
-		}
-
-		if (bHoloPickUp == true && HoldingWeaponState == EHoldingWeapon::A4 && HoloEquipState == EHoloAttachment::None)
-		{
-			HoldingAttachmentState = EHoldingAttachment::Holo;
-			HoloEquipState = EHoloAttachment::Equipped;
-
-			FActorSpawnParameters SpawnParams;
-			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-			
-			HoloScope = GetWorld()->SpawnActor<AHoloScope>(HoloClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
-			if (HoloScope)
-			{
-				HoloScope->SetOwner(this);
-				HoloScope->GetMeshComponent()->bOnlyOwnerSee = true;
-				HoloScope->GetMeshComponent()->SetRenderCustomDepth(false);
-				FName Socket = AutomaticRifle->GetScopeSocketName();
-				HoloScope->AttachToComponent(AutomaticRifle->GetSkelMeshComp(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, Socket);
-				HoloScope->GetSphereComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-				isHoloAttached = true;
-
-			}
-			UGameplayStatics::PlaySoundAtLocation(this, ItemsPickUp, GetActorLocation());
-			
-		}
-		if (bGripPickUp == true && HoldingWeaponState == EHoldingWeapon::A4 && GripEquipState == EGripAttachment::None)
-		{
-			HoldingAttachmentState = EHoldingAttachment::Grip;
-			GripEquipState = EGripAttachment::Equipped;
-
-			FActorSpawnParameters SpawnParams;
-			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		//	TArray<AActor*> Rifles;
+		//	//UGameplayStatics::GetAllActorsOfClass(this, StarterWeaponClass, Rifles);
+		//	for (int i = 0; i < Rifles.Num(); i++)
+		//	{
+		//		//AAutomaticRifle* RiflesItr = Cast<AAutomaticRifle>(Rifles[i]);
+		//		//if (RiflesItr)
+		//		//{
+		//		//	//TO DO
+		//		//	//RiflesItr->GetCurrentAmountOfClips() + 1;
+		//		//}
+		//	}
 
 
-			Grip = GetWorld()->SpawnActor<AGrip>(GripClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
-			if (Grip)
-			{
-				Grip->SetOwner(this);
-				Grip->GetMeshComponent()->bOnlyOwnerSee = true;
-				Grip->GetMeshComponent()->SetRenderCustomDepth(false);
-				FName GSocket = AutomaticRifle->GetGripSocketName();
-				Grip->AttachToComponent(AutomaticRifle->GetSkelMeshComp(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, GSocket);
-				Grip->GetSphereComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-				bGripAttached = true;
-			}
-			UGameplayStatics::PlaySoundAtLocation(this, ItemsPickUp, GetActorLocation());
+		//	UGameplayStatics::PlaySoundAtLocation(this, ItemsPickUp, GetActorLocation());
+		//}
 
-		}
-		if (bHelmetPickUp == true && HelmetEquipState==EHelmetAttachment::None)
-		{
-			HelmetEquipState = EHelmetAttachment::Equipped;
+		/////SURVIVAL STUFF///
+		//if (bDrinkPickup == true)
+		//{
+		//	amountOfDrinks++;
 
-			FActorSpawnParameters SpawnParams;
-			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		//	TArray<AActor*> Drinks;
+		//	UGameplayStatics::GetAllActorsOfClass(this, DrinkClass, Drinks);
+		//	for (int i = 0; i < Drinks.Num(); i++)
+		//	{
+		//		ADrink* Drink = Cast<ADrink>(Drinks[i]);
+		//		if (Drink)
+		//		{
+		//			if (this->IsOverlappingActor(Drink))
+		//			{
+		//				Drink->IsPickedUp = true;
+		//			}
+		//		}
+		//	}
 
-			Helmet = GetWorld()->SpawnActor<AHelmet>(HelmetClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
-			if (Helmet)
-			{
-				Helmet->SetOwner(this);
-				Helmet->GetMeshComponent()->SetRenderCustomDepth(false);
-				Helmet->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, HelmetSocket);
-				Helmet->GetSphereComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-				isHelmetAttached = true;
-			}
-			UGameplayStatics::PlaySoundAtLocation(this, ItemsPickUp, GetActorLocation());
-		}
-		if (bHeadsetPickUp == true && HeadsetEquipState == EHeadsetAttachment::None)
-		{
-			HeadsetEquipState = EHeadsetAttachment::Equipped;
+		//}
+		//if (bFoodPickup == true)
+		//{
+		//	amountOfFood++;
 
-			FActorSpawnParameters SpawnParams;
-			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		//	TArray<AActor*> Foods;
+		//	UGameplayStatics::GetAllActorsOfClass(this, FoodClass, Foods);
+		//	for (int i = 0; i < Foods.Num(); i++)
+		//	{
+		//		AFood* Food = Cast<AFood>(Foods[i]);
+		//		if (Food)
+		//		{
+		//			if (this->IsOverlappingActor(Food))
+		//			{
+		//				Food->IsPickedUp = true;
+		//			}
+		//		}
+		//	}
+		//}
+		//if (bDrinkFromPond == true)
+		//{
+		//	APlayerController* PC = Cast<APlayerController>(GetController());
+		//	DisableInput(PC);
+		//	FTimerDelegate DelegateFunc = FTimerDelegate::CreateUObject(this, &ASoldierCharacter::EndDrinkFromPond, PC);
+		//	GetWorldTimerManager().SetTimer(DrinkFromPondTimer, DelegateFunc, 2.5f, false);
 
-			Headset = GetWorld()->SpawnActor<AHeadset>(HeadsetClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
-			if (Headset)
-			{
-				Headset->SetOwner(this);
-				Headset->GetMeshComponent()->SetRenderCustomDepth(false);
-				Headset->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, HeadsetSocket);
-				Headset->GetMeshComponent()->ToggleActive();
-				Headset->GetSphereComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-				isHeadsetAttached = true;
-			}
-			///Destroy after picking up
-
-			UGameplayStatics::PlaySoundAtLocation(this, ItemsPickUp, GetActorLocation());
-		}
-		if (bLaserPickUp == true && LaserEquipState == ELaserAttachment::None)
-		{
-			LaserEquipState = ELaserAttachment::Equipped;
-
-			FActorSpawnParameters SpawnParams;
-			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-
-			
-			Laser = GetWorld()->SpawnActor<ALaser>(LaserClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
-			if (Laser)
-			{
-				Laser->SetOwner(this);
-				Laser->GetMeshComponent()->bOnlyOwnerSee = true;
-				Laser->GetMeshComponent()->SetRenderCustomDepth(false);
-				FName LSocket = AutomaticRifle->GetLaserSocketName();
-				Laser->AttachToComponent(AutomaticRifle->GetSkelMeshComp(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, LSocket);
-				Laser->GetSphereComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-
-				isLaserAttached = true;
-				UE_LOG(LogTemp, Warning, TEXT("Laser spawn"));
-			}
-			UGameplayStatics::PlaySoundAtLocation(this, ItemsPickUp, GetActorLocation());
-			
-		}
-		if (bMagazinePickUp == true)
-		{
-
-			TArray<AActor*> Rifles;
-			//UGameplayStatics::GetAllActorsOfClass(this, StarterWeaponClass, Rifles);
-			for (int i = 0; i < Rifles.Num(); i++)
-			{
-				//AAutomaticRifle* RiflesItr = Cast<AAutomaticRifle>(Rifles[i]);
-				//if (RiflesItr)
-				//{
-				//	//TO DO
-				//	//RiflesItr->GetCurrentAmountOfClips() + 1;
-				//}
-			}
-
-
-			UGameplayStatics::PlaySoundAtLocation(this, ItemsPickUp, GetActorLocation());
-		}
-
-		///SURVIVAL STUFF///
-		if (bDrinkPickup == true)
-		{
-			amountOfDrinks++;
-
-			TArray<AActor*> Drinks;
-			UGameplayStatics::GetAllActorsOfClass(this, DrinkClass, Drinks);
-			for (int i = 0; i < Drinks.Num(); i++)
-			{
-				ADrink* Drink = Cast<ADrink>(Drinks[i]);
-				if (Drink)
-				{
-					if (this->IsOverlappingActor(Drink))
-					{
-						Drink->IsPickedUp = true;
-					}
-				}
-			}
-
-		}
-		if (bFoodPickup == true)
-		{
-			amountOfFood++;
-
-			TArray<AActor*> Foods;
-			UGameplayStatics::GetAllActorsOfClass(this, FoodClass, Foods);
-			for (int i = 0; i < Foods.Num(); i++)
-			{
-				AFood* Food = Cast<AFood>(Foods[i]);
-				if (Food)
-				{
-					if (this->IsOverlappingActor(Food))
-					{
-						Food->IsPickedUp = true;
-					}
-				}
-			}
-		}
-		if (bDrinkFromPond == true)
-		{
-			APlayerController* PC = Cast<APlayerController>(GetController());
-			DisableInput(PC);
-			FTimerDelegate DelegateFunc = FTimerDelegate::CreateUObject(this, &ASoldierCharacter::EndDrinkFromPond, PC);
-			GetWorldTimerManager().SetTimer(DrinkFromPondTimer, DelegateFunc, 2.5f, false);
-
-			if (IsLocallyControlled())
-			{
-				UGameplayStatics::PlaySound2D(this, DrinkFromPondSound);
-			}
-		}
+		//	if (IsLocallyControlled())
+		//	{
+		//		UGameplayStatics::PlaySound2D(this, DrinkFromPondSound);
+		//	}
+		//}
 }
 void ASoldierCharacter::EndDrinkFromPond(APlayerController* PC)
 {
@@ -901,7 +926,11 @@ void ASoldierCharacter::ShowingPickUpHud()
 				wPickUpvar = CreateWidget<UUserWidget>(PC, wPickUp);
 				if (wPickUpvar)
 				{
-					if ((bRiflePickUp || bHeadsetPickUp || bLaserPickUp || bHelmetPickUp || bGripPickUp || bHoloPickUp || bFoodPickup || bDrinkPickup || bDrinkFromPond || bMagazinePickUp) == true)
+					/*if ((bRiflePickUp || bHeadsetPickUp || bLaserPickUp || bHelmetPickUp || bGripPickUp || bHoloPickUp || bFoodPickup || bDrinkPickup || bDrinkFromPond || bSniperPickUp ||bMagazinePickUp) == true)
+					{
+						wPickUpvar->AddToViewport();
+					}*/
+					if (bWeaponPickUp || bAttachmentPickUp == true)
 					{
 						wPickUpvar->AddToViewport();
 					}
@@ -1000,9 +1029,9 @@ void ASoldierCharacter::ZoomIn()
 				APlayerController* PC = Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
 				if (PC)
 				{
-					if (AutomaticRifle)
+					if (CurrentWeapon)
 					{
-						PC->SetViewTargetWithBlend(AutomaticRifle, ZoomingTime, EViewTargetBlendFunction::VTBlend_Linear);
+						PC->SetViewTargetWithBlend(CurrentWeapon, ZoomingTime, EViewTargetBlendFunction::VTBlend_Linear);
 					}
 				}
 			}
@@ -1057,7 +1086,7 @@ void ASoldierCharacter::ZoomOut()
 		APlayerController* PC = Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
 		if (PC)
 		{
-			if (AutomaticRifle)
+			if (CurrentWeapon)
 			{
 				PC->SetViewTargetWithBlend(this, ZoomingTime, EViewTargetBlendFunction::VTBlend_Linear);
 			}
@@ -1074,24 +1103,24 @@ void ASoldierCharacter::StartFire()
 
 		if (IsSingleFire == false)
 		{
-			if (AutomaticRifle)
+			if (CurrentWeapon)
 			{
-				if (AutomaticRifle->GetCurrentAmmoInClip() > 0 && AutomaticRifle->CurrentState != EWeaponState::Reloading)
+				if (CurrentWeapon->GetCurrentAmmoInClip() > 0 && CurrentWeapon->CurrentState != EWeaponState::Reloading )
 				{
 					bFireAnimation = true;
+					CurrentWeapon->StartFire();
 				}
-				AutomaticRifle->StartFire();
 			}
 		}
 		else
 		{
-			if (AutomaticRifle)
+			if (CurrentWeapon)
 			{
-				if (AutomaticRifle->GetCurrentAmmoInClip() > 0 && AutomaticRifle->CurrentState != EWeaponState::Reloading)
+				if (CurrentWeapon->GetCurrentAmmoInClip() > 0 && CurrentWeapon->CurrentState != EWeaponState::Reloading)
 				{
 					bFireAnimation = true;
 				}
-				AutomaticRifle->Fire();
+				CurrentWeapon->Fire();
 			}
 		}
 	}
@@ -1103,9 +1132,9 @@ void ASoldierCharacter::StopFire()
 
 	bFireAnimation = false;
 
-	if (AutomaticRifle)
+	if (CurrentWeapon)
 	{
-		AutomaticRifle->StopFire();
+		CurrentWeapon->StopFire();
 	}
 }
 void ASoldierCharacter::SprintOn()
@@ -1249,12 +1278,12 @@ void ASoldierCharacter::Reload()
 	}
 	if (CharacterState == ECharacterState::Idle && (SoldierCurrentClips > 0) && !bZooming && bDied != true)
 	{
-		if (AutomaticRifle)
+		if (CurrentWeapon)
 		{
 			CharacterState = ECharacterState::Reloading;
 			bReloading = true;
-			AutomaticRifle->StartReload();
-			AudioCompReload->Activate(true);
+			CurrentWeapon->StartReload();
+			//AudioCompReload->Activate(true);
 			ServerReloadingSound();
 			GetWorldTimerManager().SetTimer(ReloadTimer, this, &ASoldierCharacter::StopReload, 2.167f, false);
 		}
@@ -1266,7 +1295,6 @@ void ASoldierCharacter::StopReload()
 	{
 		CharacterState = ECharacterState::Idle;
 		bReloading = false;
-		//AudioCompReload->Deactivate();
 		GetWorldTimerManager().ClearTimer(ReloadTimer);
 	}
 }
@@ -1290,13 +1318,12 @@ void ASoldierCharacter::FireMode()
 }
 void ASoldierCharacter::UpdateRifleStatus()
 {
-	if (AutomaticRifle)
+	if (CurrentWeapon)
 	{
-		//SoldierCurrentAmmoInClip = AutomaticRifle->GetCurrentAmmoInClip();
-		//SoldierCurrentAmmo = AutomaticRifle->GetAllAmmo();
-		//SoldierCurrentClips = AutomaticRifle->GetCurrentAmountOfClips();
+		SoldierCurrentAmmoInClip = CurrentWeapon->GetCurrentAmmoInClip();
+		SoldierCurrentAmmo = CurrentWeapon->GetAllAmmo();
+		SoldierCurrentClips = CurrentWeapon->GetCurrentAmountOfClips();
 	}
-
 	GetWorldTimerManager().SetTimer(UpdateRifleTimer, this, &ASoldierCharacter::UpdateRifleStatus, 0.05f, false);
 }
 void ASoldierCharacter::WeaponInspectionOn()
@@ -1310,11 +1337,6 @@ void ASoldierCharacter::WeaponInspectionOn()
 void ASoldierCharacter::WeaponInspectionOff()
 {
 	IsInspecting = false;
-}
-void ASoldierCharacter::NotifyActorBeginOverlap(AActor * OtherActor)
-{
-	
-	
 }
 void ASoldierCharacter::FindingGrenadeTransform()
 {
@@ -1549,11 +1571,11 @@ void ASoldierCharacter::ServerWantToRespawn_Implementation()
 		}
 	}
 }
-void ASoldierCharacter::ServerPickUpItem_Implementation()
+void ASoldierCharacter::ServerPickUpItem_Implementation(ABaseWeaponClass* Weapons, ABaseAttachmentClass* Attachments)
 {
-	PickUp();
+	PickUp(Weapons,Attachments);
 }
-bool ASoldierCharacter::ServerPickUpItem_Validate()
+bool ASoldierCharacter::ServerPickUpItem_Validate(ABaseWeaponClass* Weapons, ABaseAttachmentClass* Attachments)
 {
 	return true;
 }
@@ -1705,6 +1727,8 @@ void ASoldierCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(ASoldierCharacter, AutomaticRifle);
+	DOREPLIFETIME(ASoldierCharacter, SniperRifle);
+	DOREPLIFETIME(ASoldierCharacter, CurrentWeapon);
 
 	DOREPLIFETIME(ASoldierCharacter, bReloading);
 	DOREPLIFETIME(ASoldierCharacter, IsFiring);

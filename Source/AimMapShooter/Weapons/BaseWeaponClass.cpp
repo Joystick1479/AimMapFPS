@@ -132,6 +132,11 @@ int32 ABaseWeaponClass::GetCurrentAmountOfClips()
 	return CurrentAmountOfClips;
 }
 
+void ABaseWeaponClass::WeaponSway()
+{
+
+}
+
 void ABaseWeaponClass::StartFire()
 {
 	float FirstDelay = FMath::Max(LastFireTime + TimeBetweenShots - GetWorld()->TimeSeconds,0.0f);

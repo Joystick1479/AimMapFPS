@@ -185,6 +185,7 @@ protected:
 	void UseAmmo();
 	void ReloadWeapon();
 	void StopReload();
+	void WeaponSway();
 
 	//*Particle effects*//
 
