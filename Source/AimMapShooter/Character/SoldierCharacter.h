@@ -261,18 +261,18 @@ protected:
 	void ZoomOut();
 
 	void PickUp(ABaseWeaponClass* Weapons,ABaseAttachmentClass* Attachments);
+	UPROPERTY(Replicated)
 	bool bAttachmentPickUp;
+	UPROPERTY(Replicated)
 	bool bWeaponPickUp;
 
 	void WeaponInspectionOn();
 	void WeaponInspectionOff();
 	void PutWeaponOnBack();
-	void UpdateWeaponRotation();
 	void RagdollOnDeath();
 	void DrinkWater();
 	void EatFood();
 	void EndDrinkFromPond(APlayerController* PC);
-	void GameOverSound();
 	void GrenadeTimeline();
 	void ShowingPickUpHud();
 	void LineTraceItem();
@@ -639,6 +639,9 @@ protected:
 	UPROPERTY(Replicated)
 	bool bWantsToRepawn;
 
+	bool bDoOnce = true;
+
+
 	
 
 public:	
@@ -649,25 +652,6 @@ public:
 	bool GetbGripAttached();
 	bool GetbWantToRespawn();
 	//TODO
-	bool bMagazinePickUp;
-
-	UPROPERTY(BlueprintReadWrite, Replicated, Category = "Player")
-	bool bRiflePickUp;
-
-	UPROPERTY(BlueprintReadOnly, Replicated, Category = "Player")
-	bool bHoloPickUp;
-
-	UPROPERTY(BlueprintReadOnly, Replicated, Category = "Player")
-	bool bGripPickUp;
-
-	UPROPERTY(BlueprintReadOnly, Replicated, Category = "Player")
-	bool bHelmetPickUp;
-
-	UPROPERTY(BlueprintReadOnly, Replicated, Category = "Player")
-	bool bHeadsetPickUp;
-
-	UPROPERTY(BlueprintReadOnly, Replicated, Category = "Player")
-	bool bLaserPickUp;
 
 	bool bDrinkPickup;
 
@@ -675,7 +659,6 @@ public:
 
 	bool bDrinkFromPond;
 
-	bool bSniperPickUp;
 
 
 	EHelmetAttachment::Type HelmetEquipState;

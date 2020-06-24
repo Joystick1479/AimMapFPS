@@ -97,6 +97,7 @@ public:
 	int32 GetCurrentAmmoInClip();
 	int32 GetAllAmmo();
 	int32 GetCurrentAmountOfClips();
+	void AddMagazine();
 	void Fire();
 
 	UFUNCTION(BlueprintCallable)
@@ -106,7 +107,13 @@ public:
 
 	EWeaponState::Type CurrentState;
 
+
+
 protected:
+
+	/** weapon data */
+	UPROPERTY(EditDefaultsOnly, Category = Config)
+	FWeaponData WeaponConfig;
 
 	//Start location of holographic sight//
 	FName LineSocket = "LineSocket";
@@ -136,6 +143,13 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "ActorHit")
 	TSubclassOf<ASoldierCharacter> SoldierHit;
 
+	//Weapon sway
+	FRotator InitialWeaponSway;
+	FRotator FinalWeaponSway;
+	FRotator tescik;
+	UPROPERTY(EditDefaultsOnly, Category = "Weapon sway")
+	float SmoothSway;
+	float DirectionSway;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon", meta = (ClampMin = 0.0f))
 	float BulletSpreadGrip;
@@ -165,9 +179,6 @@ protected:
 
 	EReloadingState::Type ReloadingState;
 
-	/** weapon data */
-	UPROPERTY(EditDefaultsOnly, Category = Config)
-	FWeaponData WeaponConfig;
 
 	FTimerHandle TimerHandle_TimeBetweenShots;
 	FTimerHandle TimerHandle_StopReload;
@@ -185,7 +196,9 @@ protected:
 	void UseAmmo();
 	void ReloadWeapon();
 	void StopReload();
-	void WeaponSway();
+	void CalculateWeaponSway();
+	void SetWeaponSway(float SwayDirection);
+	virtual void Tick(float DeltaTime) override;
 
 	//*Particle effects*//
 

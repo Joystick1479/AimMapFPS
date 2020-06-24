@@ -104,12 +104,10 @@ ASoldierCharacter::ASoldierCharacter()
 
 	CharacterState = ECharacterState::Idle;
 	HoldingWeaponState = EHoldingWeapon::None;
-	//HoldingWeaponState = EHoldingWeapon::A4;
 	HoldingAttachmentState = EHoldingAttachment::None;
 	LaserEquipState = ELaserAttachment::None;
 	MaxUseDistance = 400;
 
-	bRiflePickUp = false;
 	bWeaponOnBack = false;
 
 	AmountGrenades = 10;
@@ -205,54 +203,52 @@ void ASoldierCharacter::BeginPlay()
 }
 void ASoldierCharacter::LineTraceItem()
 {
-	//if (Role < ROLE_Authority)
-	//{
-	//	ServerLineTraceItem();
-	//	//return;
-	//}
+	if (Role < ROLE_Authority)
+	{
+		ServerLineTraceItem();
+	}
 
-		 FVector start_trace = CameraComp->GetComponentLocation();
-		 FVector direction = CameraComp->GetComponentRotation().Vector();
-		 FVector end_trace = start_trace + (direction* MaxUseDistance);
+	FVector start_trace = CameraComp->GetComponentLocation();
+	FVector direction = CameraComp->GetComponentRotation().Vector();
+	FVector end_trace = start_trace + (direction* MaxUseDistance);
+	
 
-		FCollisionQueryParams TraceParams(FName(TEXT("")), true, this);
-		TraceParams.bReturnPhysicalMaterial = false;
-		TraceParams.bTraceComplex = true;
-		TraceParams.AddIgnoredActor(this);
+	FCollisionQueryParams TraceParams(FName(TEXT("")), true, this);
+	TraceParams.bReturnPhysicalMaterial = false;
+	TraceParams.bTraceComplex = true;
+	TraceParams.AddIgnoredActor(this);
 
-		FHitResult Hit;
+	FHitResult Hit;
 
-			if (GetWorld()->LineTraceSingleByChannel(Hit, start_trace, end_trace, COLLISION_ITEMS, TraceParams))
+	if (GetWorld()->LineTraceSingleByChannel(Hit, start_trace, end_trace, COLLISION_ITEMS, TraceParams))
+	{
+		DrawDebugLine(GetWorld(), start_trace, end_trace, FColor::Red, false, 1.0f, 0, 1.0f);
+
+		ABaseWeaponClass* WeaponClass = Cast<ABaseWeaponClass>(Hit.GetActor());
+		if (WeaponClass)
+		{
+			bWeaponPickUp = true;
+			if (GetWorld()->GetFirstPlayerController()->IsInputKeyDown("E"))
 			{
-				DrawDebugLine(GetWorld(), start_trace, end_trace, FColor::Red, false, 1.0f, 0, 1.0f);
-				
-				ABaseWeaponClass* WeaponClass = Cast<ABaseWeaponClass>(Hit.GetActor());
-				if (WeaponClass)
-				{
-					bWeaponPickUp = true;
-					if (GetWorld()->GetFirstPlayerController()->IsInputKeyDown("E"))
-					{
-						PickUp(WeaponClass, nullptr);
-						//WeaponClass->Destroy();
-					}
-				}
+				PickUp(WeaponClass, nullptr);
+			}
+		}
 
-				ABaseAttachmentClass* AttachmentClass = Cast<ABaseAttachmentClass>(Hit.GetActor());
-				if(AttachmentClass)
-				{
-					bAttachmentPickUp = true;
-					if (GetWorld()->GetFirstPlayerController()->IsInputKeyDown("E"))
-					{
-						PickUp(nullptr,AttachmentClass);
-						//AttachmentClass->Destroy();
-					}
-				}
-			}
-			else
+		ABaseAttachmentClass* AttachmentClass = Cast<ABaseAttachmentClass>(Hit.GetActor());
+		if (AttachmentClass)
+		{
+			bAttachmentPickUp = true;
+			if (GetWorld()->GetFirstPlayerController()->IsInputKeyDown("E"))
 			{
-				bWeaponPickUp = false;
-				bAttachmentPickUp = false;
+				PickUp(nullptr, AttachmentClass);
 			}
+		}
+	}
+	else
+	{
+		bWeaponPickUp = false;
+		bAttachmentPickUp = false;
+	}
 	
 }
 
@@ -260,7 +256,12 @@ void ASoldierCharacter::LineTraceItem()
 void ASoldierCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	LineTraceItem();
+
+	if (IsLocallyControlled())
+	{
+		LineTraceItem();
+	}
+	
 }
 
 // Called to bind functionality to input
@@ -291,7 +292,7 @@ void ASoldierCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
 		PlayerInputComponent->BindAction("FireMode", IE_Pressed, this, &ASoldierCharacter::FireMode);
 
-		//PlayerInputComponent->BindAction("PickUp", IE_Pressed, this, &ASoldierCharacter::PickUp);
+	//	PlayerInputComponent->BindAction("PickUp", IE_Pressed, this, &ASoldierCharacter::LineTraceItem);
 
 		PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &ASoldierCharacter::SprintOn);
 		PlayerInputComponent->BindAction("Sprint", IE_Released, this, &ASoldierCharacter::SprintOff);
@@ -615,27 +616,37 @@ void ASoldierCharacter::PickUp(ABaseWeaponClass* Weapons, ABaseAttachmentClass* 
 		AAutomaticRifle* AutoRifle = Cast<AAutomaticRifle>(Weapons);
 		if (AutoRifle)
 		{
+			UE_LOG(LogTemp, Warning, TEXT("Tutaj3"));
+
 			if (HoldingWeaponState == EHoldingWeapon::None)
 			{
 				HoldingWeaponState = EHoldingWeapon::A4;
 
 				FActorSpawnParameters SpawnParams;
 				SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-				if (Role == ROLE_Authority)
+				//if (Role == ROLE_Authority)
+				//{
+				AutomaticRifle = GetWorld()->SpawnActor<AAutomaticRifle>(AutoRifleClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
+				if (AutomaticRifle)
 				{
-					AutomaticRifle = GetWorld()->SpawnActor<AAutomaticRifle>(AutoRifleClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
-					if (AutomaticRifle)
-					{
-						AutomaticRifle->SetOwner(this);
-						AutomaticRifle->AttachToComponent(FPPMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocket);
-						AutomaticRifle->GetSkelMeshComp()->bOnlyOwnerSee = true;
-						AutomaticRifle->GetSkelMeshComp()->SetAnimInstanceClass(AnimBp);
-						AutomaticRifle->GetSphereComp()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-						CurrentWeapon = AutomaticRifle;
-						isWeaponAttached = true;
-						AutoRifle->Destroy();
-					}
+					AutomaticRifle->SetOwner(this);
+					AutomaticRifle->AttachToComponent(FPPMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocket);
+					AutomaticRifle->GetSkelMeshComp()->bOnlyOwnerSee = true;
+					AutomaticRifle->GetSkelMeshComp()->SetAnimInstanceClass(AnimBp);
+					AutomaticRifle->GetSphereComp()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+					CurrentWeapon = AutomaticRifle;
+					isWeaponAttached = true;
+					AutoRifle->Destroy();
+
 				}
+
+				Rifle_3rd = GetWorld()->SpawnActor<ARifle_3rd>(ThirdWeaponClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
+				if (Rifle_3rd)
+				{
+					Rifle_3rd->SetOwner(this);
+					Rifle_3rd->AttachToComponent(this->GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocket);
+				}
+				//}
 			}
 			
 		}
@@ -661,6 +672,7 @@ void ASoldierCharacter::PickUp(ABaseWeaponClass* Weapons, ABaseAttachmentClass* 
 						CurrentWeapon = SniperRifle;
 						isWeaponAttached = true;
 						SniperWeapon->Destroy();
+
 					}
 				}
 				UGameplayStatics::PlaySoundAtLocation(this, ItemsPickUp, GetActorLocation());
@@ -670,6 +682,8 @@ void ASoldierCharacter::PickUp(ABaseWeaponClass* Weapons, ABaseAttachmentClass* 
 		AHoloScope * HoloAttachment = Cast<AHoloScope>(Attachments);
 		if (HoloAttachment)
 		{
+			UE_LOG(LogTemp, Warning, TEXT("Tutaj4"));
+
 			if ((HoldingWeaponState == EHoldingWeapon::A4 || HoldingWeaponState == EHoldingWeapon::Sniper) && HoloEquipState == EHoloAttachment::None)
 			{
 				HoldingAttachmentState = EHoldingAttachment::Holo;
@@ -677,21 +691,23 @@ void ASoldierCharacter::PickUp(ABaseWeaponClass* Weapons, ABaseAttachmentClass* 
 
 				FActorSpawnParameters SpawnParams;
 				SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-
-				HoloScope = GetWorld()->SpawnActor<AHoloScope>(HoloClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
-				if (HoloScope)
+				if (Role == ROLE_Authority)
 				{
-					HoloScope->SetOwner(this);
-					HoloScope->GetMeshComponent()->bOnlyOwnerSee = true;
-					HoloScope->GetMeshComponent()->SetRenderCustomDepth(false);
-					if (CurrentWeapon)
+					HoloScope = GetWorld()->SpawnActor<AHoloScope>(HoloClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
+					if (HoloScope)
 					{
-						FName Socket = CurrentWeapon->GetScopeSocketName();
-						HoloScope->AttachToComponent(CurrentWeapon->GetSkelMeshComp(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, Socket);
+						HoloScope->SetOwner(this);
+						HoloScope->GetMeshComponent()->bOnlyOwnerSee = true;
+						HoloScope->GetMeshComponent()->SetRenderCustomDepth(false);
+						if (CurrentWeapon)
+						{
+							FName Socket = CurrentWeapon->GetScopeSocketName();
+							HoloScope->AttachToComponent(CurrentWeapon->GetSkelMeshComp(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, Socket);
+						}
+						HoloScope->GetSphereComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+						isHoloAttached = true;
+						HoloAttachment->Destroy();
 					}
-					HoloScope->GetSphereComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-					isHoloAttached = true;
-					HoloAttachment->Destroy();
 				}
 				UGameplayStatics::PlaySoundAtLocation(this, ItemsPickUp, GetActorLocation());
 			}
@@ -802,7 +818,15 @@ void ASoldierCharacter::PickUp(ABaseWeaponClass* Weapons, ABaseAttachmentClass* 
 				UGameplayStatics::PlaySoundAtLocation(this, ItemsPickUp, GetActorLocation());
 			}
 		}
-		
+		AMagazine* Magazine = Cast<AMagazine>(Attachments);
+		if (Magazine)
+		{
+			if (CurrentWeapon)
+			{
+				CurrentWeapon->AddMagazine();
+			}
+			Magazine->Destroy();
+		}
 
 		
 		//	if (Role == ROLE_Authority)
@@ -911,11 +935,6 @@ void ASoldierCharacter::EndDrinkFromPond(APlayerController* PC)
 }
 void ASoldierCharacter::ShowingPickUpHud()
 {
-	//if (Role < ROLE_Authority)
-	//{
-	//	ServerShowingPickUpHud();
-	//}
-
 	if (IsLocallyControlled())
 	{
 		APlayerController* PC = GetWorld()->GetFirstPlayerController();
@@ -926,17 +945,15 @@ void ASoldierCharacter::ShowingPickUpHud()
 				wPickUpvar = CreateWidget<UUserWidget>(PC, wPickUp);
 				if (wPickUpvar)
 				{
-					/*if ((bRiflePickUp || bHeadsetPickUp || bLaserPickUp || bHelmetPickUp || bGripPickUp || bHoloPickUp || bFoodPickup || bDrinkPickup || bDrinkFromPond || bSniperPickUp ||bMagazinePickUp) == true)
+					if ((bWeaponPickUp || bAttachmentPickUp) && bDoOnce == true)
 					{
 						wPickUpvar->AddToViewport();
-					}*/
-					if (bWeaponPickUp || bAttachmentPickUp == true)
-					{
-						wPickUpvar->AddToViewport();
+						bDoOnce = false;
 					}
 					else
 					{
 						bRemoveHud = true;
+						bDoOnce = true;
 						TArray<UUserWidget*> PickupWidgets;
 						UWidgetBlueprintLibrary::GetAllWidgetsOfClass(this, PickupWidgets, PickUpTestWidgetClass, true);
 
@@ -1283,7 +1300,6 @@ void ASoldierCharacter::Reload()
 			CharacterState = ECharacterState::Reloading;
 			bReloading = true;
 			CurrentWeapon->StartReload();
-			//AudioCompReload->Activate(true);
 			ServerReloadingSound();
 			GetWorldTimerManager().SetTimer(ReloadTimer, this, &ASoldierCharacter::StopReload, 2.167f, false);
 		}
@@ -1731,8 +1747,12 @@ void ASoldierCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	DOREPLIFETIME(ASoldierCharacter, CurrentWeapon);
 
 	DOREPLIFETIME(ASoldierCharacter, bReloading);
-	DOREPLIFETIME(ASoldierCharacter, IsFiring);
 	DOREPLIFETIME(ASoldierCharacter, bZooming);
+	DOREPLIFETIME(ASoldierCharacter, bDied);
+	DOREPLIFETIME(ASoldierCharacter, bWeaponPickUp);
+	DOREPLIFETIME(ASoldierCharacter, bAttachmentPickUp);
+
+	DOREPLIFETIME(ASoldierCharacter, IsFiring);
 	DOREPLIFETIME(ASoldierCharacter, ClimbAnim);
 	DOREPLIFETIME(ASoldierCharacter, VaultAnim);
 	DOREPLIFETIME(ASoldierCharacter, isAllowClimbing);
@@ -1743,18 +1763,11 @@ void ASoldierCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	DOREPLIFETIME(ASoldierCharacter, GoVault);
 	DOREPLIFETIME(ASoldierCharacter, MaxHeightForVault);
 	DOREPLIFETIME(ASoldierCharacter, TimerHandle_Vault);
-	DOREPLIFETIME(ASoldierCharacter, bDied);
 	DOREPLIFETIME(ASoldierCharacter, IsCrouching);
 	DOREPLIFETIME(ASoldierCharacter, wHealthIndicator);
 	DOREPLIFETIME(ASoldierCharacter, wHealthIndicatorvar);
 	DOREPLIFETIME(ASoldierCharacter, wAmmoCount);
 	DOREPLIFETIME(ASoldierCharacter, wAmmoCountvar);
-	DOREPLIFETIME(ASoldierCharacter, bRiflePickUp);
-	DOREPLIFETIME(ASoldierCharacter, bHoloPickUp);
-	DOREPLIFETIME(ASoldierCharacter, bGripPickUp);
-	DOREPLIFETIME(ASoldierCharacter, bHeadsetPickUp);
-	DOREPLIFETIME(ASoldierCharacter, bLaserPickUp);
-	DOREPLIFETIME(ASoldierCharacter, bHelmetPickUp);
 	DOREPLIFETIME(ASoldierCharacter, PlayerName);
 	DOREPLIFETIME(ASoldierCharacter, CameraComp);
 	DOREPLIFETIME(ASoldierCharacter, STL);

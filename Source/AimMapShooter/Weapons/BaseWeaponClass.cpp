@@ -24,7 +24,7 @@
 ABaseWeaponClass::ABaseWeaponClass()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = false;
+	PrimaryActorTick.bCanEverTick = true;
 
 	CameraSocket = "CameraSocket";
 
@@ -56,6 +56,7 @@ ABaseWeaponClass::ABaseWeaponClass()
 	BulletSpread = 2.0f;
 	BulletSpreadZooming = 0.5f;
 	BulletSpreadGrip = 1.0f;
+	SmoothSway = 4.0f;
 
 	//*Multiplayer repliaction **//
 	SetReplicates(true);
@@ -132,11 +133,71 @@ int32 ABaseWeaponClass::GetCurrentAmountOfClips()
 	return CurrentAmountOfClips;
 }
 
-void ABaseWeaponClass::WeaponSway()
+void ABaseWeaponClass::AddMagazine()
 {
+	CurrentAmountOfClips++;
+}	
+
+void ABaseWeaponClass::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	CalculateWeaponSway();
+}
+
+void ABaseWeaponClass::CalculateWeaponSway()
+{
+	
+	ASoldierCharacter* SoldierCharOwner = Cast<ASoldierCharacter>(GetOwner());
+	if (SoldierCharOwner)
+	{
+		InitialWeaponSway = SoldierCharOwner->GetActorRotation();
+
+		if (InitialWeaponSway != FinalWeaponSway)
+		{
+			//UE_LOG(LogTemp, Warning, TEXT("True"));
+			//if (InitialWeaponSway.Yaw > FinalWeaponSway.Yaw)
+			//{
+			//	FinalWeaponSway = InitialWeaponSway;
+
+			//	DirectionSway = 10;
+			//	//SetWeaponSway(DirectionSway);
+			//}
+			//else
+			//{
+			//	FinalWeaponSway = InitialWeaponSway;
+
+			//	DirectionSway = (-10);
+			//	//SetWeaponSway(DirectionSway);
+			//}
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("false"));
+			
+			FRotator CurrentRotation = GetActorRotation();
+			FRotator TargetRotation = FRotator(CurrentRotation.Roll, 0.0f, CurrentRotation.Yaw);
+			
+			SetActorRotation(UKismetMathLibrary::RInterpTo(GetActorRotation(),FRotator(CurrentRotation.Roll,0.0f, CurrentRotation.Yaw), UGameplayStatics::GetWorldDeltaSeconds(GetWorld()) * SmoothSway, 3.0f));
+
+			
+		}
+	}
 
 }
 
+void ABaseWeaponClass::SetWeaponSway(float SwayDirection)
+{
+	FRotator CurrentWeaponRotation = GetActorRotation();
+	FRotator TargetWeaponRotation = FRotator(GetActorRotation().Roll, GetActorRotation().Pitch + SwayDirection, GetActorRotation().Yaw);
+	TargetWeaponRotation.Pitch = UKismetMathLibrary::Clamp(TargetWeaponRotation.Pitch, -5.0f, 5.0f);
+
+	SetActorRotation(UKismetMathLibrary::RInterpTo(CurrentWeaponRotation, TargetWeaponRotation, UGameplayStatics::GetWorldDeltaSeconds(GetWorld())*SmoothSway, 0.5f));
+
+	UE_LOG(LogTemp, Warning, TEXT("Clamped pitch rotation: %f"), TargetWeaponRotation.Pitch);
+
+
+}
 void ABaseWeaponClass::StartFire()
 {
 	float FirstDelay = FMath::Max(LastFireTime + TimeBetweenShots - GetWorld()->TimeSeconds,0.0f);
