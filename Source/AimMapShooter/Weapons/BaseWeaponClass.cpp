@@ -19,6 +19,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Net/UnrealNetwork.h"
 #include "Animation/AnimSequence.h"
+#include "Math/Rotator.h"
 
 // Sets default values
 ABaseWeaponClass::ABaseWeaponClass()
@@ -80,7 +81,7 @@ void ABaseWeaponClass::BeginPlay()
 
 
 	TimeBetweenShots = 60 / RateOfFire;
-	
+
 }
 
 USkeletalMeshComponent* ABaseWeaponClass::GetSkelMeshComp()
@@ -151,50 +152,51 @@ void ABaseWeaponClass::CalculateWeaponSway()
 	ASoldierCharacter* SoldierCharOwner = Cast<ASoldierCharacter>(GetOwner());
 	if (SoldierCharOwner)
 	{
-		InitialWeaponSway = SoldierCharOwner->GetActorRotation();
-
-		if (InitialWeaponSway != FinalWeaponSway)
+		InitialWeaponRotation = SoldierCharOwner->GetActorRotation();
+		
+		if (!InitialWeaponRotation.Equals(FinalWeaponRotation))
 		{
-			//UE_LOG(LogTemp, Warning, TEXT("True"));
-			//if (InitialWeaponSway.Yaw > FinalWeaponSway.Yaw)
-			//{
-			//	FinalWeaponSway = InitialWeaponSway;
 
-			//	DirectionSway = 10;
-			//	//SetWeaponSway(DirectionSway);
-			//}
-			//else
-			//{
-			//	FinalWeaponSway = InitialWeaponSway;
+			if (InitialWeaponRotation.Yaw > FinalWeaponRotation.Yaw)
+			{
+				FinalWeaponRotation = InitialWeaponRotation;
 
-			//	DirectionSway = (-10);
-			//	//SetWeaponSway(DirectionSway);
-			//}
+				DirectionSway = 10;
+
+				SetWeaponSway(DirectionSway);
+			}
+			else
+			{
+				FinalWeaponRotation = InitialWeaponRotation;
+
+				DirectionSway = -10;
+
+				SetWeaponSway(DirectionSway);
+			}
 		}
 		else
 		{
-			UE_LOG(LogTemp, Warning, TEXT("false"));
-			
 			FRotator CurrentRotation = GetActorRotation();
-			FRotator TargetRotation = FRotator(CurrentRotation.Roll, 0.0f, CurrentRotation.Yaw);
-			
-			SetActorRotation(UKismetMathLibrary::RInterpTo(GetActorRotation(),FRotator(CurrentRotation.Roll,0.0f, CurrentRotation.Yaw), UGameplayStatics::GetWorldDeltaSeconds(GetWorld()) * SmoothSway, 3.0f));
+			FRotator TargetRotation = FRotator(0.0f, CurrentRotation.Yaw, CurrentRotation.Roll);
 
-			
+			SetActorRotation(UKismetMathLibrary::RInterpTo(CurrentRotation, TargetRotation, UGameplayStatics::GetWorldDeltaSeconds(GetWorld()) *SmoothSway, 3.0f));
 		}
 	}
+
 
 }
 
 void ABaseWeaponClass::SetWeaponSway(float SwayDirection)
 {
-	FRotator CurrentWeaponRotation = GetActorRotation();
-	FRotator TargetWeaponRotation = FRotator(GetActorRotation().Roll, GetActorRotation().Pitch + SwayDirection, GetActorRotation().Yaw);
-	TargetWeaponRotation.Pitch = UKismetMathLibrary::Clamp(TargetWeaponRotation.Pitch, -5.0f, 5.0f);
+	FRotator CurrentRotation = GetActorRotation();
 
-	SetActorRotation(UKismetMathLibrary::RInterpTo(CurrentWeaponRotation, TargetWeaponRotation, UGameplayStatics::GetWorldDeltaSeconds(GetWorld())*SmoothSway, 0.5f));
+	FRotator FinalRotation = FRotator(GetActorRotation().Pitch + SwayDirection, GetActorRotation().Yaw , GetActorRotation().Roll);
 
-	UE_LOG(LogTemp, Warning, TEXT("Clamped pitch rotation: %f"), TargetWeaponRotation.Pitch);
+	FinalRotation.Pitch = UKismetMathLibrary::Clamp(FinalRotation.Pitch, -5.f, 5.f);
+
+	FRotator InterpRotation = UKismetMathLibrary::RInterpTo(CurrentRotation, FinalRotation, UGameplayStatics::GetWorldDeltaSeconds(GetWorld()) *SmoothSway, 0.5f);
+
+	SetActorRotation(InterpRotation);
 
 
 }

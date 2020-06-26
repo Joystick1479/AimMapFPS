@@ -144,9 +144,9 @@ protected:
 	TSubclassOf<ASoldierCharacter> SoldierHit;
 
 	//Weapon sway
-	FRotator InitialWeaponSway;
-	FRotator FinalWeaponSway;
-	FRotator tescik;
+	FRotator InitialWeaponRotation;
+	FRotator FinalWeaponRotation;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon sway")
 	float SmoothSway;
 	float DirectionSway;
@@ -196,7 +196,7 @@ protected:
 	void UseAmmo();
 	void ReloadWeapon();
 	void StopReload();
-	void CalculateWeaponSway();
+	virtual void CalculateWeaponSway();
 	void SetWeaponSway(float SwayDirection);
 	virtual void Tick(float DeltaTime) override;
 
