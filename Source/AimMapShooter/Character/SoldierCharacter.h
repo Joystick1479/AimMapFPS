@@ -375,10 +375,10 @@ protected:
 	void ServerLineTraceItem();
 
 
-	UPROPERTY(Replicated)
+	UPROPERTY(Replicated, BlueprintReadOnly)
 	ASniperRifle* SniperRifle;
 
-	UPROPERTY(Replicated)
+	UPROPERTY(Replicated, BlueprintReadOnly)
 	AAutomaticRifle* AutomaticRifle;
 
 	AHoloScope* HoloScope;
