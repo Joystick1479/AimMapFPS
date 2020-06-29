@@ -177,11 +177,6 @@ void AFlashGrenade::MulticastSpawnExplosionDecal_Implementation()
 		}
 	}
 }
-// Called every frame
-void AFlashGrenade::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-}
 
 void AFlashGrenade::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {

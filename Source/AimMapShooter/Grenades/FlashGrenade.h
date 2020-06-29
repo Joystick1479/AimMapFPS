@@ -19,11 +19,6 @@ public:
 	AFlashGrenade();
 
 
-	UPROPERTY(Replicated)
-	FVector Impulse;
-
-	UPROPERTY(Replicated)
-	FVector Impulse2;
 
 protected:
 	// Called when the game starts or when spawned
@@ -36,6 +31,13 @@ protected:
 	float ImpulseForce2;
 
 private:
+
+
+	UPROPERTY(Replicated)
+	FVector Impulse;
+
+	UPROPERTY(Replicated)
+	FVector Impulse2;
 
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	class UStaticMeshComponent* MeshComp;
@@ -102,10 +104,5 @@ private:
 
 	FTimerHandle TimerHandle_Explosion;
 
-public:	
-
-
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
 
 };

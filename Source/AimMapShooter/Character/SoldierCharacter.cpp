@@ -190,6 +190,7 @@ void ASoldierCharacter::BeginPlay()
 	UpdateRifleStatus();
 	OutOfBreathSound();
 	RagdollOnDeath();
+	OnFoodLow();
 
 
 	///CLAMP CAMERA
@@ -655,7 +656,6 @@ void ASoldierCharacter::PickUp(ABaseWeaponClass* Weapons, ABaseAttachmentClass* 
 					Rifle_3rd->SetOwner(this);
 					Rifle_3rd->AttachToComponent(this->GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocket);
 				}
-				//}
 			}
 			
 		}
@@ -900,7 +900,6 @@ void ASoldierCharacter::PickUp(ABaseWeaponClass* Weapons, ABaseAttachmentClass* 
 void ASoldierCharacter::EndDrinkFromPond(APlayerController* PC)
 {
 	EnableInput(PC);
-	bDrinkFromPond = false;
 	if (SurvivalComp)
 	{
 		SurvivalComp->Drink = SurvivalComp->Drink + amountOfBoostDrink;
@@ -1478,6 +1477,8 @@ void ASoldierCharacter::OnFoodLow()
 			SurvivalComp->OnRep_Food();
 		}
 	}
+
+	GetWorldTimerManager().SetTimer(UpdateSurvivalComponent, this, &ASoldierCharacter::OnFoodLow, 10.0f, false);
 	
 }
 void ASoldierCharacter::OnDrinkLow()
@@ -1508,6 +1509,8 @@ void ASoldierCharacter::OnDrinkLow()
 			SurvivalComp->OnRep_Drink();
 		}
 	}
+
+	GetWorldTimerManager().SetTimer(UpdateSurvivalComponent, this, &ASoldierCharacter::OnDrinkLow, 8.0f, false);
 }
 bool ASoldierCharacter::GetbDied()
 {

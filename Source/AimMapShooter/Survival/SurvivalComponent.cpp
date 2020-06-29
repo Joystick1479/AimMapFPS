@@ -49,20 +49,11 @@ void USurvivalComponent::OnRep_Food()
 		GetWorld()->GetTimerManager().SetTimer(FoodTimerHandle, this, &USurvivalComponent::OnRep_Food, FreQOfDrainingFood, false);
 	}
 
-
 	if (Food == 0)
 	{
 		GetWorld()->GetTimerManager().ClearTimer(FoodTimerHandle);
 
-		ASoldierCharacter* SoldierChar = Cast<ASoldierCharacter>(GetOwner());
-		{
-			if (SoldierChar)
-			{
-				SoldierChar->OnFoodLow();
-			}
-		}
 	}
-	
 }
 
 void USurvivalComponent::OnRep_Drink()
@@ -74,20 +65,12 @@ void USurvivalComponent::OnRep_Drink()
 		//UE_LOG(LogTemp, Warning, TEXT("Drink is: %f"), Drink);
 		GetWorld()->GetTimerManager().SetTimer(DrinkTimerHandle, this, &USurvivalComponent::OnRep_Drink, FreQOfDrainingDrink, false);
 	}
+
 	if (Drink == 0)
 	{
 		GetWorld()->GetTimerManager().ClearTimer(DrinkTimerHandle);
 
-		ASoldierCharacter* SoldierChar = Cast<ASoldierCharacter>(GetOwner());
-		{
-			if (SoldierChar)
-			{
-				SoldierChar->OnDrinkLow();
-			}
-		}
 	}
-
-
 }
 
 // Called every frame

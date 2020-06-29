@@ -133,6 +133,9 @@ protected:
 
 	ELaserAttachment::Type LaserEquipState;
 
+	EHelmetAttachment::Type HelmetEquipState;
+
+
 	//*Vaulting stuff//*
 	void Vault();
 	void ResetVaultTimer();
@@ -407,6 +410,7 @@ protected:
 	FTimerHandle UpdateBreath;
 	FTimerHandle OutOfBreathTimer;
 	FTimerHandle SlowDownSprintTimer;
+	FTimerHandle UpdateSurvivalComponent;
 
 	///GRENADE///
 	void ThrowGrenade();
@@ -637,35 +641,23 @@ protected:
 
 	bool bDoOnce = true;
 
-
+	void OnFoodLow();
+	void OnDrinkLow();
 	
 
 public:	
 
-	//ZROBIONE
+	
 	bool GetbDied();
 	bool GetbZooming();
 	bool GetbGripAttached();
 	bool GetbWantToRespawn();
-	//TODO
-
-	bool bDrinkPickup;
-
-	bool bFoodPickup;
-
-	bool bDrinkFromPond;
-
-
-
-	EHelmetAttachment::Type HelmetEquipState;
-	void Flashbang(float ThrowDistance, FVector PlayerFacingAngle);
-
-
-	void OnFoodLow();
-	void OnDrinkLow();
 
 	UPROPERTY(BlueprintReadOnly)
 	bool bFireAnimation;
+	
+	void Flashbang(float ThrowDistance, FVector PlayerFacingAngle);
+
 	
 	
 };
