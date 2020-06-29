@@ -7,11 +7,16 @@ public class AimMapShooter : ModuleRules
 	public AimMapShooter(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
-	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore","UMG","Slate","SlateCore", "OnlineSubsystem", "OnlineSubsystemSteam","NavigationSystem","AIModule","Paper2D" });
+
+        MinFilesUsingPrecompiledHeaderOverride = 1;
+        bFasterWithoutUnity = true;
+
+        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore","UMG","Slate","SlateCore", "OnlineSubsystem", "OnlineSubsystemSteam","NavigationSystem","AIModule","Paper2D" });
 
 
         PrivateDependencyModuleNames.AddRange(new string[] {  });
+
+       
 
 		// Uncomment if you are using Slate UI
 		// PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });

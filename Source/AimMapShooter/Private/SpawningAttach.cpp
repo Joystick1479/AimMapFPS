@@ -13,6 +13,8 @@
 #include "Particles/ParticleSystem.h"
 #include "Kismet/GameplayStatics.h"
 
+#include "Net/UnrealNetwork.h"
+
 // Sets default values
 ASpawningAttach::ASpawningAttach()
 {

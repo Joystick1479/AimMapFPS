@@ -52,12 +52,14 @@ ABaseWeaponClass::ABaseWeaponClass()
 	CurrentAmmoInClip = 0;
 	CurrentAmountOfClips = 0;
 
+	SmoothSway1 = 5.0f;
+	SmoothSway2 = 3.0f;
+
 	RateOfFire = 600;
 	BaseDamage = 20.0f;
 	BulletSpread = 2.0f;
 	BulletSpreadZooming = 0.5f;
 	BulletSpreadGrip = 1.0f;
-	SmoothSway = 4.0f;
 
 	//*Multiplayer repliaction **//
 	SetReplicates(true);
@@ -78,7 +80,6 @@ void ABaseWeaponClass::BeginPlay()
 		WeaponConfig.InitialClips--; ///* Minus one clip when we pick up the gun because it's already loaded *///
 		CurrentAmountOfClips = WeaponConfig.InitialClips;
 	}
-
 
 	TimeBetweenShots = 60 / RateOfFire;
 
@@ -152,8 +153,9 @@ void ABaseWeaponClass::CalculateWeaponSway()
 	ASoldierCharacter* SoldierCharOwner = Cast<ASoldierCharacter>(GetOwner());
 	if (SoldierCharOwner)
 	{
-		InitialWeaponRotation = SoldierCharOwner->GetActorRotation();
 		
+		InitialWeaponRotation = SoldierCharOwner->GetActorRotation();
+
 		if (!InitialWeaponRotation.Equals(FinalWeaponRotation))
 		{
 
@@ -179,7 +181,7 @@ void ABaseWeaponClass::CalculateWeaponSway()
 			FRotator CurrentRotation = GetActorRotation();
 			FRotator TargetRotation = FRotator(0.0f, CurrentRotation.Yaw, CurrentRotation.Roll);
 
-			SetActorRotation(UKismetMathLibrary::RInterpTo(CurrentRotation, TargetRotation, UGameplayStatics::GetWorldDeltaSeconds(GetWorld()) *SmoothSway, 3.0f));
+			SetActorRotation(UKismetMathLibrary::RInterpTo(CurrentRotation, TargetRotation, UGameplayStatics::GetWorldDeltaSeconds(GetWorld()), SmoothSway1));
 		}
 	}
 
@@ -194,7 +196,7 @@ void ABaseWeaponClass::SetWeaponSway(float SwayDirection)
 
 	FinalRotation.Pitch = UKismetMathLibrary::Clamp(FinalRotation.Pitch, -5.f, 5.f);
 
-	FRotator InterpRotation = UKismetMathLibrary::RInterpTo(CurrentRotation, FinalRotation, UGameplayStatics::GetWorldDeltaSeconds(GetWorld()) *SmoothSway, 0.5f);
+	FRotator InterpRotation = UKismetMathLibrary::RInterpTo(CurrentRotation, FinalRotation, UGameplayStatics::GetWorldDeltaSeconds(GetWorld()), SmoothSway2);
 
 	SetActorRotation(InterpRotation);
 

@@ -51,6 +51,7 @@
 #include "Survival/Drink.h"
 #include "Survival/Food.h"
 #include "Survival/Water.h"
+#include "Survival/BaseSurvivalItemClass.h"
 #include "AimMapGameModeBase.h"
 
 // Sets default values
@@ -227,27 +228,35 @@ void ASoldierCharacter::LineTraceItem()
 		ABaseWeaponClass* WeaponClass = Cast<ABaseWeaponClass>(Hit.GetActor());
 		if (WeaponClass)
 		{
-			bWeaponPickUp = true;
+			bWantToPickUp = true;
 			if (GetWorld()->GetFirstPlayerController()->IsInputKeyDown("E"))
 			{
-				PickUp(WeaponClass, nullptr);
+				PickUp(WeaponClass, nullptr,nullptr);
 			}
 		}
 
 		ABaseAttachmentClass* AttachmentClass = Cast<ABaseAttachmentClass>(Hit.GetActor());
 		if (AttachmentClass)
 		{
-			bAttachmentPickUp = true;
+			bWantToPickUp = true;
 			if (GetWorld()->GetFirstPlayerController()->IsInputKeyDown("E"))
 			{
-				PickUp(nullptr, AttachmentClass);
+				PickUp(nullptr, AttachmentClass,nullptr);
+			}
+		}
+		ABaseSurvivalItemClass* SurvItem = Cast<ABaseSurvivalItemClass>(Hit.GetActor());
+		if (SurvItem)
+		{
+			bWantToPickUp = true;
+			if (GetWorld()->GetFirstPlayerController()->IsInputKeyDown("E"))
+			{
+				PickUp(nullptr, nullptr, SurvItem);
 			}
 		}
 	}
 	else
 	{
-		bWeaponPickUp = false;
-		bAttachmentPickUp = false;
+		bWantToPickUp = false;
 	}
 	
 }
@@ -605,12 +614,12 @@ void ASoldierCharacter::TurnOnLaser()
 		Laser->StartLaser();
 	}
 }
-void ASoldierCharacter::PickUp(ABaseWeaponClass* Weapons, ABaseAttachmentClass* Attachments)
+void ASoldierCharacter::PickUp(ABaseWeaponClass* Weapons, ABaseAttachmentClass* Attachments, ABaseSurvivalItemClass* SurvivalItem)
 {
 
 		if (Role < ROLE_Authority)
 		{
-			ServerPickUpItem(Weapons,Attachments);
+			ServerPickUpItem(Weapons,Attachments,SurvivalItem);
 		}
 
 		AAutomaticRifle* AutoRifle = Cast<AAutomaticRifle>(Weapons);
@@ -850,75 +859,43 @@ void ASoldierCharacter::PickUp(ABaseWeaponClass* Weapons, ABaseAttachmentClass* 
 		//		}
 		//	}*/
 		//	UGameplayStatics::PlaySoundAtLocation(this, ItemsPickUp, GetActorLocation());
-		//if (bMagazinePickUp == true)
-		//{
 
-		//	TArray<AActor*> Rifles;
-		//	//UGameplayStatics::GetAllActorsOfClass(this, StarterWeaponClass, Rifles);
-		//	for (int i = 0; i < Rifles.Num(); i++)
-		//	{
-		//		//AAutomaticRifle* RiflesItr = Cast<AAutomaticRifle>(Rifles[i]);
-		//		//if (RiflesItr)
-		//		//{
-		//		//	//TO DO
-		//		//	//RiflesItr->GetCurrentAmountOfClips() + 1;
-		//		//}
-		//	}
+		
+		///SURVIVAL STUFF///
+		ADrink* DrinkActor = Cast<ADrink>(SurvivalItem);
+		if (DrinkActor)
+		{
+			amountOfDrinks++;
 
+			DrinkActor->Destroy();
+		}
+		AFood* FoodActor = Cast<AFood>(SurvivalItem);
+		if (FoodActor)
+		{
+			amountOfFood++;
+			
+			FoodActor->Destroy();
+		}
 
-		//	UGameplayStatics::PlaySoundAtLocation(this, ItemsPickUp, GetActorLocation());
-		//}
+		AWater* WaterActor = Cast<AWater>(SurvivalItem);
+		if (WaterActor)
+		{
+			
+			APlayerController* PC = Cast<APlayerController>(GetController());
+			if (PC)
+			{
+				DisableInput(PC);
+				FTimerDelegate DelegateFunc = FTimerDelegate::CreateUObject(this, &ASoldierCharacter::EndDrinkFromPond, PC);
+				GetWorldTimerManager().SetTimer(DrinkFromPondTimer, DelegateFunc, 2.5f, false);
+			}
+			
+			if (IsLocallyControlled())
+			{
+				UGameplayStatics::PlaySound2D(this, DrinkFromPondSound);
+			}
 
-		/////SURVIVAL STUFF///
-		//if (bDrinkPickup == true)
-		//{
-		//	amountOfDrinks++;
-
-		//	TArray<AActor*> Drinks;
-		//	UGameplayStatics::GetAllActorsOfClass(this, DrinkClass, Drinks);
-		//	for (int i = 0; i < Drinks.Num(); i++)
-		//	{
-		//		ADrink* Drink = Cast<ADrink>(Drinks[i]);
-		//		if (Drink)
-		//		{
-		//			if (this->IsOverlappingActor(Drink))
-		//			{
-		//				Drink->IsPickedUp = true;
-		//			}
-		//		}
-		//	}
-
-		//}
-		//if (bFoodPickup == true)
-		//{
-		//	amountOfFood++;
-
-		//	TArray<AActor*> Foods;
-		//	UGameplayStatics::GetAllActorsOfClass(this, FoodClass, Foods);
-		//	for (int i = 0; i < Foods.Num(); i++)
-		//	{
-		//		AFood* Food = Cast<AFood>(Foods[i]);
-		//		if (Food)
-		//		{
-		//			if (this->IsOverlappingActor(Food))
-		//			{
-		//				Food->IsPickedUp = true;
-		//			}
-		//		}
-		//	}
-		//}
-		//if (bDrinkFromPond == true)
-		//{
-		//	APlayerController* PC = Cast<APlayerController>(GetController());
-		//	DisableInput(PC);
-		//	FTimerDelegate DelegateFunc = FTimerDelegate::CreateUObject(this, &ASoldierCharacter::EndDrinkFromPond, PC);
-		//	GetWorldTimerManager().SetTimer(DrinkFromPondTimer, DelegateFunc, 2.5f, false);
-
-		//	if (IsLocallyControlled())
-		//	{
-		//		UGameplayStatics::PlaySound2D(this, DrinkFromPondSound);
-		//	}
-		//}
+		}
+		
 }
 void ASoldierCharacter::EndDrinkFromPond(APlayerController* PC)
 {
@@ -945,7 +922,7 @@ void ASoldierCharacter::ShowingPickUpHud()
 				wPickUpvar = CreateWidget<UUserWidget>(PC, wPickUp);
 				if (wPickUpvar)
 				{
-					if ((bWeaponPickUp || bAttachmentPickUp) && bDoOnce == true)
+					if (bWantToPickUp && bDoOnce == true)
 					{
 						wPickUpvar->AddToViewport();
 						bDoOnce = false;
@@ -1587,11 +1564,11 @@ void ASoldierCharacter::ServerWantToRespawn_Implementation()
 		}
 	}
 }
-void ASoldierCharacter::ServerPickUpItem_Implementation(ABaseWeaponClass* Weapons, ABaseAttachmentClass* Attachments)
+void ASoldierCharacter::ServerPickUpItem_Implementation(ABaseWeaponClass* Weapons, ABaseAttachmentClass* Attachments, ABaseSurvivalItemClass* SurvivalItem)
 {
-	PickUp(Weapons,Attachments);
+	PickUp(Weapons,Attachments,SurvivalItem);
 }
-bool ASoldierCharacter::ServerPickUpItem_Validate(ABaseWeaponClass* Weapons, ABaseAttachmentClass* Attachments)
+bool ASoldierCharacter::ServerPickUpItem_Validate(ABaseWeaponClass* Weapons, ABaseAttachmentClass* Attachments, ABaseSurvivalItemClass* SurvivalItem)
 {
 	return true;
 }
@@ -1749,8 +1726,6 @@ void ASoldierCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	DOREPLIFETIME(ASoldierCharacter, bReloading);
 	DOREPLIFETIME(ASoldierCharacter, bZooming);
 	DOREPLIFETIME(ASoldierCharacter, bDied);
-	DOREPLIFETIME(ASoldierCharacter, bWeaponPickUp);
-	DOREPLIFETIME(ASoldierCharacter, bAttachmentPickUp);
 
 	DOREPLIFETIME(ASoldierCharacter, IsFiring);
 	DOREPLIFETIME(ASoldierCharacter, ClimbAnim);

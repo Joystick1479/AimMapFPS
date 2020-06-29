@@ -148,7 +148,11 @@ protected:
 	FRotator FinalWeaponRotation;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon sway")
-	float SmoothSway;
+	float SmoothSway1;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Weapon sway")
+	float SmoothSway2;
+
 	float DirectionSway;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon", meta = (ClampMin = 0.0f))

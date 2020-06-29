@@ -32,6 +32,7 @@ class UTimelineComponent;
 class ASniperRifle;
 class ABaseWeaponClass;
 class ABaseAttachmentClass;
+class ABaseSurvivalItemClass;
 
 
 namespace ECharacterState
@@ -260,11 +261,8 @@ protected:
 	void ZoomIn();
 	void ZoomOut();
 
-	void PickUp(ABaseWeaponClass* Weapons,ABaseAttachmentClass* Attachments);
-	UPROPERTY(Replicated)
-	bool bAttachmentPickUp;
-	UPROPERTY(Replicated)
-	bool bWeaponPickUp;
+	void PickUp(ABaseWeaponClass* Weapons,ABaseAttachmentClass* Attachments, ABaseSurvivalItemClass* SurvivalItem);
+	bool bWantToPickUp;
 
 	void WeaponInspectionOn();
 	void WeaponInspectionOff();
@@ -335,7 +333,7 @@ protected:
 	void ServerPutWeaponOnBack();
 
 	UFUNCTION(Server, Reliable, WithValidation)
-	void ServerPickUpItem(ABaseWeaponClass* Weapons, ABaseAttachmentClass* Attachments);
+	void ServerPickUpItem(ABaseWeaponClass* Weapons, ABaseAttachmentClass* Attachments, ABaseSurvivalItemClass* SurvivalItem);
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerReload();
@@ -427,49 +425,49 @@ protected:
 	float Distance;
 	FVector FacingAngle;
 	UPROPERTY(Replicated)
-		FVector STL;
+	FVector STL;
 	UPROPERTY(Replicated)
-		FRotator STR;
+	FRotator STR;
 	UPROPERTY(EditDefaultsOnly)
-		int32 AmountGrenades;
+	int32 AmountGrenades;
 	UPROPERTY(VisibleAnywhere)
-		UTimelineComponent* MyTimeline;
+	UTimelineComponent* MyTimeline;
 	UPROPERTY()
-		UCurveFloat* FloatCurve;
+	UCurveFloat* FloatCurve;
 
 	UPROPERTY()
-		TEnumAsByte<ETimelineDirection::Type> TimelineDirection;
+	TEnumAsByte<ETimelineDirection::Type> TimelineDirection;
 
 	FTimerHandle Timer_Flash;
 
 	UPROPERTY(Replicated)
-		AFlashGrenade* FlashGrenade;
+	AFlashGrenade* FlashGrenade;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Grenade")
-		TSubclassOf<AFlashGrenade> FlashGrenadeClass;
+	TSubclassOf<AFlashGrenade> FlashGrenadeClass;
 
 	///GRENADE REPLICATION///
 	UFUNCTION(Server, Reliable, WithValidation)
-		void ServerSpawnGrenade();
+	void ServerSpawnGrenade();
 
 	UFUNCTION(Server, Reliable)
-		void ServerFlashbang(FVector Facing);
+	void ServerFlashbang(FVector Facing);
 
 	UFUNCTION(Client, Reliable)
-		void MulticastFlashbang(FVector Facing);
+	void MulticastFlashbang(FVector Facing);
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Grenade")
-		class USceneComponent* GrenadeStartLocation;
+	class USceneComponent* GrenadeStartLocation;
 
 	UPROPERTY(BlueprintReadWrite, Replicated)
-		FString PlayerName;
+	FString PlayerName;
 
 	/// Variable for sprinting ///
 	float MaxWalkSpeed;
 
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated, Category = "Camera")
-		UCameraComponent* CameraComp;
+	UCameraComponent* CameraComp;
 
 	void TurnOnLaser();
 
@@ -486,124 +484,124 @@ protected:
 
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated, Category = "Sprint")
-		bool IsSprinting;
+	bool IsSprinting;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Zoom")
-		bool IsSingleFire;
+	bool IsSingleFire;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated, Category = "Zoom")
-		bool IsFiring;
+	bool IsFiring;
 	///Bool for crouching///
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated, Category = "Crouch")
-		bool IsCrouching;
+	bool IsCrouching;
 
 
 
 	UPROPERTY(EditDefaultsOnly, Category = "Player")
-		TSubclassOf<ASoldierCharacter> SoldierChar;
+	TSubclassOf<ASoldierCharacter> SoldierChar;
 
 	UPROPERTY(EditDefaultsOnly, Replicated, Category = "Player")
-		TSubclassOf<UUserWidget> wPickUp;
+	TSubclassOf<UUserWidget> wPickUp;
 
 	UPROPERTY(Replicated)
-		UUserWidget* wPickUpvar;
+	UUserWidget* wPickUpvar;
 
 
 	UPROPERTY(EditDefaultsOnly, Replicated, Category = "Player")
-		TSubclassOf<UUserWidget> wAmmoCount;
+	TSubclassOf<UUserWidget> wAmmoCount;
 
 	UPROPERTY(Replicated)
-		UUserWidget* wAmmoCountvar;
+	UUserWidget* wAmmoCountvar;
 
 	UPROPERTY(EditDefaultsOnly, Replicated, Category = "Player")
-		TSubclassOf<UUserWidget> wHealthIndicator;
+	TSubclassOf<UUserWidget> wHealthIndicator;
 
 	UPROPERTY(EditDefaultsOnly, Category = "widget")
-		TSubclassOf<UUserWidget> WidgetClass;
+	TSubclassOf<UUserWidget> WidgetClass;
 
 	UPROPERTY(Replicated)
-		UUserWidget* wHealthIndicatorvar;
+	UUserWidget* wHealthIndicatorvar;
 
 	UPROPERTY(EditDefaultsOnly, Category = "widget")
-		TSubclassOf<UUserWidget> PickUpTestWidgetClass;
+	TSubclassOf<UUserWidget> PickUpTestWidgetClass;
 
 	UPROPERTY(BlueprintReadOnly, Replicated, Category = "Player")
-		bool bRemoveHud;
+	bool bRemoveHud;
 
 	UPROPERTY(BlueprintReadOnly, Replicated, Category = "Player")
-		bool isWeaponAttached;
+	bool isWeaponAttached;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Player")
-		bool isLaserAttached;
+	bool isLaserAttached;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Player")
-		bool isHeadsetAttached;
+	bool isHeadsetAttached;
 
 
 	UPROPERTY(BlueprintReadOnly, Category = "Player")
-		bool isHoloAttached;
+	bool isHoloAttached;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Player")
-		bool isHelmetAttached;
+	bool isHelmetAttached;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Player")
-		bool isLaserON;
+	bool isLaserON;
 	UPROPERTY(BlueprintReadOnly, Category = "Player")
-		int32 SoldierCurrentAmmoInClip;
+	int32 SoldierCurrentAmmoInClip;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Player")
-		int32 SoldierCurrentAmmo;
+	int32 SoldierCurrentAmmo;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Player")
-		int32 SoldierCurrentClips;
+	int32 SoldierCurrentClips;
 
 
 	///SURVIVAL///
 	UPROPERTY(EditDefaultsOnly, Category = "Survival")
-		float FreQOfDrainingHealthWhenLowFood;
+	float FreQOfDrainingHealthWhenLowFood;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Survival")
-		float FreQOfDrainingHealthWhenLowDrink;
+	float FreQOfDrainingHealthWhenLowDrink;
 
 	UFUNCTION(Server, Reliable, WithValidation)
-		void ServerOnFoodLow();
+	void ServerOnFoodLow();
 
 
 	UFUNCTION(Server, Reliable, WithValidation)
-		void ServerOnDrinkLow();
+	void ServerOnDrinkLow();
 
 	FTimerHandle FoodLowTimer;
 	FTimerHandle DrinkLowTimer;
 	FTimerHandle DrinkFromPondTimer;
 
 	UPROPERTY(BlueprintReadOnly)
-		float amountOfDrinks;
+	float amountOfDrinks;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Survival items")
-		TSubclassOf<class ADrink> DrinkClass;
+	TSubclassOf<class ADrink> DrinkClass;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Survival items")
-		TSubclassOf<class AFood> FoodClass;
+	TSubclassOf<class AFood> FoodClass;
 
 
 
 	UPROPERTY(BlueprintReadOnly)
-		float amountOfFood;
+	float amountOfFood;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Survival items")
-		float amountOfBoostFood;
+	float amountOfBoostFood;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Survival items")
-		float amountOfBoostDrink;
+	float amountOfBoostDrink;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Survival items")
-		USoundCue* EatFoodSound;
+	USoundCue* EatFoodSound;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Survival items")
-		USoundCue* DrinkWaterSound;
+	USoundCue* DrinkWaterSound;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Survival items")
-		USoundCue* DrinkFromPondSound;
+	USoundCue* DrinkFromPondSound;
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -614,15 +612,13 @@ protected:
 
 	//Implementing Multithreading test
 	UFUNCTION(BlueprintCallable, Category = "Multithreading")
-		void CalculatePrimeNumbers();
+	void CalculatePrimeNumbers();
 
 	UFUNCTION(BlueprintCallable, Category = "Multithreading")
-		void CalculatePrimeNumbersAsync();
+	void CalculatePrimeNumbersAsync();
 
 	UPROPERTY(EditAnywhere, Category = MultiThreading)
-		int32 MaxPrime;
-
-	//ZROBIONE
+	int32 MaxPrime;
 
 	UPROPERTY(Replicated, BlueprintReadOnly, Category = "Player")
 	bool bDied;
