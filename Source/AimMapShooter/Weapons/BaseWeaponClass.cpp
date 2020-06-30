@@ -83,8 +83,19 @@ void ABaseWeaponClass::BeginPlay()
 
 	TimeBetweenShots = 60 / RateOfFire;
 
+
+	//Setting up weapon sway with a small delay
+	FTimerHandle TimerHandle_SwayTimer;
+	bStartWeaponSway = true;
+	FTimerDelegate DelegateFunc = FTimerDelegate::CreateUObject(this, &ABaseWeaponClass::SetbWeaponSway, bStartWeaponSway);
+	GetWorldTimerManager().SetTimer(TimerHandle_SwayTimer, DelegateFunc, 3.0f, false);
+
 }
 
+void ABaseWeaponClass::SetbWeaponSway(bool bSway)
+{
+	bStartWeaponSway = bSway;
+}
 USkeletalMeshComponent* ABaseWeaponClass::GetSkelMeshComp()
 {
 	return this->SkelMeshComp;
@@ -144,7 +155,10 @@ void ABaseWeaponClass::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	CalculateWeaponSway();
+	if (bStartWeaponSway)
+	{
+		CalculateWeaponSway();
+	}
 }
 
 void ABaseWeaponClass::CalculateWeaponSway()

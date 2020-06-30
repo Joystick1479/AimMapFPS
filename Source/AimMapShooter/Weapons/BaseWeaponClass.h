@@ -202,6 +202,7 @@ protected:
 	void StopReload();
 	virtual void CalculateWeaponSway();
 	void SetWeaponSway(float SwayDirection);
+	void SetbWeaponSway(bool bSway);
 	virtual void Tick(float DeltaTime) override;
 
 	//*Particle effects*//
@@ -262,6 +263,9 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, Replicated)
 	bool bFireAnimation;
+
+
+	bool bStartWeaponSway;
 
 	AHelmet* Helmet;
 

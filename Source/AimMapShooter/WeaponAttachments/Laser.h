@@ -8,6 +8,7 @@
 
 class UStaticMeshComponent;
 class UPointLightComponent;
+class ABaseWeaponClass;
 
 UCLASS()
 class AIMMAPSHOOTER_API ALaser : public ABaseAttachmentClass
@@ -34,10 +35,11 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	UStaticMeshComponent* MeshComp2;
 
+
 public:
 
 	UPointLightComponent* GetPointLightComponent();
 	UStaticMeshComponent* GetScalableMeshComponent();
 
-	void StartLaser();
+	void StartLaser(ABaseWeaponClass* WeaponClass);
 };

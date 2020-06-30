@@ -224,7 +224,7 @@ void ASoldierCharacter::LineTraceItem()
 
 	if (GetWorld()->LineTraceSingleByChannel(Hit, start_trace, end_trace, COLLISION_ITEMS, TraceParams))
 	{
-		DrawDebugLine(GetWorld(), start_trace, end_trace, FColor::Red, false, 1.0f, 0, 1.0f);
+		//DrawDebugLine(GetWorld(), start_trace, end_trace, FColor::Red, false, 1.0f, 0, 1.0f);
 
 		ABaseWeaponClass* WeaponClass = Cast<ABaseWeaponClass>(Hit.GetActor());
 		if (WeaponClass)
@@ -612,7 +612,10 @@ void ASoldierCharacter::TurnOnLaser()
 	{
 		Laser->GetScalableMeshComponent()->ToggleVisibility();
 		Laser->GetPointLightComponent()->ToggleVisibility();
-		Laser->StartLaser();
+		if (CurrentWeapon)
+		{
+			Laser->StartLaser(CurrentWeapon);
+		}
 	}
 }
 void ASoldierCharacter::PickUp(ABaseWeaponClass* Weapons, ABaseAttachmentClass* Attachments, ABaseSurvivalItemClass* SurvivalItem)
@@ -621,13 +624,12 @@ void ASoldierCharacter::PickUp(ABaseWeaponClass* Weapons, ABaseAttachmentClass* 
 		if (Role < ROLE_Authority)
 		{
 			ServerPickUpItem(Weapons,Attachments,SurvivalItem);
+			return;
 		}
 
 		AAutomaticRifle* AutoRifle = Cast<AAutomaticRifle>(Weapons);
 		if (AutoRifle)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Tutaj3"));
-
 			if (HoldingWeaponState == EHoldingWeapon::None)
 			{
 				HoldingWeaponState = EHoldingWeapon::A4;
@@ -643,7 +645,9 @@ void ASoldierCharacter::PickUp(ABaseWeaponClass* Weapons, ABaseAttachmentClass* 
 					AutomaticRifle->AttachToComponent(FPPMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocket);
 					AutomaticRifle->GetSkelMeshComp()->bOnlyOwnerSee = true;
 					AutomaticRifle->GetSkelMeshComp()->SetAnimInstanceClass(AnimBp);
-					AutomaticRifle->GetSphereComp()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+					Testuje = AutomaticRifle->GetSphereComp();
+					Testuje->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+					//AutomaticRifle->GetSphereComp()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 					CurrentWeapon = AutomaticRifle;
 					isWeaponAttached = true;
 					AutoRifle->Destroy();
@@ -655,6 +659,7 @@ void ASoldierCharacter::PickUp(ABaseWeaponClass* Weapons, ABaseAttachmentClass* 
 				{
 					Rifle_3rd->SetOwner(this);
 					Rifle_3rd->AttachToComponent(this->GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocket);
+					Rifle_3rd->GetSkelMeshComp()->bOwnerNoSee = true;
 				}
 			}
 			
@@ -1042,7 +1047,7 @@ void ASoldierCharacter::ZoomIn()
 			{
 				if (this == HideIt->GetOwner())
 				{
-					HideIt->SkelMeshComp->SetHiddenInGame(true, false);
+					HideIt->GetSkelMeshComp()->SetHiddenInGame(true, false);
 				}
 			}
 		}
@@ -1060,7 +1065,7 @@ void ASoldierCharacter::ZoomOut()
 			ARifle_3rd* HideIt = Cast<ARifle_3rd>(ThirdWeapon[i]);
 			if (HideIt)
 			{
-				HideIt->SkelMeshComp->SetHiddenInGame(false, false);
+				HideIt->GetSkelMeshComp()->SetHiddenInGame(false, false);
 			}
 		}
 	}
@@ -1276,7 +1281,7 @@ void ASoldierCharacter::Reload()
 			CharacterState = ECharacterState::Reloading;
 			bReloading = true;
 			CurrentWeapon->StartReload();
-			ServerReloadingSound();
+			//ServerReloadingSound();
 			GetWorldTimerManager().SetTimer(ReloadTimer, this, &ASoldierCharacter::StopReload, 2.167f, false);
 		}
 	}
@@ -1663,14 +1668,6 @@ bool ASoldierCharacter::ServerEndCrouch_Validate()
 {
 	return true;
 }
-void ASoldierCharacter::ServerShowingPickUpHud_Implementation()
-{
-	ShowingPickUpHud();
-}
-bool ASoldierCharacter::ServerShowingPickUpHud_Validate()
-{
-	return true;
-}
 void ASoldierCharacter::ServerTurnOnLaser_Implementation()
 {
 	TurnOnLaser();
@@ -1725,10 +1722,12 @@ void ASoldierCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	DOREPLIFETIME(ASoldierCharacter, AutomaticRifle);
 	DOREPLIFETIME(ASoldierCharacter, SniperRifle);
 	DOREPLIFETIME(ASoldierCharacter, CurrentWeapon);
+	DOREPLIFETIME(ASoldierCharacter, Testuje);
 
 	DOREPLIFETIME(ASoldierCharacter, bReloading);
 	DOREPLIFETIME(ASoldierCharacter, bZooming);
 	DOREPLIFETIME(ASoldierCharacter, bDied);
+	
 
 	DOREPLIFETIME(ASoldierCharacter, IsFiring);
 	DOREPLIFETIME(ASoldierCharacter, ClimbAnim);

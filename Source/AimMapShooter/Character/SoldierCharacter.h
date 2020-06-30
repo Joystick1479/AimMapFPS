@@ -266,6 +266,8 @@ protected:
 
 	void PickUp(ABaseWeaponClass* Weapons,ABaseAttachmentClass* Attachments, ABaseSurvivalItemClass* SurvivalItem);
 	bool bWantToPickUp;
+	UPROPERTY(replicated)
+	class USphereComponent* Testuje;
 
 	void WeaponInspectionOn();
 	void WeaponInspectionOff();
@@ -358,9 +360,6 @@ protected:
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerEndCrouch();
-
-	UFUNCTION(Server, Reliable, WithValidation)
-	void ServerShowingPickUpHud();
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerTurnOnLaser();

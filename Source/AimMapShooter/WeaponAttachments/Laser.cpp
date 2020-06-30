@@ -3,7 +3,8 @@
 
 #include "Components/StaticMeshComponent.h"
 
-#include "Weapons/AutomaticRifle.h"
+#include "Weapons/BaseWeaponClass.h"
+#include "Character/SoldierCharacter.h"
 
 #include "DrawDebugHelpers.h"
 
@@ -13,7 +14,7 @@
 ALaser::ALaser()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = false;
+	PrimaryActorTick.bCanEverTick = true;
 
 	MeshComp2 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComp2"));
 	MeshComp2->SetupAttachment(MeshComp);
@@ -30,32 +31,37 @@ ALaser::ALaser()
 	
 }
 
-void ALaser::StartLaser()
+void ALaser::StartLaser(ABaseWeaponClass* WeaponClass)
 {
-	AAutomaticRifle* Rifle = Cast<AAutomaticRifle>(GetOwner());
-	if (Rifle)
+	if (WeaponClass)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("LOL"));
-		FName Socket = Rifle->GetMuzzleSocketName();
+		
+		FName Socket = WeaponClass->GetMuzzleSocketName();
 		FHitResult Hit;
 		FVector StartSocketLocation = MeshComp->GetSocketLocation(LaserSocket);
-		FRotator Rotation = Rifle->GetSkelMeshComp()->GetSocketTransform(Socket).Rotator();
-		FVector ShotDirection = Rotation.Vector();
-		FVector EndSocketLocation = StartSocketLocation + (ShotDirection * 10000);
+		FRotator ActorEyes;
+		ASoldierCharacter* SoldierChar = Cast<ASoldierCharacter>(GetOwner());
+		if (SoldierChar)
+		{
+			SoldierChar->GetActorEyesViewPoint(StartSocketLocation, ActorEyes);
+		}
+
+		FVector EndLocation = StartSocketLocation + ActorEyes.Vector() * 10000;
+
 		FCollisionQueryParams QueryParams;
 		QueryParams.AddIgnoredActor(this);
 		QueryParams.bTraceComplex = false;
 
-		if (GetWorld()->LineTraceSingleByChannel(Hit, StartSocketLocation, EndSocketLocation, ECollisionChannel::ECC_Visibility, QueryParams))
-		{
 
-			DrawDebugLine(GetWorld(), StartSocketLocation, EndSocketLocation, FColor::White, false, 1.0f, 0, 10.0f);
+		if (GetWorld()->LineTraceSingleByChannel(Hit, StartSocketLocation, EndLocation, ECollisionChannel::ECC_Visibility, QueryParams))
+		{
+			DrawDebugLine(GetWorld(), StartSocketLocation, EndLocation, FColor::White, false, 1.0f, 0, 1.0f);
 			FVector StartLaserLocation = Hit.TraceStart;
 			FVector EndLaserLocation = Hit.Location;
 			FVector Laser = StartLaserLocation - EndLaserLocation;
 			float LaserLentgh = Laser.Size() / LengthOfLaser;
 			FVector Last = FVector(LaserLentgh, ThickOfLaser, ThickOfLaser);
-			MeshComp2->SetWorldScale3D(Last);
+			//MeshComp2->SetWorldScale3D(Last);
 
 
 			FVector LaserImpact = Hit.ImpactPoint;

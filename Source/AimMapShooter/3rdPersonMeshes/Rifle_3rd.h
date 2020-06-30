@@ -15,17 +15,16 @@ public:
 	// Sets default values for this actor's properties
 	ARifle_3rd();
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
-	class USkeletalMeshComponent* SkelMeshComp;
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 
-
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
+	class USkeletalMeshComponent* SkelMeshComp;
 public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+
+	USkeletalMeshComponent* GetSkelMeshComp();
 
 };
