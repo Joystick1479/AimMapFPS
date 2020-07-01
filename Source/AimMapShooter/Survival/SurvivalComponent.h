@@ -26,8 +26,6 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated, Category = "SurvivalComponent")
 	float DefaultDrink;
 
-
-
 	UPROPERTY(EditDefaultsOnly,Category = "Food")
 	float FreQOfDrainingFood;
 

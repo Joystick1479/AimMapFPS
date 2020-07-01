@@ -79,9 +79,6 @@ private:
 
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastSpawnEffects();
-	
-	UPROPERTY(Replicated)
-	bool Test;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Pawn")
 	TSubclassOf<ASoldierCharacter> SoldierChar;

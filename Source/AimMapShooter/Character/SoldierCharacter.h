@@ -119,6 +119,8 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	virtual void CalcCamera(float DeltaTime, struct FMinimalViewInfo& OutResult) override;
+
 	ECharacterState::Type CharacterState;
 
 	EHoldingWeapon::Type HoldingWeaponState;
@@ -148,13 +150,13 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated, Category = "Vault")
 	FVector NextWallHight;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated, Category = "Vault")
-	bool isAllowClimbing;
+	bool bIsAllowClimbing;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated, Category = "Vault")
-	bool isWallThick;
+	bool bIsWallThick;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated, Category = "Vault")
-	bool isAbleToVault;
+	bool bIsAbleToVault;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated, Category = "Vault")
-	bool isObjectTooHigh;
+	bool bIsObjectTooHigh;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated, Category = "Vault")
 	FTimerHandle TimerHandle_Vault;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated, Category = "Animation")
@@ -162,9 +164,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated, Category = "Animation")
 	UAnimMontage* VaultAnim;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated, Category = "Vaulting")
-	bool GoVault;
+	bool bGoVault;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated, Category = "Vaulting")
-	bool GoClimb;
+	bool bGoClimb;
 
 	UPROPERTY(EditDefaultsOnly, Replicated, Category = "Vaulting")
 	float MaxHeightForVault;
@@ -223,12 +225,12 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player")
 	float stamina;
 
-	bool ResetBreath;
+	bool bResetBreath;
 
 	bool bWeaponOnBack;
 
 	UPROPERTY(BlueprintReadOnly)
-	bool IsInspecting;
+	bool bIsInspecting;
 
 	UPROPERTY(EditDefaultsOnly, Category = "LineTrace")
 	float MaxUseDistance;
@@ -266,8 +268,6 @@ protected:
 
 	void PickUp(ABaseWeaponClass* Weapons,ABaseAttachmentClass* Attachments, ABaseSurvivalItemClass* SurvivalItem);
 	bool bWantToPickUp;
-	UPROPERTY(replicated)
-	class USphereComponent* Testuje;
 
 	void WeaponInspectionOn();
 	void WeaponInspectionOff();
@@ -423,7 +423,7 @@ protected:
 	UFUNCTION()
 	void TimelineFinishedCallback();
 	void PlayTimeline();
-	bool IsFacing;
+	bool bIsFacing;
 	float FlashAmount;
 	float Distance;
 	FVector FacingAngle;
@@ -487,16 +487,16 @@ protected:
 
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated, Category = "Sprint")
-	bool IsSprinting;
+	bool bIsSprinting;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Zoom")
-	bool IsSingleFire;
+	bool bIsSingleFire;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated, Category = "Zoom")
-	bool IsFiring;
+	bool bIsFiring;
 	///Bool for crouching///
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated, Category = "Crouch")
-	bool IsCrouching;
+	bool bIsCrouching;
 
 
 
@@ -532,23 +532,21 @@ protected:
 	bool bRemoveHud;
 
 	UPROPERTY(BlueprintReadOnly, Replicated, Category = "Player")
-	bool isWeaponAttached;
+	bool bIsWeaponAttached;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Player")
-	bool isLaserAttached;
+	bool bIsLaserAttached;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Player")
-	bool isHeadsetAttached;
+	bool bIsHeadsetAttached;
 
 
 	UPROPERTY(BlueprintReadOnly, Category = "Player")
-	bool isHoloAttached;
+	bool bIsHoloAttached;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Player")
-	bool isHelmetAttached;
+	bool bIsHelmetAttached;
 
-	UPROPERTY(BlueprintReadOnly, Category = "Player")
-	bool isLaserON;
 	UPROPERTY(BlueprintReadOnly, Category = "Player")
 	int32 SoldierCurrentAmmoInClip;
 

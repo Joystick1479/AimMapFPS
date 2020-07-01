@@ -167,7 +167,7 @@ void ABaseWeaponClass::CalculateWeaponSway()
 	ASoldierCharacter* SoldierCharOwner = Cast<ASoldierCharacter>(GetOwner());
 	if (SoldierCharOwner)
 	{
-		
+
 		InitialWeaponRotation = SoldierCharOwner->GetActorRotation();
 
 		if (!InitialWeaponRotation.Equals(FinalWeaponRotation))
@@ -197,9 +197,8 @@ void ABaseWeaponClass::CalculateWeaponSway()
 
 			SetActorRotation(UKismetMathLibrary::RInterpTo(CurrentRotation, TargetRotation, UGameplayStatics::GetWorldDeltaSeconds(GetWorld()), SmoothSway1));
 		}
+
 	}
-
-
 }
 
 void ABaseWeaponClass::SetWeaponSway(float SwayDirection)

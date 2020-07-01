@@ -192,7 +192,7 @@ void APayloadCharacter::NotifyActorEndOverlap(AActor * OtherActor)
 	ASoldierCharacter* SoldierCharacter = Cast<ASoldierCharacter>(OtherActor);
 	if (SoldierCharacter)
 	{
-		ShouldPush = false;
+		bShouldPush = false;
 	}
 }
 
@@ -209,11 +209,11 @@ void APayloadCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	//This function tells us how we want to replicate things//
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME(APayloadCharacter, ShouldPush);
+	DOREPLIFETIME(APayloadCharacter, bShouldPush);
 	DOREPLIFETIME(APayloadCharacter, ForceToPush);
 	DOREPLIFETIME(APayloadCharacter, Translation);
-	DOREPLIFETIME(APayloadCharacter, OnePlayerPushing);
-	DOREPLIFETIME(APayloadCharacter, ContestedPushing);
+	DOREPLIFETIME(APayloadCharacter, bOnePlayerPushing);
+	DOREPLIFETIME(APayloadCharacter, bContestedPushing);
 
 
 }

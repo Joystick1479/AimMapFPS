@@ -100,7 +100,7 @@ ASoldierCharacter::ASoldierCharacter()
 
 	ZoomingTime = 0.2f;
 
-	IsSingleFire = false;
+	bIsSingleFire = false;
 	bReloading = false;
 
 	CharacterState = ECharacterState::Idle;
@@ -119,8 +119,8 @@ ASoldierCharacter::ASoldierCharacter()
 
 	///// VAULTING /////
 	MaxHeightForVault = 60;
-	isAllowClimbing = false;
-	isAbleToVault = false;
+	bIsAllowClimbing = false;
+	bIsAbleToVault = false;
 
 
 	/////SURVIVAL/////
@@ -271,6 +271,7 @@ void ASoldierCharacter::Tick(float DeltaTime)
 	{
 		LineTraceItem();
 	}
+
 	
 }
 
@@ -356,7 +357,7 @@ void ASoldierCharacter::PutWeaponOnBack()
 			Rifle_3rd->AttachToComponent(this->GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponBackSocket);
 		}
 
-		isWeaponAttached = false;
+		bIsWeaponAttached = false;
 		bWeaponOnBack = true;
 	}
 	else if (HoldingWeaponState == EHoldingWeapon::A4 || HoldingWeaponState == EHoldingWeapon::Sniper && bWeaponOnBack == true)
@@ -371,7 +372,7 @@ void ASoldierCharacter::PutWeaponOnBack()
 			Rifle_3rd->AttachToComponent(this->GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocket);
 		}
 
-		isWeaponAttached = true;
+		bIsWeaponAttached = true;
 		bWeaponOnBack = false;
 	}
 }
@@ -449,7 +450,7 @@ void ASoldierCharacter::Vault()
 			WallLocation = Hit.ImpactPoint;
 			WallNormal = Hit.Normal;
 			//DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::Green, false, 1.0f, 0, 1.0f);
-			isAbleToVault = true;
+			bIsAbleToVault = true;
 
 			///// CHECKING IF OBJECT IS HIGH ENOUGH ////
 			FHitResult Hit2;
@@ -459,20 +460,20 @@ void ASoldierCharacter::Vault()
 			FVector StartLocation2 = AlmostStartLocation2 + FVector(0, 0, 200);
 			FVector EndLocation2 = StartLocation2 - FVector(0, 0, 200);
 
-			if (GetWorld()->LineTraceSingleByChannel(Hit2, StartLocation2, EndLocation2, COLLISION_TRACE, CollisionParams) && isAbleToVault == true)
+			if (GetWorld()->LineTraceSingleByChannel(Hit2, StartLocation2, EndLocation2, COLLISION_TRACE, CollisionParams) && bIsAbleToVault == true)
 			{
 			//	DrawDebugLine(GetWorld(), StartLocation2, EndLocation2, FColor::Blue, false, 1.0f, 0, 1.0f);
 				WallHight = Hit2.ImpactPoint;
 				float Test = (WallHight - WallLocation).Z;
 				if (Test < MaxHeightForVault)
 				{
-					isObjectTooHigh = false;
+					bIsObjectTooHigh = false;
 					UE_LOG(LogTemp, Warning, TEXT("Object is not to high:%f "), Test);
 
 				}
 				else
 				{
-					isObjectTooHigh = true;
+					bIsObjectTooHigh = true;
 					UE_LOG(LogTemp, Warning, TEXT("Object is to high. It is:%f "), Test);
 				}
 			}
@@ -480,7 +481,7 @@ void ASoldierCharacter::Vault()
 		}
 		else
 		{
-			isAbleToVault = false;
+			bIsAbleToVault = false;
 		}
 
 		/// GETTING THIRD LINE TRACE FOR THICKNESS TO DECIDE IF VAULT OR CLIMB ///
@@ -491,19 +492,19 @@ void ASoldierCharacter::Vault()
 		FVector AlmostStartLocation3 = (TempStartLocation3 * (-50)) + WallLocation;
 		FVector StartLocation3 = AlmostStartLocation3 + FVector(0, 0, 250);
 		FVector EndLocation3 = StartLocation3 - FVector(0, 0, 300);
-		if (GetWorld()->LineTraceSingleByChannel(Hit, StartLocation3, EndLocation3, COLLISION_TRACE, CollisionParams) && isAbleToVault == true)
+		if (GetWorld()->LineTraceSingleByChannel(Hit, StartLocation3, EndLocation3, COLLISION_TRACE, CollisionParams) && bIsAbleToVault == true)
 		{
 			//DrawDebugLine(GetWorld(), StartLocation3, EndLocation3, FColor::Yellow, false, 1.0f, 0, 1.0f);
 			NextWallHight = Hit3.ImpactPoint;
-			isAllowClimbing = true;
+			bIsAllowClimbing = true;
 		}
 		else
 		{
-			isAllowClimbing = false;
+			bIsAllowClimbing = false;
 		}
 
 		//// IF ALL THE TERMS ARE GOOD THEN GO VAULT OR CLIMB ////
-		if (isAllowClimbing == true && isAbleToVault == true && isObjectTooHigh == false)
+		if (bIsAllowClimbing == true && bIsAbleToVault == true && bIsObjectTooHigh == false)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Climb"));
 
@@ -529,15 +530,15 @@ void ASoldierCharacter::Vault()
 				PC->DisableInput(PC);
 			}
 
-			GoClimb = true;
-			GoVault = false;
+			bGoClimb = true;
+			bGoVault = false;
 			GetWorld()->GetTimerManager().SetTimer(TimerHandle_Vault, this, &ASoldierCharacter::ResetVaultTimer, 0.7f, false);
 		}
-		else if (isAbleToVault == true && isAllowClimbing == false && isObjectTooHigh == false)
+		else if (bIsAbleToVault == true && bIsAllowClimbing == false && bIsObjectTooHigh == false)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Vault"));
-			GoClimb = false;
-			GoVault = true;
+			bGoClimb = false;
+			bGoVault = true;
 
 			///***Turning off collision when getting on the obstacle***//
 			UCapsuleComponent* CharCapsuleComponent = this->FindComponentByClass<UCapsuleComponent>();
@@ -566,8 +567,8 @@ void ASoldierCharacter::Vault()
 		}
 		else
 		{
-			GoVault = false;
-			GoClimb = false;
+			bGoVault = false;
+			bGoClimb = false;
 		}
 }
 void ASoldierCharacter::ResetVaultTimer()
@@ -577,8 +578,8 @@ void ASoldierCharacter::ResetVaultTimer()
 		ServerResetTimerVault();
 	}
 
-	GoClimb = false;
-	GoVault = false;
+	bGoClimb = false;
+	bGoVault = false;
 
 	UE_LOG(LogTemp, Warning, TEXT("Resetting timer"));
 
@@ -645,11 +646,9 @@ void ASoldierCharacter::PickUp(ABaseWeaponClass* Weapons, ABaseAttachmentClass* 
 					AutomaticRifle->AttachToComponent(FPPMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocket);
 					AutomaticRifle->GetSkelMeshComp()->bOnlyOwnerSee = true;
 					AutomaticRifle->GetSkelMeshComp()->SetAnimInstanceClass(AnimBp);
-					Testuje = AutomaticRifle->GetSphereComp();
-					Testuje->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-					//AutomaticRifle->GetSphereComp()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+					AutomaticRifle->GetSphereComp()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 					CurrentWeapon = AutomaticRifle;
-					isWeaponAttached = true;
+					bIsWeaponAttached = true;
 					AutoRifle->Destroy();
 
 				}
@@ -684,7 +683,7 @@ void ASoldierCharacter::PickUp(ABaseWeaponClass* Weapons, ABaseAttachmentClass* 
 						SniperRifle->GetSkelMeshComp()->SetAnimInstanceClass(AnimBp);
 						SniperRifle->GetSphereComp()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 						CurrentWeapon = SniperRifle;
-						isWeaponAttached = true;
+						bIsWeaponAttached = true;
 						SniperWeapon->Destroy();
 
 					}
@@ -719,7 +718,7 @@ void ASoldierCharacter::PickUp(ABaseWeaponClass* Weapons, ABaseAttachmentClass* 
 							HoloScope->AttachToComponent(CurrentWeapon->GetSkelMeshComp(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, Socket);
 						}
 						HoloScope->GetSphereComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-						isHoloAttached = true;
+						bIsHoloAttached = true;
 						HoloAttachment->Destroy();
 					}
 				}
@@ -778,7 +777,7 @@ void ASoldierCharacter::PickUp(ABaseWeaponClass* Weapons, ABaseAttachmentClass* 
 					}
 					Laser->GetSphereComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
-					isLaserAttached = true;
+					bIsLaserAttached = true;
 					LaserAttachment->Destroy();
 				}
 				UGameplayStatics::PlaySoundAtLocation(this, ItemsPickUp, GetActorLocation());
@@ -801,7 +800,7 @@ void ASoldierCharacter::PickUp(ABaseWeaponClass* Weapons, ABaseAttachmentClass* 
 					Helmet->GetMeshComponent()->SetRenderCustomDepth(false);
 					Helmet->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, HelmetSocket);
 					Helmet->GetSphereComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-					isHelmetAttached = true;
+					bIsHelmetAttached = true;
 					HelmetAttachment->Destroy();
 				}
 				UGameplayStatics::PlaySoundAtLocation(this, ItemsPickUp, GetActorLocation());
@@ -826,7 +825,7 @@ void ASoldierCharacter::PickUp(ABaseWeaponClass* Weapons, ABaseAttachmentClass* 
 					Headset->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, HeadsetSocket);
 					Headset->GetMeshComponent()->ToggleActive();
 					Headset->GetSphereComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-					isHeadsetAttached = true;
+					bIsHeadsetAttached = true;
 					HeadsetAttachment->Destroy();
 				}
 				UGameplayStatics::PlaySoundAtLocation(this, ItemsPickUp, GetActorLocation());
@@ -963,7 +962,7 @@ void ASoldierCharacter::MoveRight(float Value)
 {
 	if (bDied != true)
 	{
-		if (!IsSprinting)
+		if (!bIsSprinting)
 		{
 			AddMovementInput(GetActorRightVector() * Value);
 		}
@@ -994,7 +993,7 @@ void ASoldierCharacter::BeginCrouch()
 	//{
 	//	if (MoveComp->GetLastUpdateVelocity().Size() < 10)
 	//	{
-			IsCrouching = true;
+			bIsCrouching = true;
 			Crouch();
 	//	}
 //	}
@@ -1006,24 +1005,60 @@ void ASoldierCharacter::EndCrouch()
 	{
 		ServerEndCrouch();
 	}
-	IsCrouching = false;
+	bIsCrouching = false;
 	UnCrouch();
 
+}
+void ASoldierCharacter::CalcCamera(float DeltaTime, struct FMinimalViewInfo& OutResult)
+{
+	UCameraComponent* FirstPersonCamera = FindComponentByClass<UCameraComponent>();
+	if (FirstPersonCamera && FirstPersonCamera->IsActive())
+	{
+		FirstPersonCamera->GetCameraView(DeltaTime, OutResult);
+		if (bZooming)
+		{
+			// Get the camera location
+			FVector CameraLocation = FirstPersonCamera->GetComponentLocation();
+
+			// Get the weapon sight transform
+			FTransform SightTransform = CurrentWeapon->GetSkelMeshComp()->GetSocketTransform(FName(TEXT("LineSocket")));
+			FVector SightLocation = SightTransform.GetLocation();
+			FRotator SightRotation = SightTransform.GetRotation().Rotator();
+
+			// Get the sight location
+			FVector SightDirection = FRotationMatrix(SightRotation).GetScaledAxis(EAxis::X);
+			FVector DirectionToSight = SightLocation - CameraLocation;
+			float DirectionToSightDot = FVector::DotProduct(DirectionToSight.GetSafeNormal(), SightDirection);
+			float DirectionToSightLen = 58.f;
+		//	float DirectionToSightLen = DirectionToSight.Size();
+			float DirectionToSightDotLen = DirectionToSightDot * DirectionToSightLen;
+			FVector SightDirectionDotLen = SightDirection * DirectionToSightDotLen;
+			FVector SightTargetLocation = SightLocation - SightDirectionDotLen;
+
+			float AimAlpha = bZooming ? 1.0f : 0.0f;
+			OutResult.Location = CameraLocation + AimAlpha * (SightTargetLocation - CameraLocation);
+			
+			
+		}
+	}
+	else
+	{
+		GetActorEyesViewPoint(OutResult.Location, OutResult.Rotation);
+	}
 }
 void ASoldierCharacter::ZoomIn()
 {
 	///Hide 3rd person mesh
 	UCharacterMovementComponent* MoveComp = this->FindComponentByClass<UCharacterMovementComponent>();
-	if (MoveComp && !IsSprinting && !IsInspecting && !bReloading &&bWeaponOnBack != true)
+	if (MoveComp && !bIsSprinting && !bIsInspecting && !bReloading &&bWeaponOnBack != true)
 	{
 		MoveComp->MaxWalkSpeed = 250.0f;
-		if (!IsSprinting)
+		if (!bIsSprinting)
 		{
 			bZooming = true;
 
-			if (IsLocallyControlled())
+			/*if (IsLocallyControlled())
 			{
-
 				APlayerController* PC = Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
 				if (PC)
 				{
@@ -1032,11 +1067,11 @@ void ASoldierCharacter::ZoomIn()
 						PC->SetViewTargetWithBlend(CurrentWeapon, ZoomingTime, EViewTargetBlendFunction::VTBlend_Linear);
 					}
 				}
-			}
+			}*/
 		}
 	}
 
-	if (IsLocallyControlled())
+	/*if (IsLocallyControlled())
 	{
 		TArray<AActor*> ThirdWeapon;
 		UGameplayStatics::GetAllActorsOfClass(this, ThirdWeaponClass, ThirdWeapon);
@@ -1051,7 +1086,7 @@ void ASoldierCharacter::ZoomIn()
 				}
 			}
 		}
-	}
+	}*/
 }
 void ASoldierCharacter::ZoomOut()
 {
@@ -1093,13 +1128,13 @@ void ASoldierCharacter::ZoomOut()
 }
 void ASoldierCharacter::StartFire()
 {
-	if (!IsSprinting && bWeaponOnBack == false && bDied != true)
+	if (!bIsSprinting && bWeaponOnBack == false && bDied != true)
 	{
 		CharacterState = ECharacterState::Firing;
 
-		IsFiring = true;
+		bIsFiring = true;
 
-		if (IsSingleFire == false)
+		if (bIsSingleFire == false)
 		{
 			if (CurrentWeapon)
 			{
@@ -1126,7 +1161,7 @@ void ASoldierCharacter::StartFire()
 void ASoldierCharacter::StopFire()
 {
 	CharacterState = ECharacterState::Idle;
-	IsFiring = false;
+	bIsFiring = false;
 
 	bFireAnimation = false;
 
@@ -1150,12 +1185,12 @@ void ASoldierCharacter::SprintOn()
 			MoveComp->MaxWalkSpeed = 300.0f;
 		}
 	}
-	else if (stamina > 10 && IsSprinting == false)
+	else if (stamina > 10 && bIsSprinting == false)
 	{
 		if (bZooming != true && GetVelocity().Size()>0)
 		{
 			SprintProgressBar();
-			IsSprinting = true;
+			bIsSprinting = true;
 			UCharacterMovementComponent* MoveComp = this->FindComponentByClass<UCharacterMovementComponent>();
 			if (MoveComp)
 			{
@@ -1175,7 +1210,7 @@ void ASoldierCharacter::SprintOff()
 
 	SprintProgressBar();
 
-	IsSprinting = false;
+	bIsSprinting = false;
 	UCharacterMovementComponent* MoveComp = this->FindComponentByClass<UCharacterMovementComponent>();
 	if (MoveComp)
 	{
@@ -1185,14 +1220,14 @@ void ASoldierCharacter::SprintOff()
 }
 void ASoldierCharacter::SprintProgressBar()
 {
-	if (IsSprinting == true)
+	if (bIsSprinting == true)
 	{
 		GetWorldTimerManager().SetTimer(SprintTimerHandle, this, &ASoldierCharacter::SprintProgressBar, 0.2f, false);
 		stamina--;
-		if (stamina == 0) IsSprinting = false;
+		if (stamina == 0) bIsSprinting = false;
 		//UE_LOG(LogTemp, Warning, TEXT("Sprinting now, bar is: %f"), stamina);
 	}
-	if (IsSprinting == false)
+	if (bIsSprinting == false)
 	{
 		//UE_LOG(LogTemp, Warning, TEXT("Resting spring now, bar is: %f"), stamina);
 
@@ -1214,7 +1249,7 @@ void ASoldierCharacter::SprintSlowDown()
 	////SLOW DOWN WHEN OUT OF STAMINA
 	if (stamina == 1)
 	{
-		IsSprinting = false;
+		bIsSprinting = false;
 		UCharacterMovementComponent* MoveComp = this->FindComponentByClass<UCharacterMovementComponent>();
 		if (MoveComp)
 		{
@@ -1229,11 +1264,11 @@ void ASoldierCharacter::OutOfBreathSound()
 	
 	if (IsLocallyControlled())
 	{
-		if (stamina < 10 && ResetBreath == false)
+		if (stamina < 10 && bResetBreath == false)
 		{
 			UGameplayStatics::PlaySound2D(this, OutOfBreath);
 			GetWorldTimerManager().SetTimer(OutOfBreathTimer, this, &ASoldierCharacter::OutOfBreathReset, 9.0f, false);
-			ResetBreath = true;
+			bResetBreath = true;
 		}
 	}
 
@@ -1241,11 +1276,11 @@ void ASoldierCharacter::OutOfBreathSound()
 }
 void ASoldierCharacter::OutOfBreathReset()
 {
-	ResetBreath = false;
+	bResetBreath = false;
 }
 void ASoldierCharacter::Headbobbing()
 {
-	if (IsSprinting == true)
+	if (bIsSprinting == true)
 	{
 		APlayerController* PC = Cast<APlayerController>(GetController());
 		if (PC)
@@ -1255,7 +1290,7 @@ void ASoldierCharacter::Headbobbing()
 	}
 	if (GetVelocity().Size() > 0)
 	{
-		if (IsSprinting == false)
+		if (bIsSprinting == false)
 		{
 			APlayerController* PC = Cast<APlayerController>(GetController());
 			if (PC)
@@ -1300,13 +1335,13 @@ void ASoldierCharacter::FireMode()
 	//* NO SWITCHING FIRE MODES WHEN FIRING *//
 	if (CharacterState != ECharacterState::Firing)
 	{
-		if (IsSingleFire == false)
+		if (bIsSingleFire == false)
 		{
-			IsSingleFire = true;
+			bIsSingleFire = true;
 		}
 		else
 		{
-			IsSingleFire = false;
+			bIsSingleFire = false;
 		}
 	}
 	
@@ -1325,15 +1360,15 @@ void ASoldierCharacter::UpdateRifleStatus()
 }
 void ASoldierCharacter::WeaponInspectionOn()
 {
-	if (IsInspecting != true)
+	if (bIsInspecting != true)
 	{
-		IsInspecting = true;
+		bIsInspecting = true;
 		GetWorld()->GetTimerManager().SetTimer(InspectionTimer, this, &ASoldierCharacter::WeaponInspectionOff, 3.704f);
 	}
 }
 void ASoldierCharacter::WeaponInspectionOff()
 {
-	IsInspecting = false;
+	bIsInspecting = false;
 }
 void ASoldierCharacter::FindingGrenadeTransform()
 {
@@ -1387,7 +1422,7 @@ void ASoldierCharacter::Flashbang(float ThrowDistance, FVector PlayerFacingAngle
 		if (Distance < 2000.0f)
 		{
 			AngleFromFlash(FacingAngle);
-			if (IsFacing == true)
+			if (bIsFacing == true)
 			{
 				FlashAmount = 0.5f;
 			}
@@ -1426,7 +1461,7 @@ void ASoldierCharacter::AngleFromFlash(FVector GrenadeLoc)
 			float CameraRotation = CameraComp->GetComponentRotation().Yaw;
 			float DiffRotation = LookAtRotaion - CameraRotation;
 	
-			IsFacing = UKismetMathLibrary::BooleanOR(DiffRotation >= 90.0f, DiffRotation <= -90.0f);
+			bIsFacing = UKismetMathLibrary::BooleanOR(DiffRotation >= 90.0f, DiffRotation <= -90.0f);
 		}
 	}
 }
@@ -1706,7 +1741,7 @@ void ASoldierCharacter::MulticastFlashbang_Implementation(FVector Facing)
 	if (Distance < 2000.0f)
 	{
 		AngleFromFlash(Facing);
-		if (IsFacing == true)
+		if (bIsFacing == true)
 		{
 			FlashAmount = 0.5f;
 		}
@@ -1722,25 +1757,24 @@ void ASoldierCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	DOREPLIFETIME(ASoldierCharacter, AutomaticRifle);
 	DOREPLIFETIME(ASoldierCharacter, SniperRifle);
 	DOREPLIFETIME(ASoldierCharacter, CurrentWeapon);
-	DOREPLIFETIME(ASoldierCharacter, Testuje);
 
 	DOREPLIFETIME(ASoldierCharacter, bReloading);
 	DOREPLIFETIME(ASoldierCharacter, bZooming);
 	DOREPLIFETIME(ASoldierCharacter, bDied);
 	
 
-	DOREPLIFETIME(ASoldierCharacter, IsFiring);
+	DOREPLIFETIME(ASoldierCharacter, bIsFiring);
 	DOREPLIFETIME(ASoldierCharacter, ClimbAnim);
 	DOREPLIFETIME(ASoldierCharacter, VaultAnim);
-	DOREPLIFETIME(ASoldierCharacter, isAllowClimbing);
-	DOREPLIFETIME(ASoldierCharacter, isWallThick);
-	DOREPLIFETIME(ASoldierCharacter, isAbleToVault);
-	DOREPLIFETIME(ASoldierCharacter, isObjectTooHigh);
-	DOREPLIFETIME(ASoldierCharacter, GoClimb);
-	DOREPLIFETIME(ASoldierCharacter, GoVault);
+	DOREPLIFETIME(ASoldierCharacter, bIsAllowClimbing);
+	DOREPLIFETIME(ASoldierCharacter, bIsWallThick);
+	DOREPLIFETIME(ASoldierCharacter, bIsAbleToVault);
+	DOREPLIFETIME(ASoldierCharacter, bIsObjectTooHigh);
+	DOREPLIFETIME(ASoldierCharacter, bGoClimb);
+	DOREPLIFETIME(ASoldierCharacter, bGoVault);
 	DOREPLIFETIME(ASoldierCharacter, MaxHeightForVault);
 	DOREPLIFETIME(ASoldierCharacter, TimerHandle_Vault);
-	DOREPLIFETIME(ASoldierCharacter, IsCrouching);
+	DOREPLIFETIME(ASoldierCharacter, bIsCrouching);
 	DOREPLIFETIME(ASoldierCharacter, wHealthIndicator);
 	DOREPLIFETIME(ASoldierCharacter, wHealthIndicatorvar);
 	DOREPLIFETIME(ASoldierCharacter, wAmmoCount);
@@ -1749,7 +1783,7 @@ void ASoldierCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	DOREPLIFETIME(ASoldierCharacter, CameraComp);
 	DOREPLIFETIME(ASoldierCharacter, STL);
 	DOREPLIFETIME(ASoldierCharacter, STR);
-	DOREPLIFETIME(ASoldierCharacter, isWeaponAttached);
+	DOREPLIFETIME(ASoldierCharacter, bIsWeaponAttached);
 	DOREPLIFETIME(ASoldierCharacter, bWantsToRepawn);
 
 

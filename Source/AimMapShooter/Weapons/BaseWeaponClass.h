@@ -97,13 +97,13 @@ public:
 	int32 GetCurrentAmmoInClip();
 	int32 GetAllAmmo();
 	int32 GetCurrentAmountOfClips();
-	void AddMagazine();
-	void Fire();
+	virtual void AddMagazine();
+	virtual void Fire();
 
 	UFUNCTION(BlueprintCallable)
-	void StartReload();
-	void StartFire();
-	void StopFire();
+	virtual void StartReload();
+	virtual void StartFire();
+	virtual void StopFire();
 
 	EWeaponState::Type CurrentState;
 
@@ -183,33 +183,28 @@ protected:
 
 	EReloadingState::Type ReloadingState;
 
-
 	FTimerHandle TimerHandle_TimeBetweenShots;
 	FTimerHandle TimerHandle_StopReload;
 	FTimerHandle TimerHandle_ReloadWeapon;
 
-	float LastFireTime;
-	float LastReloadTime;
-
 	//* Bullets per minute fired*//
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
 	float RateOfFire;
+	float LastFireTime;
+	float LastReloadTime;
 
 	virtual void BeginPlay() override;
-
-	void UseAmmo();
-	void ReloadWeapon();
-	void StopReload();
+	virtual void UseAmmo();
+	virtual void ReloadWeapon();
+	virtual void StopReload();
 	virtual void CalculateWeaponSway();
-	void SetWeaponSway(float SwayDirection);
-	void SetbWeaponSway(bool bSway);
+	virtual void SetWeaponSway(float SwayDirection);
+	virtual void SetbWeaponSway(bool bSway);
 	virtual void Tick(float DeltaTime) override;
 
 	//*Particle effects*//
-
-	void PlayImpactEffects(FVector ImpactPoint);
-
-	void PlayFireEffects(FVector EndLocation);
+	virtual void PlayImpactEffects(FVector ImpactPoint);
+	virtual void PlayFireEffects(FVector EndLocation);
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Effects")
 	UParticleSystem* ImpactEffect;
@@ -263,7 +258,6 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, Replicated)
 	bool bFireAnimation;
-
 
 	bool bStartWeaponSway;
 

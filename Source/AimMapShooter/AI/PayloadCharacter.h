@@ -37,10 +37,8 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "EndTarget")
 	TSubclassOf<ASoldierCharacter> SoldierCharacterClass;
 
-	void NotifyActorBeginOverlap(AActor* OtherActor);
-	void NotifyActorEndOverlap(AActor* OtherActor);
-
-	//TArray<ABlueEndgame*> BlueEndGames;
+	virtual void NotifyActorBeginOverlap(AActor* OtherActor) override;
+	virtual void NotifyActorEndOverlap(AActor* OtherActor) override;
 
 	FTimerHandle BlueTimerHandle;
 	FTimerHandle RedTimerHandle;
@@ -53,7 +51,7 @@ protected:
 
 	float Acceleration;
 
-	void PayloadMove(float DeltaTime);
+	virtual void PayloadMove(float DeltaTime);
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerPayloadMove(float DeltaTime);
@@ -61,24 +59,23 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "Sounds")
 	class UAudioComponent* AudioComp;
 
-public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	// Called to bind functionality to input
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
 	UPROPERTY(BlueprintReadWrite, Replicated)
-	bool ShouldPush;
-	
-	UPROPERTY(BlueprintReadOnly, Replicated)
-	bool OnePlayerPushing;
+	bool bShouldPush;
 
 	UPROPERTY(BlueprintReadOnly, Replicated)
-	bool ContestedPushing;
+	bool bOnePlayerPushing;
+
+	UPROPERTY(BlueprintReadOnly, Replicated)
+	bool bContestedPushing;
 
 	UPROPERTY(BlueprintReadWrite, Replicated)
 	FVector Translation;
 
-
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 };
