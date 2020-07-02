@@ -97,8 +97,9 @@ ASoldierCharacter::ASoldierCharacter()
 	check(Curve.Succeeded());
 	FloatCurve = Curve.Object;
 
-
+	FieldOfView = 75.f;
 	ZoomingTime = 0.2f;
+	ZoomInterpSpeed = 7.5f;
 
 	bIsSingleFire = false;
 	bReloading = false;
@@ -706,6 +707,7 @@ void ASoldierCharacter::PickUp(ABaseWeaponClass* Weapons, ABaseAttachmentClass* 
 				SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 				if (Role == ROLE_Authority)
 				{
+					//HoloScope = GetWorld()->SpawnActor<AHoloScope>(HoloClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
 					HoloScope = GetWorld()->SpawnActor<AHoloScope>(HoloClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
 					if (HoloScope)
 					{
@@ -1015,30 +1017,60 @@ void ASoldierCharacter::CalcCamera(float DeltaTime, struct FMinimalViewInfo& Out
 	if (FirstPersonCamera && FirstPersonCamera->IsActive())
 	{
 		FirstPersonCamera->GetCameraView(DeltaTime, OutResult);
+
+		// Get the camera location
+		FVector CameraLocation = FirstPersonCamera->GetComponentLocation();
+
+		// Get the weapon sight transform
+		FTransform SightTransform;
+		if (HoloScope)
+		{
+			SightTransform = HoloScope->GetMeshComponent()->GetSocketTransform(FName(TEXT("LineSocket")));
+		}
+		else if(CurrentWeapon)
+		{
+			SightTransform = CurrentWeapon->GetSkelMeshComp()->GetSocketTransform(FName(TEXT("LineSocket")));
+		}
+		FVector SightLocation = SightTransform.GetLocation();
+		FRotator SightRotation = SightTransform.GetRotation().Rotator();
+
+		// Get the sight location
+		FVector SightDirection = FRotationMatrix(SightRotation).GetScaledAxis(EAxis::X);
+		FVector DirectionToSight = SightLocation - CameraLocation;
+		float DirectionToSightDot = FVector::DotProduct(DirectionToSight.GetSafeNormal(), SightDirection);
+		float DirectionToSightLen = 58.f;
+		//float DirectionToSightLen = DirectionToSight.Size();
+		float DirectionToSightDotLen = DirectionToSightDot * DirectionToSightLen;
+		DirectionToSightDotLen = UKismetMathLibrary::Clamp(DirectionToSightDotLen, 56.f, 56.f);
+		FVector SightDirectionDotLen = SightDirection * DirectionToSightDotLen;
+		//UE_LOG(LogTemp, Warning, TEXT("%f"), DirectionToSightDotLen);
+		FVector SightTargetLocation = SightLocation - SightDirectionDotLen;
+
+		//AimAlpha = bZooming ? 1.0f : 0.0f;
+		
 		if (bZooming)
 		{
-			// Get the camera location
-			FVector CameraLocation = FirstPersonCamera->GetComponentLocation();
+			AimAlpha = UKismetMathLibrary::FInterpTo(AimAlpha, 1.0f, UGameplayStatics::GetWorldDeltaSeconds(GetWorld()), ZoomInterpSpeed);
 
-			// Get the weapon sight transform
-			FTransform SightTransform = CurrentWeapon->GetSkelMeshComp()->GetSocketTransform(FName(TEXT("LineSocket")));
-			FVector SightLocation = SightTransform.GetLocation();
-			FRotator SightRotation = SightTransform.GetRotation().Rotator();
+			FieldOfView = UKismetMathLibrary::FInterpTo(FieldOfView, 45.0f, UGameplayStatics::GetWorldDeltaSeconds(GetWorld()), ZoomInterpSpeed);
 
-			// Get the sight location
-			FVector SightDirection = FRotationMatrix(SightRotation).GetScaledAxis(EAxis::X);
-			FVector DirectionToSight = SightLocation - CameraLocation;
-			float DirectionToSightDot = FVector::DotProduct(DirectionToSight.GetSafeNormal(), SightDirection);
-			float DirectionToSightLen = 58.f;
-		//	float DirectionToSightLen = DirectionToSight.Size();
-			float DirectionToSightDotLen = DirectionToSightDot * DirectionToSightLen;
-			FVector SightDirectionDotLen = SightDirection * DirectionToSightDotLen;
-			FVector SightTargetLocation = SightLocation - SightDirectionDotLen;
+			FirstPersonCamera->SetFieldOfView(FieldOfView);
 
-			float AimAlpha = bZooming ? 1.0f : 0.0f;
+			//UE_LOG(LogTemp, Warning, TEXT("%f"), FieldOfView);
+
 			OutResult.Location = CameraLocation + AimAlpha * (SightTargetLocation - CameraLocation);
-			
-			
+		}
+		else
+		{
+			AimAlpha = UKismetMathLibrary::FInterpTo(AimAlpha, 0.0f, UGameplayStatics::GetWorldDeltaSeconds(GetWorld()), ZoomInterpSpeed);
+
+			FieldOfView = UKismetMathLibrary::FInterpTo(FieldOfView, 75.0f, UGameplayStatics::GetWorldDeltaSeconds(GetWorld()), ZoomInterpSpeed);
+
+			FirstPersonCamera->SetFieldOfView(FieldOfView);
+
+			//UE_LOG(LogTemp, Warning, TEXT("%f"), FieldOfView);
+
+			OutResult.Location = CameraLocation + AimAlpha * (SightTargetLocation - CameraLocation);
 		}
 	}
 	else
@@ -1091,7 +1123,7 @@ void ASoldierCharacter::ZoomIn()
 void ASoldierCharacter::ZoomOut()
 {
 	///Make 3rd rifle visible
-	if (IsLocallyControlled())
+	/*if (IsLocallyControlled())
 	{
 		TArray<AActor*> ThirdWeapon;
 		UGameplayStatics::GetAllActorsOfClass(this, ThirdWeaponClass, ThirdWeapon);
@@ -1109,11 +1141,11 @@ void ASoldierCharacter::ZoomOut()
 	if (MoveComp)
 	{
 		MoveComp->MaxWalkSpeed = 300.0f;
-	}
+	}*/
 
 	bZooming = false;
 
-	if (IsLocallyControlled())
+	/*if (IsLocallyControlled())
 	{
 
 		APlayerController* PC = Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
@@ -1124,7 +1156,7 @@ void ASoldierCharacter::ZoomOut()
 				PC->SetViewTargetWithBlend(this, ZoomingTime, EViewTargetBlendFunction::VTBlend_Linear);
 			}
 		}
-	}
+	}*/
 }
 void ASoldierCharacter::StartFire()
 {
@@ -1187,7 +1219,7 @@ void ASoldierCharacter::SprintOn()
 	}
 	else if (stamina > 10 && bIsSprinting == false)
 	{
-		if (bZooming != true && GetVelocity().Size()>0)
+		if (GetVelocity().Size()>0)
 		{
 			SprintProgressBar();
 			bIsSprinting = true;
@@ -1309,7 +1341,7 @@ void ASoldierCharacter::Reload()
 	{
 		ServerReload();
 	}
-	if (CharacterState == ECharacterState::Idle && (SoldierCurrentClips > 0) && !bZooming && bDied != true)
+	if (CharacterState == ECharacterState::Idle && (SoldierCurrentClips > 0) && bDied != true)
 	{
 		if (CurrentWeapon)
 		{
@@ -1435,6 +1467,8 @@ void ASoldierCharacter::TimelineCallback(float interpolatedVal)
 {
 	float LerpFloat = UKismetMathLibrary::Lerp(FlashAmount, 1.0f, interpolatedVal);
 	UKismetMaterialLibrary::SetScalarParameterValue(this, MaterialCollection, "Flash_Value", LerpFloat);
+
+	
 
 }
 void ASoldierCharacter::TimelineFinishedCallback()

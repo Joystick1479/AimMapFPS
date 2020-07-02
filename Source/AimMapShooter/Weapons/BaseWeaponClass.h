@@ -261,6 +261,8 @@ protected:
 
 	bool bStartWeaponSway;
 
+	FRotator WeaponInitialRotation;
+
 	AHelmet* Helmet;
 
 	

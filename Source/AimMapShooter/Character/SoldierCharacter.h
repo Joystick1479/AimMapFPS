@@ -627,6 +627,12 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated, Category = "Zoom")
 	bool bZooming;
 
+	float AimAlpha;
+	UPROPERTY(EditDefaultsOnly, Category = "Zoom")
+	float ZoomInterpSpeed;
+	float FieldOfView;
+
+
 	UPROPERTY(BlueprintReadOnly, Category = "Player")
 	bool bGripAttached;
 

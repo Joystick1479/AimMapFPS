@@ -90,6 +90,8 @@ void ABaseWeaponClass::BeginPlay()
 	FTimerDelegate DelegateFunc = FTimerDelegate::CreateUObject(this, &ABaseWeaponClass::SetbWeaponSway, bStartWeaponSway);
 	GetWorldTimerManager().SetTimer(TimerHandle_SwayTimer, DelegateFunc, 3.0f, false);
 
+	
+
 }
 
 void ABaseWeaponClass::SetbWeaponSway(bool bSway)
@@ -157,7 +159,7 @@ void ABaseWeaponClass::Tick(float DeltaTime)
 
 	if (bStartWeaponSway)
 	{
-		CalculateWeaponSway();
+		//CalculateWeaponSway();
 	}
 }
 
@@ -195,6 +197,11 @@ void ABaseWeaponClass::CalculateWeaponSway()
 			FRotator CurrentRotation = GetActorRotation();
 			FRotator TargetRotation = FRotator(0.0f, CurrentRotation.Yaw, CurrentRotation.Roll);
 
+			UE_LOG(LogTemp,Warning,TEXT("Rotation relative is : %s"), *this->GetActorTransform().GetRotation().ToString());
+			UE_LOG(LogTemp, Warning, TEXT("Rotation is : %s"), *this->GetActorRotation().ToString());
+
+			this->GetActorTransform().GetLocation();
+
 			SetActorRotation(UKismetMathLibrary::RInterpTo(CurrentRotation, TargetRotation, UGameplayStatics::GetWorldDeltaSeconds(GetWorld()), SmoothSway1));
 		}
 
@@ -205,14 +212,13 @@ void ABaseWeaponClass::SetWeaponSway(float SwayDirection)
 {
 	FRotator CurrentRotation = GetActorRotation();
 
-	FRotator FinalRotation = FRotator(GetActorRotation().Pitch + SwayDirection, GetActorRotation().Yaw , GetActorRotation().Roll);
+	FRotator FinalRotation = FRotator(GetActorRotation().Pitch + SwayDirection, GetActorRotation().Yaw, GetActorRotation().Roll);
 
 	FinalRotation.Pitch = UKismetMathLibrary::Clamp(FinalRotation.Pitch, -5.f, 5.f);
 
-	FRotator InterpRotation = UKismetMathLibrary::RInterpTo(CurrentRotation, FinalRotation, UGameplayStatics::GetWorldDeltaSeconds(GetWorld()), SmoothSway2);
+	FRotator InterpRotation = UKismetMathLibrary::RInterpTo(GetActorRotation(), FinalRotation, UGameplayStatics::GetWorldDeltaSeconds(GetWorld()), SmoothSway2);
 
 	SetActorRotation(InterpRotation);
-
 
 }
 void ABaseWeaponClass::StartFire()
@@ -252,8 +258,8 @@ void ABaseWeaponClass::Fire()
 			if (MyOwner)
 			{
 				FHitResult Hit;
-				FVector StartLocation = SkelMeshComp->GetSocketLocation(LineSocket);
-				FRotator Rotation = SkelMeshComp->GetSocketRotation(LineSocket);
+				FVector StartLocation = SkelMeshComp->GetSocketLocation(MuzzleSocket);
+				FRotator Rotation = SkelMeshComp->GetSocketRotation(MuzzleSocket);
 				FVector ShotDirection = Rotation.Vector();
 				float HalfRad = FMath::DegreesToRadians(BulletSpreadZooming);
 				ShotDirection = FMath::VRandCone(ShotDirection, HalfRad, HalfRad);
