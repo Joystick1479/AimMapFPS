@@ -159,22 +159,19 @@ void ABaseWeaponClass::Tick(float DeltaTime)
 
 	if (bStartWeaponSway)
 	{
-		//CalculateWeaponSway();
+		CalculateWeaponSway();
 	}
 }
 
 void ABaseWeaponClass::CalculateWeaponSway()
 {
-	
 	ASoldierCharacter* SoldierCharOwner = Cast<ASoldierCharacter>(GetOwner());
 	if (SoldierCharOwner)
 	{
-
 		InitialWeaponRotation = SoldierCharOwner->GetActorRotation();
 
 		if (!InitialWeaponRotation.Equals(FinalWeaponRotation))
 		{
-
 			if (InitialWeaponRotation.Yaw > FinalWeaponRotation.Yaw)
 			{
 				FinalWeaponRotation = InitialWeaponRotation;
@@ -194,32 +191,24 @@ void ABaseWeaponClass::CalculateWeaponSway()
 		}
 		else
 		{
-			FRotator CurrentRotation = GetActorRotation();
-			FRotator TargetRotation = FRotator(0.0f, CurrentRotation.Yaw, CurrentRotation.Roll);
+			FRotator CurrentRotation = this->GetSkelMeshComp()->GetRelativeTransform().Rotator();
+			FRotator TargetRotation = UKismetMathLibrary::RInterpTo(CurrentRotation, FRotator(0.0f, CurrentRotation.Yaw, CurrentRotation.Roll), UGameplayStatics::GetWorldDeltaSeconds(GetWorld()), SmoothSway1);
 
-			UE_LOG(LogTemp,Warning,TEXT("Rotation relative is : %s"), *this->GetActorTransform().GetRotation().ToString());
-			UE_LOG(LogTemp, Warning, TEXT("Rotation is : %s"), *this->GetActorRotation().ToString());
-
-			this->GetActorTransform().GetLocation();
-
-			SetActorRotation(UKismetMathLibrary::RInterpTo(CurrentRotation, TargetRotation, UGameplayStatics::GetWorldDeltaSeconds(GetWorld()), SmoothSway1));
+			this->GetSkelMeshComp()->SetRelativeRotation(TargetRotation);
 		}
-
 	}
 }
 
 void ABaseWeaponClass::SetWeaponSway(float SwayDirection)
 {
-	FRotator CurrentRotation = GetActorRotation();
-
-	FRotator FinalRotation = FRotator(GetActorRotation().Pitch + SwayDirection, GetActorRotation().Yaw, GetActorRotation().Roll);
+	FRotator CurrentRotation = this->GetSkelMeshComp()->GetRelativeTransform().Rotator();
+	FRotator FinalRotation = FRotator(CurrentRotation.Pitch + SwayDirection, CurrentRotation.Yaw, CurrentRotation.Roll);
 
 	FinalRotation.Pitch = UKismetMathLibrary::Clamp(FinalRotation.Pitch, -5.f, 5.f);
 
-	FRotator InterpRotation = UKismetMathLibrary::RInterpTo(GetActorRotation(), FinalRotation, UGameplayStatics::GetWorldDeltaSeconds(GetWorld()), SmoothSway2);
+	FRotator SwayRotation = UKismetMathLibrary::RInterpTo(CurrentRotation, FinalRotation, UGameplayStatics::GetWorldDeltaSeconds(GetWorld()), SmoothSway2);
 
-	SetActorRotation(InterpRotation);
-
+	this->GetSkelMeshComp()->SetRelativeRotation(SwayRotation);
 }
 void ABaseWeaponClass::StartFire()
 {

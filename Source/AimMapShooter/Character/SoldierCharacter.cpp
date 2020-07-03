@@ -100,6 +100,8 @@ ASoldierCharacter::ASoldierCharacter()
 	FieldOfView = 75.f;
 	ZoomingTime = 0.2f;
 	ZoomInterpSpeed = 7.5f;
+	HoloScopeFieldOfView = 30.0f;
+	NoScopeFieldOfView = 45.0f;
 
 	bIsSingleFire = false;
 	bReloading = false;
@@ -340,41 +342,24 @@ void ASoldierCharacter::RagdollOnDeath()
 }
 void ASoldierCharacter::PutWeaponOnBack()
 {
-	if (Role < ROLE_Authority)
+	/*if (Role < ROLE_Authority)
 	{
 		ServerPutWeaponOnBack();
-	}
-	if (HoldingWeaponState == EHoldingWeapon::A4 && bWeaponOnBack == false)
+	}*/
+
+	//TODO Attach 3rd person gun to hands, multipalyer replication
+	
+	if (CurrentWeapon &&bWeaponOnBack == false)
 	{
-		/// TO DO NIE WOLNO STRZELAC JAK NA PLECACH BRON
-
-		///Put weapon on back for 3rd person and hide weapon for 1st person///
-		if (this->CurrentWeapon)
-		{
-			this->CurrentWeapon->SetActorHiddenInGame(true);
-		}
-		if (Rifle_3rd)
-		{
-			Rifle_3rd->AttachToComponent(this->GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponBackSocket);
-		}
-
-		bIsWeaponAttached = false;
+		CurrentWeapon->SetActorHiddenInGame(true);
 		bWeaponOnBack = true;
+		bIsWeaponAttached = false;
 	}
-	else if (HoldingWeaponState == EHoldingWeapon::A4 || HoldingWeaponState == EHoldingWeapon::Sniper && bWeaponOnBack == true)
+	else if (CurrentWeapon && bWeaponOnBack == true)
 	{
-		///Put weapon on back//
-		if (this->CurrentWeapon)
-		{
-			this->CurrentWeapon->SetActorHiddenInGame(false);
-		}
-		if (Rifle_3rd)
-		{
-			Rifle_3rd->AttachToComponent(this->GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocket);
-		}
-
-		bIsWeaponAttached = true;
+		CurrentWeapon->SetActorHiddenInGame(false);
 		bWeaponOnBack = false;
+		bIsWeaponAttached = true;
 	}
 }
 void ASoldierCharacter::EatFood()
@@ -1043,7 +1028,6 @@ void ASoldierCharacter::CalcCamera(float DeltaTime, struct FMinimalViewInfo& Out
 		float DirectionToSightDotLen = DirectionToSightDot * DirectionToSightLen;
 		DirectionToSightDotLen = UKismetMathLibrary::Clamp(DirectionToSightDotLen, 56.f, 56.f);
 		FVector SightDirectionDotLen = SightDirection * DirectionToSightDotLen;
-		//UE_LOG(LogTemp, Warning, TEXT("%f"), DirectionToSightDotLen);
 		FVector SightTargetLocation = SightLocation - SightDirectionDotLen;
 
 		//AimAlpha = bZooming ? 1.0f : 0.0f;
@@ -1052,11 +1036,19 @@ void ASoldierCharacter::CalcCamera(float DeltaTime, struct FMinimalViewInfo& Out
 		{
 			AimAlpha = UKismetMathLibrary::FInterpTo(AimAlpha, 1.0f, UGameplayStatics::GetWorldDeltaSeconds(GetWorld()), ZoomInterpSpeed);
 
-			FieldOfView = UKismetMathLibrary::FInterpTo(FieldOfView, 45.0f, UGameplayStatics::GetWorldDeltaSeconds(GetWorld()), ZoomInterpSpeed);
+			if (HoloScope)
+			{
+				
+				FieldOfView = UKismetMathLibrary::FInterpTo(FieldOfView, HoloScopeFieldOfView, UGameplayStatics::GetWorldDeltaSeconds(GetWorld()), ZoomInterpSpeed);
 
-			FirstPersonCamera->SetFieldOfView(FieldOfView);
+				FirstPersonCamera->SetFieldOfView(FieldOfView);
+			}
+			else
+			{
+				FieldOfView = UKismetMathLibrary::FInterpTo(FieldOfView, NoScopeFieldOfView, UGameplayStatics::GetWorldDeltaSeconds(GetWorld()), ZoomInterpSpeed);
 
-			//UE_LOG(LogTemp, Warning, TEXT("%f"), FieldOfView);
+				FirstPersonCamera->SetFieldOfView(FieldOfView);
+			}
 
 			OutResult.Location = CameraLocation + AimAlpha * (SightTargetLocation - CameraLocation);
 		}
@@ -1068,8 +1060,6 @@ void ASoldierCharacter::CalcCamera(float DeltaTime, struct FMinimalViewInfo& Out
 
 			FirstPersonCamera->SetFieldOfView(FieldOfView);
 
-			//UE_LOG(LogTemp, Warning, TEXT("%f"), FieldOfView);
-
 			OutResult.Location = CameraLocation + AimAlpha * (SightTargetLocation - CameraLocation);
 		}
 	}
@@ -1080,83 +1070,23 @@ void ASoldierCharacter::CalcCamera(float DeltaTime, struct FMinimalViewInfo& Out
 }
 void ASoldierCharacter::ZoomIn()
 {
-	///Hide 3rd person mesh
 	UCharacterMovementComponent* MoveComp = this->FindComponentByClass<UCharacterMovementComponent>();
-	if (MoveComp && !bIsSprinting && !bIsInspecting && !bReloading &&bWeaponOnBack != true)
+	if (MoveComp && !bIsInspecting &&bWeaponOnBack != true)
 	{
 		MoveComp->MaxWalkSpeed = 250.0f;
-		if (!bIsSprinting)
-		{
-			bZooming = true;
-
-			/*if (IsLocallyControlled())
-			{
-				APlayerController* PC = Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
-				if (PC)
-				{
-					if (CurrentWeapon)
-					{
-						PC->SetViewTargetWithBlend(CurrentWeapon, ZoomingTime, EViewTargetBlendFunction::VTBlend_Linear);
-					}
-				}
-			}*/
-		}
 	}
 
-	/*if (IsLocallyControlled())
-	{
-		TArray<AActor*> ThirdWeapon;
-		UGameplayStatics::GetAllActorsOfClass(this, ThirdWeaponClass, ThirdWeapon);
-		for (int i = 0; i < ThirdWeapon.Num(); i++)
-		{
-			ARifle_3rd* HideIt = Cast<ARifle_3rd>(ThirdWeapon[i]);
-			if (HideIt)
-			{
-				if (this == HideIt->GetOwner())
-				{
-					HideIt->GetSkelMeshComp()->SetHiddenInGame(true, false);
-				}
-			}
-		}
-	}*/
+	bZooming = true;
 }
 void ASoldierCharacter::ZoomOut()
 {
-	///Make 3rd rifle visible
-	/*if (IsLocallyControlled())
-	{
-		TArray<AActor*> ThirdWeapon;
-		UGameplayStatics::GetAllActorsOfClass(this, ThirdWeaponClass, ThirdWeapon);
-		for (int i = 0; i < ThirdWeapon.Num(); i++)
-		{
-			ARifle_3rd* HideIt = Cast<ARifle_3rd>(ThirdWeapon[i]);
-			if (HideIt)
-			{
-				HideIt->GetSkelMeshComp()->SetHiddenInGame(false, false);
-			}
-		}
-	}
-
 	UCharacterMovementComponent* MoveComp = this->FindComponentByClass<UCharacterMovementComponent>();
 	if (MoveComp)
 	{
 		MoveComp->MaxWalkSpeed = 300.0f;
-	}*/
+	}
 
 	bZooming = false;
-
-	/*if (IsLocallyControlled())
-	{
-
-		APlayerController* PC = Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
-		if (PC)
-		{
-			if (CurrentWeapon)
-			{
-				PC->SetViewTargetWithBlend(this, ZoomingTime, EViewTargetBlendFunction::VTBlend_Linear);
-			}
-		}
-	}*/
 }
 void ASoldierCharacter::StartFire()
 {

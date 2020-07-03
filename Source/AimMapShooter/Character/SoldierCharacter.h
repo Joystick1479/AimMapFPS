@@ -624,13 +624,17 @@ protected:
 	UPROPERTY(Replicated, BlueprintReadOnly, Category = "Player")
 	bool bDied;
 
+	//Zooming stuff
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated, Category = "Zoom")
 	bool bZooming;
-
 	float AimAlpha;
 	UPROPERTY(EditDefaultsOnly, Category = "Zoom")
 	float ZoomInterpSpeed;
 	float FieldOfView;
+	UPROPERTY(EditDefaultsOnly, Category = "Zoom")
+	float HoloScopeFieldOfView;
+	UPROPERTY(EditDefaultsOnly, Category = "Zoom")
+	float NoScopeFieldOfView;
 
 
 	UPROPERTY(BlueprintReadOnly, Category = "Player")
