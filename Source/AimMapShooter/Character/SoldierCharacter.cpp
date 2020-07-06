@@ -1070,22 +1070,22 @@ void ASoldierCharacter::CalcCamera(float DeltaTime, struct FMinimalViewInfo& Out
 void ASoldierCharacter::ZoomIn()
 {
 	UCharacterMovementComponent* MoveComp = this->FindComponentByClass<UCharacterMovementComponent>();
-	if (MoveComp && !bIsInspecting &&bWeaponOnBack != true)
+	if (bIsWeaponAttached &&MoveComp && !bIsInspecting &&bWeaponOnBack != true)
 	{
 		MoveComp->MaxWalkSpeed = 250.0f;
-	}
 
-	bZooming = true;
+		bZooming = true;
+	}
 }
 void ASoldierCharacter::ZoomOut()
 {
 	UCharacterMovementComponent* MoveComp = this->FindComponentByClass<UCharacterMovementComponent>();
-	if (MoveComp)
+	if (MoveComp && bIsWeaponAttached)
 	{
 		MoveComp->MaxWalkSpeed = 300.0f;
-	}
 
-	bZooming = false;
+		bZooming = false;
+	}
 }
 void ASoldierCharacter::StartFire()
 {

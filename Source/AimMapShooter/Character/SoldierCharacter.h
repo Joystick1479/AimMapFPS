@@ -531,7 +531,7 @@ protected:
 	UPROPERTY(BlueprintReadOnly, Replicated, Category = "Player")
 	bool bRemoveHud;
 
-	UPROPERTY(BlueprintReadOnly, Replicated, Category = "Player")
+	UPROPERTY(BlueprintReadWrite, Replicated, Category = "Player")
 	bool bIsWeaponAttached;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Player")
