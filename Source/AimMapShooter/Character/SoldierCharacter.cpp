@@ -692,7 +692,6 @@ void ASoldierCharacter::PickUp(ABaseWeaponClass* Weapons, ABaseAttachmentClass* 
 				SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 				if (Role == ROLE_Authority)
 				{
-					//HoloScope = GetWorld()->SpawnActor<AHoloScope>(HoloClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
 					HoloScope = GetWorld()->SpawnActor<AHoloScope>(HoloClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
 					if (HoloScope)
 					{
