@@ -659,6 +659,7 @@ public:
 	bool GetbZooming();
 	bool GetbGripAttached();
 	bool GetbWantToRespawn();
+	void SetbZooming(bool SetZoom);
 
 	UPROPERTY(BlueprintReadOnly)
 	bool bFireAnimation;

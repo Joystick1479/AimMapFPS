@@ -94,6 +94,7 @@ public:
 	FName GetGripSocketName();
 	FName GetLaserSocketName();
 
+	float GetDistanceToObject();
 	int32 GetCurrentAmmoInClip();
 	int32 GetAllAmmo();
 	int32 GetCurrentAmountOfClips();

@@ -1070,11 +1070,14 @@ void ASoldierCharacter::CalcCamera(float DeltaTime, struct FMinimalViewInfo& Out
 void ASoldierCharacter::ZoomIn()
 {
 	UCharacterMovementComponent* MoveComp = this->FindComponentByClass<UCharacterMovementComponent>();
-	if (bIsWeaponAttached &&MoveComp && !bIsInspecting &&bWeaponOnBack != true)
+	if (CurrentWeapon)
 	{
-		MoveComp->MaxWalkSpeed = 250.0f;
+		if (CurrentWeapon->GetDistanceToObject() < 0.35f && bIsWeaponAttached && MoveComp && !bIsInspecting && bWeaponOnBack != true)
+		{
+			MoveComp->MaxWalkSpeed = 250.0f;
 
-		bZooming = true;
+			bZooming = true;
+		}
 	}
 }
 void ASoldierCharacter::ZoomOut()
@@ -1531,7 +1534,10 @@ bool ASoldierCharacter::GetbWantToRespawn()
 {
 	return bWantsToRepawn;
 }
-
+void ASoldierCharacter::SetbZooming(bool SetZoom)
+{
+	bZooming = SetZoom;
+}
 void ASoldierCharacter::ServerDrinkWater_Implementation()
 {
 	DrinkWater();

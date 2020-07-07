@@ -139,6 +139,10 @@ int32 ABaseWeaponClass::GetCurrentAmmoInClip()
 	return CurrentAmmoInClip;
 }
 
+float ABaseWeaponClass::GetDistanceToObject()
+{
+	return DistanceToObject;
+}
 int32 ABaseWeaponClass::GetAllAmmo()
 {
 	return CurrentAmmo;
@@ -184,13 +188,16 @@ void ABaseWeaponClass::LineTraceWeaponClipping()
 
 		if (GetWorld()->LineTraceSingleByChannel(Hit, SoldierCharacterLocation, SoldierCharacterLineEnd, ECollisionChannel::ECC_Visibility, QueryParams))
 		{
-			//DrawDebugLine(GetWorld(), SoldierCharacterLocation, SoldierCharacterLineEnd, FColor::Red, false, 1.0f, 0, 1.0f);
-
 			float CloseToObstacle;
 			CloseToObstacle = 50.0f / Hit.Distance;
 			CloseToObstacle = UKismetMathLibrary::FClamp(CloseToObstacle, 0.0f, 1.0f);
 
 			DistanceToObject = UKismetMathLibrary::Lerp(DistanceToObject, CloseToObstacle, UGameplayStatics::GetWorldDeltaSeconds(GetWorld()) * SmoothClipping);
+
+			if (DistanceToObject > 0.34f)
+			{
+				SoldierCharacter->SetbZooming(false);
+			}
 		}
 		else
 		{
@@ -270,7 +277,7 @@ void ABaseWeaponClass::Fire()
 
 		ASoldierCharacter* SoldierCharacter = Cast<ASoldierCharacter>(GetOwner());
 		ALaser* Laser = Cast<ALaser>(GetOwner());
-		if (SoldierCharacter->GetbZooming() == true)
+		if (SoldierCharacter->GetbZooming() || DistanceToObject>0.35f)
 		{
 			///RECOIL
 			float PitchRandomVal = UKismetMathLibrary::RandomFloatInRange(-0.1, -0.5);
@@ -357,7 +364,7 @@ void ABaseWeaponClass::Fire()
 				}
 			}
 		}
-		else if(SoldierCharacter->GetbZooming() == false)
+		else if(SoldierCharacter->GetbZooming() == false && DistanceToObject < 0.35f)
 		{
 			///RECOIL
 			float randomval = UKismetMathLibrary::RandomFloatInRange(-0.1, -0.5);
