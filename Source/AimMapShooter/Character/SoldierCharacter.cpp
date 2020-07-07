@@ -185,7 +185,6 @@ void ASoldierCharacter::BeginPlay()
 	}
 
 	///Calling these function on begin play with timers to avoid ticking
-	ShowingPickUpHud();
 	FindingGrenadeTransform();
 	Headbobbing();
 	GrenadeTimeline();
@@ -899,44 +898,6 @@ void ASoldierCharacter::EndDrinkFromPond(APlayerController* PC)
 		}
 	}
 }
-void ASoldierCharacter::ShowingPickUpHud()
-{
-	if (IsLocallyControlled())
-	{
-		APlayerController* PC = GetWorld()->GetFirstPlayerController();
-		if (PC)
-		{
-			if (wPickUp)
-			{
-				wPickUpvar = CreateWidget<UUserWidget>(PC, wPickUp);
-				if (wPickUpvar)
-				{
-					if (bWantToPickUp && bDoOnce == true)
-					{
-						wPickUpvar->AddToViewport();
-						bDoOnce = false;
-					}
-					else
-					{
-						bRemoveHud = true;
-						bDoOnce = true;
-						TArray<UUserWidget*> PickupWidgets;
-						UWidgetBlueprintLibrary::GetAllWidgetsOfClass(this, PickupWidgets, PickUpTestWidgetClass, true);
-
-						if (PickupWidgets.Num() > 0)
-						{
-							UUserWidget* NewPickupWidget = PickupWidgets[0];
-							NewPickupWidget->RemoveFromParent();
-						}
-					}
-				}
-			}
-		}
-	}
-	
-	GetWorldTimerManager().SetTimer(HudTimer, this, &ASoldierCharacter::ShowingPickUpHud, 0.5f, false);
-
-}
 void ASoldierCharacter::MoveForward(float Value)
 {
 	if (bDied != true)
@@ -1533,6 +1494,10 @@ bool ASoldierCharacter::GetbGripAttached()
 bool ASoldierCharacter::GetbWantToRespawn()
 {
 	return bWantsToRepawn;
+}
+bool ASoldierCharacter::GetbWantToPickUp()
+{
+	return bWantToPickUp;
 }
 void ASoldierCharacter::SetbZooming(bool SetZoom)
 {

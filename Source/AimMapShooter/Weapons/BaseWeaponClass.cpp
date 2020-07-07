@@ -275,10 +275,13 @@ void ABaseWeaponClass::Fire()
 	{
 		CurrentState = EWeaponState::Firing;
 
+
 		ASoldierCharacter* SoldierCharacter = Cast<ASoldierCharacter>(GetOwner());
 		ALaser* Laser = Cast<ALaser>(GetOwner());
-		if (SoldierCharacter->GetbZooming() || DistanceToObject>0.35f)
+		if (SoldierCharacter->GetbZooming() && DistanceToObject < 0.35f)
 		{
+			UE_LOG(LogTemp, Warning, TEXT("Zooming"));
+
 			///RECOIL
 			float PitchRandomVal = UKismetMathLibrary::RandomFloatInRange(-0.1, -0.5);
 			SoldierCharacter->AddControllerPitchInput(PitchRandomVal);
@@ -290,8 +293,8 @@ void ABaseWeaponClass::Fire()
 			if (MyOwner)
 			{
 				FHitResult Hit;
-				FVector StartLocation = SkelMeshComp->GetSocketLocation(MuzzleSocket);
-				FRotator Rotation = SkelMeshComp->GetSocketRotation(MuzzleSocket);
+				FVector StartLocation = SkelMeshComp->GetSocketLocation(ScopeSocket);
+				FRotator Rotation = SkelMeshComp->GetSocketRotation(ScopeSocket);
 				FVector ShotDirection = Rotation.Vector();
 				float HalfRad = FMath::DegreesToRadians(BulletSpreadZooming);
 				ShotDirection = FMath::VRandCone(ShotDirection, HalfRad, HalfRad);
@@ -305,6 +308,8 @@ void ABaseWeaponClass::Fire()
 
 				if (GetWorld()->LineTraceSingleByChannel(Hit, StartLocation, EndLocation, ECollisionChannel::ECC_Destructible, QueryParams))
 				{
+					DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::Red, false, 1.0f, 0, 1.0f);
+
 
 					PlayImpactEffects(Hit.ImpactPoint);
 
@@ -364,7 +369,7 @@ void ABaseWeaponClass::Fire()
 				}
 			}
 		}
-		else if(SoldierCharacter->GetbZooming() == false && DistanceToObject < 0.35f)
+		else if(SoldierCharacter->GetbZooming() == false || DistanceToObject > 0.35f)
 		{
 			///RECOIL
 			float randomval = UKismetMathLibrary::RandomFloatInRange(-0.1, -0.5);
@@ -372,6 +377,7 @@ void ABaseWeaponClass::Fire()
 			float YawRandomVal = UKismetMathLibrary::RandomFloatInRange(-0.2, 0.2);
 			SoldierCharacter->AddControllerYawInput(YawRandomVal);
 
+			UE_LOG(LogTemp, Warning, TEXT("NotZooming"));
 
 			AActor* MyOwner = GetOwner();
 			if (MyOwner)
@@ -401,7 +407,7 @@ void ABaseWeaponClass::Fire()
 
 				if (GetWorld()->LineTraceSingleByChannel(Hit, StartLocation, EndLocation, ECollisionChannel::ECC_Destructible, QueryParams))
 				{
-					//DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::White, false, 1.0f, 0, 1.0f);
+					DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::White, false, 1.0f, 0, 1.0f);
 
 					PlayImpactEffects(Hit.ImpactPoint);
 

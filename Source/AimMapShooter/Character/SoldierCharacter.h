@@ -504,13 +504,6 @@ protected:
 	TSubclassOf<ASoldierCharacter> SoldierChar;
 
 	UPROPERTY(EditDefaultsOnly, Replicated, Category = "Player")
-	TSubclassOf<UUserWidget> wPickUp;
-
-	UPROPERTY(Replicated)
-	UUserWidget* wPickUpvar;
-
-
-	UPROPERTY(EditDefaultsOnly, Replicated, Category = "Player")
 	TSubclassOf<UUserWidget> wAmmoCount;
 
 	UPROPERTY(Replicated)
@@ -524,12 +517,6 @@ protected:
 
 	UPROPERTY(Replicated)
 	UUserWidget* wHealthIndicatorvar;
-
-	UPROPERTY(EditDefaultsOnly, Category = "widget")
-	TSubclassOf<UUserWidget> PickUpTestWidgetClass;
-
-	UPROPERTY(BlueprintReadOnly, Replicated, Category = "Player")
-	bool bRemoveHud;
 
 	UPROPERTY(BlueprintReadWrite, Replicated, Category = "Player")
 	bool bIsWeaponAttached;
@@ -646,8 +633,6 @@ protected:
 	UPROPERTY(Replicated)
 	bool bWantsToRepawn;
 
-	bool bDoOnce = true;
-
 	void OnFoodLow();
 	void OnDrinkLow();
 	
@@ -659,6 +644,7 @@ public:
 	bool GetbZooming();
 	bool GetbGripAttached();
 	bool GetbWantToRespawn();
+	bool GetbWantToPickUp();
 	void SetbZooming(bool SetZoom);
 
 	UPROPERTY(BlueprintReadOnly)

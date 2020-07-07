@@ -18,23 +18,11 @@ class AIMMAPSHOOTER_API ACharacterPlayerState : public APlayerState
 	GENERATED_BODY()
 
 protected:
-	virtual void BeginPlay() override;
+	
 
 private:
-	void StartingHud();
-
-	virtual void Tick(float DeltaTime) override;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Player")
-	TSubclassOf<UUserWidget> wAmmoCount;
-
-	UPROPERTY()
-	UUserWidget* wAmmoCountvar;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Player")
-	TSubclassOf<UUserWidget> wHealthIndicator;
 	
-	UPROPERTY()
-	UUserWidget* wHealthIndicatorvar;
+
+	
 
 };
