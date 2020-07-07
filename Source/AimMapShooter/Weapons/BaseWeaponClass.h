@@ -155,6 +155,13 @@ protected:
 
 	float DirectionSway;
 
+	//Weapon clipping
+	UPROPERTY(BlueprintReadWrite,EditDefaultsOnly, Category = "Weapon clipping")
+	float DistanceToObject;
+
+	UPROPERTY(BlueprintReadWrite,EditDefaultsOnly, Category = "Weapon clipping")
+	float SmoothClipping;
+	//
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon", meta = (ClampMin = 0.0f))
 	float BulletSpreadGrip;
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon", meta = (ClampMin = 0.0f))
@@ -200,6 +207,7 @@ protected:
 	virtual void CalculateWeaponSway();
 	virtual void SetWeaponSway(float SwayDirection);
 	virtual void SetbWeaponSway(bool bSway);
+	virtual void LineTraceWeaponClipping();
 	virtual void Tick(float DeltaTime) override;
 
 	//*Particle effects*//

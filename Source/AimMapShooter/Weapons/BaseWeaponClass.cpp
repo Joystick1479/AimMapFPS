@@ -28,17 +28,6 @@ ABaseWeaponClass::ABaseWeaponClass()
 	PrimaryActorTick.bCanEverTick = true;
 
 	CameraSocket = "CameraSocket";
-
-	SkelMeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkelMesh"));
-	RootComponent = SkelMeshComp;
-	
-
-	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
-	Camera->SetupAttachment(SkelMeshComp, CameraSocket);
-
-	SphereComp = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
-	SphereComp->SetupAttachment(SkelMeshComp);
-
 	MuzzleSocket = "MuzzleFlash";
 	LineSocket = "LineSocket";
 	ScopeSocket = "ScopeSocket";
@@ -46,15 +35,27 @@ ABaseWeaponClass::ABaseWeaponClass()
 	LaserSocket = "LaserSocket";
 	LaserSocketEnd = "LaserSocketEnd";
 
-	CurrentState = EWeaponState::Idle;
+	SkelMeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkelMesh"));
+	RootComponent = SkelMeshComp;
 
+	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
+	Camera->SetupAttachment(SkelMeshComp, CameraSocket);
+
+	SphereComp = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
+	SphereComp->SetupAttachment(SkelMeshComp);
+
+	//
+	CurrentState = EWeaponState::Idle;
+	//
 	CurrentAmmo = 0;
 	CurrentAmmoInClip = 0;
 	CurrentAmountOfClips = 0;
-
+	//
 	SmoothSway1 = 5.0f;
 	SmoothSway2 = 3.0f;
-
+	//
+	SmoothClipping = 7.0f;
+	//
 	RateOfFire = 600;
 	BaseDamage = 20.0f;
 	BulletSpread = 2.0f;
@@ -160,6 +161,41 @@ void ABaseWeaponClass::Tick(float DeltaTime)
 	if (bStartWeaponSway)
 	{
 		CalculateWeaponSway();
+	}
+
+	LineTraceWeaponClipping();
+}
+
+void ABaseWeaponClass::LineTraceWeaponClipping()
+{
+
+	ASoldierCharacter* SoldierCharacter = Cast<ASoldierCharacter>(GetOwner());
+	if (SoldierCharacter)
+	{
+		FVector SoldierCharacterLocation = SoldierCharacter->GetActorLocation();
+		FVector SoldierCharacterRotation = UKismetMathLibrary::GetForwardVector(SoldierCharacter->GetActorRotation());
+		FVector SoldierCharacterLength = SoldierCharacterRotation * 150.0f;
+		FVector SoldierCharacterLineEnd = SoldierCharacterLocation + SoldierCharacterLength;
+
+		FHitResult Hit;
+		FCollisionQueryParams QueryParams;
+		QueryParams.AddIgnoredActor(SoldierCharacter);
+		QueryParams.AddIgnoredActor(this);
+
+		if (GetWorld()->LineTraceSingleByChannel(Hit, SoldierCharacterLocation, SoldierCharacterLineEnd, ECollisionChannel::ECC_Visibility, QueryParams))
+		{
+			//DrawDebugLine(GetWorld(), SoldierCharacterLocation, SoldierCharacterLineEnd, FColor::Red, false, 1.0f, 0, 1.0f);
+
+			float CloseToObstacle;
+			CloseToObstacle = 50.0f / Hit.Distance;
+			CloseToObstacle = UKismetMathLibrary::FClamp(CloseToObstacle, 0.0f, 1.0f);
+
+			DistanceToObject = UKismetMathLibrary::Lerp(DistanceToObject, CloseToObstacle, UGameplayStatics::GetWorldDeltaSeconds(GetWorld()) * SmoothClipping);
+		}
+		else
+		{
+			DistanceToObject = UKismetMathLibrary::Lerp(DistanceToObject, 0.0f, UGameplayStatics::GetWorldDeltaSeconds(GetWorld()) * SmoothClipping);
+		}
 	}
 }
 

@@ -392,7 +392,7 @@ protected:
 
 	AHelmet* Helmet;
 
-	UPROPERTY(Replicated)
+	UPROPERTY(BlueprintReadOnly, Replicated)
 	ABaseWeaponClass* CurrentWeapon;
 
 	///Timers
