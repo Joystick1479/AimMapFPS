@@ -16,6 +16,7 @@ class UCameraShake;
 class ALaser;
 class UAnimSequence;
 class AHelmet;
+class USceneComponent;
 
 //Contains information of a single hitscan weapon line trace//
 USTRUCT()
@@ -134,6 +135,8 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
 	USphereComponent* SphereComp;
 
+	USceneComponent* SceneComp;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Player")
 	TSubclassOf<UCameraShake> CameShakeHipClass;
 
@@ -245,8 +248,11 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Effects")
 	USoundCue* HitImpactSound;
 
-	UPROPERTY(EditAnywhere, Category = "Animation reload")
+	UPROPERTY(EditAnywhere, Category = "Animations")
 	UAnimSequence* AnimSeqReload;
+
+	UPROPERTY(EditAnywhere, Category = "Animations")
+	UAnimSequence* AnimFire;
 
 
 	///////****MUTLIPLAYER REPLICATION*****////

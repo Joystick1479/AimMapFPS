@@ -191,6 +191,12 @@ protected:
 	TSubclassOf<ASniperRifle> SniperRifleClass;
 
 	UPROPERTY(EditDefaultsOnly, Replicated, Category = "Player")
+	TSubclassOf<class AScarH> ScarHRifleClass;
+
+	UPROPERTY(EditDefaultsOnly, Replicated, Category = "Player")
+	TSubclassOf<class AM4Rifle> M4RifleClass;
+
+	UPROPERTY(EditDefaultsOnly, Replicated, Category = "Player")
 	TSubclassOf<ARifle_3rd> ThirdWeaponClass;
 
 	UPROPERTY(EditDefaultsOnly, Replicated, Category = "Player")
@@ -379,6 +385,12 @@ protected:
 
 	UPROPERTY(Replicated, BlueprintReadOnly)
 	AAutomaticRifle* AutomaticRifle;
+
+	UPROPERTY(Replicated, BlueprintReadOnly)
+	class AScarH* Scar;
+
+	UPROPERTY(Replicated, BlueprintReadOnly)
+	class AM4Rifle* M4;
 
 	AHoloScope* HoloScope;
 

@@ -4,6 +4,8 @@
 
 #include "Weapons/AutomaticRifle.h"
 #include "Weapons/SniperRifle.h"
+#include "Weapons/ScarH.h"
+#include "Weapons/M4Rifle.h"
 
 #include "Components/SkeletalMeshComponent.h"
 #include "Animation//AnimInstance.h"
@@ -78,6 +80,7 @@ ASoldierCharacter::ASoldierCharacter()
 
 	CameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComp"));
 	CameraComp->SetupAttachment(SpringArm);
+
 
 	HealthComp = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComp"));
 
@@ -174,15 +177,15 @@ void ASoldierCharacter::BeginPlay()
 		HealthComp->Health = 100;
 	}
 
-	if (SpringArm)
+	/*if (SpringArm)
 	{
 		SpringArm->AttachToComponent(FPPMesh, FAttachmentTransformRules::SnapToTargetIncludingScale);
-	
+
 	}
 	if (CameraComp)
 	{
 		CameraComp->AttachToComponent(SpringArm, FAttachmentTransformRules::SnapToTargetIncludingScale);
-	}
+	}*/
 
 	///Calling these function on begin play with timers to avoid ticking
 	FindingGrenadeTransform();
@@ -677,6 +680,56 @@ void ASoldierCharacter::PickUp(ABaseWeaponClass* Weapons, ABaseAttachmentClass* 
 
 			}
 		}
+		AScarH* ScarH = Cast<AScarH>(Weapons);
+		if (ScarH)
+		{
+			if (HoldingWeaponState == EHoldingWeapon::None)
+			{
+				HoldingWeaponState = EHoldingWeapon::A4;
+
+				FActorSpawnParameters SpawnParams;
+				SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+				//if (Role == ROLE_Authority)
+				//{
+				Scar = GetWorld()->SpawnActor<AScarH>(ScarHRifleClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
+				if (Scar)
+				{
+					Scar->SetOwner(this);
+					Scar->AttachToComponent(FPPMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocket);
+					Scar->GetSkelMeshComp()->bOnlyOwnerSee = true;
+					//Scar->GetSkelMeshComp()->SetAnimInstanceClass(AnimBp);
+					Scar->GetSphereComp()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+					CurrentWeapon = Scar;
+					bIsWeaponAttached = true;
+					ScarH->Destroy();
+				}
+			}
+		}
+		AM4Rifle* M4Rifle = Cast<AM4Rifle>(Weapons);
+		if (M4Rifle)
+		{
+			if (HoldingWeaponState == EHoldingWeapon::None)
+			{
+				HoldingWeaponState = EHoldingWeapon::A4;
+
+				FActorSpawnParameters SpawnParams;
+				SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+				//if (Role == ROLE_Authority)
+				//{
+				M4 = GetWorld()->SpawnActor<AM4Rifle>(M4RifleClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
+				if (M4)
+				{
+					M4->SetOwner(this);
+					M4->AttachToComponent(FPPMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocket);
+					M4->GetSkelMeshComp()->bOnlyOwnerSee = true;
+					//Scar->GetSkelMeshComp()->SetAnimInstanceClass(AnimBp);
+					M4->GetSphereComp()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+					CurrentWeapon = M4;
+					bIsWeaponAttached = true;
+					M4Rifle->Destroy();
+				}
+			}
+		}
 		AHoloScope * HoloAttachment = Cast<AHoloScope>(Attachments);
 		if (HoloAttachment)
 		{
@@ -971,10 +1024,14 @@ void ASoldierCharacter::CalcCamera(float DeltaTime, struct FMinimalViewInfo& Out
 		if (HoloScope)
 		{
 			SightTransform = HoloScope->GetMeshComponent()->GetSocketTransform(FName(TEXT("LineSocket")));
+			UE_LOG(LogTemp, Warning, TEXT("Zooming1"));
+
 		}
 		else if(CurrentWeapon)
 		{
 			SightTransform = CurrentWeapon->GetSkelMeshComp()->GetSocketTransform(FName(TEXT("LineSocket")));
+			UE_LOG(LogTemp, Warning, TEXT("Zooming2"));
+
 		}
 		FVector SightLocation = SightTransform.GetLocation();
 		FRotator SightRotation = SightTransform.GetRotation().Rotator();
@@ -989,12 +1046,16 @@ void ASoldierCharacter::CalcCamera(float DeltaTime, struct FMinimalViewInfo& Out
 		DirectionToSightDotLen = UKismetMathLibrary::Clamp(DirectionToSightDotLen, 56.f, 56.f);
 		FVector SightDirectionDotLen = SightDirection * DirectionToSightDotLen;
 		FVector SightTargetLocation = SightLocation - SightDirectionDotLen;
+		UE_LOG(LogTemp, Warning, TEXT("Zooming3"));
+
 
 		//AimAlpha = bZooming ? 1.0f : 0.0f;
 		
 		if (bZooming)
 		{
 			AimAlpha = UKismetMathLibrary::FInterpTo(AimAlpha, 1.0f, UGameplayStatics::GetWorldDeltaSeconds(GetWorld()), ZoomInterpSpeed);
+			UE_LOG(LogTemp, Warning, TEXT("Zooming4"));
+
 
 			if (HoloScope)
 			{
@@ -1008,6 +1069,8 @@ void ASoldierCharacter::CalcCamera(float DeltaTime, struct FMinimalViewInfo& Out
 				FieldOfView = UKismetMathLibrary::FInterpTo(FieldOfView, NoScopeFieldOfView, UGameplayStatics::GetWorldDeltaSeconds(GetWorld()), ZoomInterpSpeed);
 
 				FirstPersonCamera->SetFieldOfView(FieldOfView);
+				UE_LOG(LogTemp, Warning, TEXT("Zooming5"));
+
 			}
 
 			OutResult.Location = CameraLocation + AimAlpha * (SightTargetLocation - CameraLocation);
@@ -1030,6 +1093,7 @@ void ASoldierCharacter::CalcCamera(float DeltaTime, struct FMinimalViewInfo& Out
 }
 void ASoldierCharacter::ZoomIn()
 {
+
 	UCharacterMovementComponent* MoveComp = this->FindComponentByClass<UCharacterMovementComponent>();
 	if (CurrentWeapon)
 	{
@@ -1691,6 +1755,7 @@ void ASoldierCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	DOREPLIFETIME(ASoldierCharacter, AutomaticRifle);
 	DOREPLIFETIME(ASoldierCharacter, SniperRifle);
 	DOREPLIFETIME(ASoldierCharacter, CurrentWeapon);
+	DOREPLIFETIME(ASoldierCharacter, Scar);
 
 	DOREPLIFETIME(ASoldierCharacter, bReloading);
 	DOREPLIFETIME(ASoldierCharacter, bZooming);

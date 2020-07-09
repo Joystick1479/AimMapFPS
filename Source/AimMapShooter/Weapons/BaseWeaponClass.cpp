@@ -1,25 +1,35 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 #include "BaseWeaponClass.h"
-#include "Components/SkeletalMeshComponent.h"
 #include "Camera/CameraComponent.h"
 #include "DrawDebugHelpers.h"
 #include "Character/SoldierCharacter.h"
 #include "TimerManager.h"
+
 #include "Particles/ParticleSystem.h"
 #include "Particles/ParticleSystemComponent.h"
-#include "Kismet/GameplayStatics.h"
+
 #include "Sound/SoundCue.h"
+
 #include "Components/AudioComponent.h"
 #include "Components/SphereComponent.h"
+#include "Components/SceneComponent.h" 
+#include "Components/SkeletalMeshComponent.h"
+
 #include "AimMapShooter.h"
 #include "PhysicalMaterials/PhysicalMaterial.h"
+
 #include "WeaponAttachments/Laser.h"
 #include "WeaponAttachments/Helmet.h"
-#include "Math/Vector.h"
+
 #include "Kismet/KismetMathLibrary.h"
+#include "Kismet/GameplayStatics.h"
+
 #include "Net/UnrealNetwork.h"
 #include "Animation/AnimSequence.h"
+
 #include "Math/Rotator.h"
+#include "Math/Vector.h"
+
 
 // Sets default values
 ABaseWeaponClass::ABaseWeaponClass()
@@ -35,8 +45,11 @@ ABaseWeaponClass::ABaseWeaponClass()
 	LaserSocket = "LaserSocket";
 	LaserSocketEnd = "LaserSocketEnd";
 
+	SceneComp = CreateDefaultSubobject<USceneComponent>(TEXT("SceneComp"));
+	RootComponent = SceneComp;
+
 	SkelMeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkelMesh"));
-	RootComponent = SkelMeshComp;
+	SkelMeshComp->SetupAttachment(SceneComp);
 
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	Camera->SetupAttachment(SkelMeshComp, CameraSocket);
@@ -306,12 +319,14 @@ void ABaseWeaponClass::Fire()
 				QueryParams.bReturnPhysicalMaterial = true;
 				QueryParams.bTraceComplex = true;
 
-				if (GetWorld()->LineTraceSingleByChannel(Hit, StartLocation, EndLocation, ECollisionChannel::ECC_Destructible, QueryParams))
+				if (GetWorld()->LineTraceSingleByChannel(Hit, StartLocation, EndLocation, ECollisionChannel::ECC_Visibility, QueryParams))
 				{
-					DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::Red, false, 1.0f, 0, 1.0f);
+					//DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::Red, false, 1.0f, 0, 1.0f);
 
 
 					PlayImpactEffects(Hit.ImpactPoint);
+
+					SkelMeshComp->PlayAnimation(AnimFire, false);
 
 					//*Applying damage*//
 					AActor* HitActor = Hit.GetActor();
@@ -384,11 +399,12 @@ void ABaseWeaponClass::Fire()
 			{
 				FHitResult Hit;
 				FVector StartLocation = SkelMeshComp->GetSocketLocation(MuzzleSocket);
-				FRotator temp;
-				MyOwner->GetActorEyesViewPoint(StartLocation, temp);
+				//FRotator temp;
+				//MyOwner->GetActorEyesViewPoint(StartLocation, temp);
+				FRotator temp = SkelMeshComp->GetSocketRotation(MuzzleSocket);
 
-				FRotator RotationCamera = temp;
-				FVector ShotDirection = RotationCamera.Vector();
+				FVector RotationCamera = temp.Vector();
+				FVector ShotDirection = RotationCamera;
 
 				if (SoldierCharacter->GetbGripAttached() == true)
 				{
@@ -407,9 +423,12 @@ void ABaseWeaponClass::Fire()
 
 				if (GetWorld()->LineTraceSingleByChannel(Hit, StartLocation, EndLocation, ECollisionChannel::ECC_Destructible, QueryParams))
 				{
-					DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::White, false, 1.0f, 0, 1.0f);
+					//DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::White, false, 1.0f, 0, 1.0f);
 
 					PlayImpactEffects(Hit.ImpactPoint);
+
+					SkelMeshComp->PlayAnimation(AnimFire, false);
+
 
 					//*Applying damage*//
 					AActor* HitActor = Hit.GetActor();
