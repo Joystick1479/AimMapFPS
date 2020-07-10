@@ -191,7 +191,7 @@ void ABaseWeaponClass::LineTraceWeaponClipping()
 	{
 		FVector SoldierCharacterLocation = SoldierCharacter->GetActorLocation();
 		FVector SoldierCharacterRotation = UKismetMathLibrary::GetForwardVector(SoldierCharacter->GetActorRotation());
-		FVector SoldierCharacterLength = SoldierCharacterRotation * 150.0f;
+		FVector SoldierCharacterLength = SoldierCharacterRotation * 100.0f;
 		FVector SoldierCharacterLineEnd = SoldierCharacterLocation + SoldierCharacterLength;
 
 		FHitResult Hit;

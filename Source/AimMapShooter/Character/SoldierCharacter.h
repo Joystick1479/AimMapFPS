@@ -21,6 +21,7 @@ class AHeadset;
 class ALaser;
 class AMagazine;
 class ARifle_3rd;
+class AAK47_3rd;
 class UCapsuleComponent;
 class UUserWidget;
 class USoundCue;
@@ -200,6 +201,9 @@ protected:
 	TSubclassOf<ARifle_3rd> ThirdWeaponClass;
 
 	UPROPERTY(EditDefaultsOnly, Replicated, Category = "Player")
+	TSubclassOf<AAK47_3rd> AKThirdWeaponClass;
+
+	UPROPERTY(EditDefaultsOnly, Replicated, Category = "Player")
 	TSubclassOf<AHoloScope> HoloClass;
 
 	UPROPERTY(EditDefaultsOnly, Replicated, Category = "Player")
@@ -224,6 +228,8 @@ protected:
 	TSubclassOf<UCameraShake> CameraSprintShake;
 
 	ARifle_3rd* Rifle_3rd;
+
+	AAK47_3rd* AK_3rd;
 
 	UPROPERTY(EditDefaultsOnly, Replicated, Category = "Weapon")
 	float ZoomingTime;
@@ -393,7 +399,7 @@ protected:
 	class AM4Rifle* M4;
 
 	AHoloScope* HoloScope;
-
+	UPROPERTY(BlueprintReadOnly)
 	AGrip* Grip;
 
 	AHeadset* Headset;

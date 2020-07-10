@@ -33,7 +33,9 @@
 #include "WeaponAttachments/Headset.h"
 #include "WeaponAttachments/Laser.h"
 #include "WeaponAttachments/Magazine.h"
+
 #include "3rdPersonMeshes/Rifle_3rd.h"
+#include "3rdPersonMeshes/AK47_3rd.h"
 
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -703,6 +705,14 @@ void ASoldierCharacter::PickUp(ABaseWeaponClass* Weapons, ABaseAttachmentClass* 
 					bIsWeaponAttached = true;
 					ScarH->Destroy();
 				}
+
+				AK_3rd = GetWorld()->SpawnActor<AAK47_3rd>(AKThirdWeaponClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
+				if (AK_3rd)
+				{
+					AK_3rd->SetOwner(this);
+					AK_3rd->AttachToComponent(this->GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocket);
+					AK_3rd->GetSkelMeshComp()->bOwnerNoSee = true;
+				}
 			}
 		}
 		AM4Rifle* M4Rifle = Cast<AM4Rifle>(Weapons);
@@ -1046,7 +1056,6 @@ void ASoldierCharacter::CalcCamera(float DeltaTime, struct FMinimalViewInfo& Out
 		DirectionToSightDotLen = UKismetMathLibrary::Clamp(DirectionToSightDotLen, 56.f, 56.f);
 		FVector SightDirectionDotLen = SightDirection * DirectionToSightDotLen;
 		FVector SightTargetLocation = SightLocation - SightDirectionDotLen;
-		UE_LOG(LogTemp, Warning, TEXT("Zooming3"));
 
 
 		//AimAlpha = bZooming ? 1.0f : 0.0f;
@@ -1054,8 +1063,6 @@ void ASoldierCharacter::CalcCamera(float DeltaTime, struct FMinimalViewInfo& Out
 		if (bZooming)
 		{
 			AimAlpha = UKismetMathLibrary::FInterpTo(AimAlpha, 1.0f, UGameplayStatics::GetWorldDeltaSeconds(GetWorld()), ZoomInterpSpeed);
-			UE_LOG(LogTemp, Warning, TEXT("Zooming4"));
-
 
 			if (HoloScope)
 			{
@@ -1069,8 +1076,6 @@ void ASoldierCharacter::CalcCamera(float DeltaTime, struct FMinimalViewInfo& Out
 				FieldOfView = UKismetMathLibrary::FInterpTo(FieldOfView, NoScopeFieldOfView, UGameplayStatics::GetWorldDeltaSeconds(GetWorld()), ZoomInterpSpeed);
 
 				FirstPersonCamera->SetFieldOfView(FieldOfView);
-				UE_LOG(LogTemp, Warning, TEXT("Zooming5"));
-
 			}
 
 			OutResult.Location = CameraLocation + AimAlpha * (SightTargetLocation - CameraLocation);
