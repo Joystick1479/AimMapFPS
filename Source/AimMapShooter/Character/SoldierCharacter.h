@@ -262,8 +262,9 @@ protected:
 
 	UFUNCTION(BlueprintCallable)
 	void StartFire();
-
+	UFUNCTION(BlueprintCallable)
 	void StopFire();
+
 	void SprintOn();
 	void SprintOff();
 	void SprintProgressBar();
@@ -409,8 +410,8 @@ protected:
 	ALaser* Laser;
 
 	AHelmet* Helmet;
-
-	UPROPERTY(BlueprintReadOnly, Replicated)
+	
+	UPROPERTY(BlueprintReadWrite, Replicated)
 	ABaseWeaponClass* CurrentWeapon;
 
 	///Timers
@@ -630,8 +631,7 @@ protected:
 	bool bDied;
 
 	//Zooming stuff
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated, Category = "Zoom")
-	bool bZooming;
+
 	float AimAlpha;
 	UPROPERTY(EditDefaultsOnly, Category = "Zoom")
 	float ZoomInterpSpeed;
@@ -653,7 +653,9 @@ protected:
 
 	void OnFoodLow();
 	void OnDrinkLow();
-	
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated, Category = "Zoom")
+	bool bZooming;
 
 public:	
 
@@ -670,7 +672,7 @@ public:
 	
 	void Flashbang(float ThrowDistance, FVector PlayerFacingAngle);
 
-	
+
 	
 };
 
