@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Components/TimelineComponent.h"
+#include "Templates/UniquePtr.h" 
 #include "SoldierCharacter.generated.h"
 
 class UCameraComponent;
@@ -138,6 +139,10 @@ protected:
 
 	EHelmetAttachment::Type HelmetEquipState;
 
+	class ASingleplayerGameMode* SingleGameMode;
+
+	bool bSinglePlayerMode;
+
 
 	//*Vaulting stuff//*
 	void Vault();
@@ -173,7 +178,7 @@ protected:
 	float MaxHeightForVault;
 
 	///Components/Actor classess
-	UPROPERTY(VisibleAnywhere, Category = "FPPMesh")
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "FPPMesh")
 	USkeletalMeshComponent* FPPMesh;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
@@ -410,9 +415,10 @@ protected:
 	ALaser* Laser;
 
 	AHelmet* Helmet;
-	
+
 	UPROPERTY(BlueprintReadWrite, Replicated)
 	ABaseWeaponClass* CurrentWeapon;
+
 
 	///Timers
 	FTimerHandle TimelineHandle;
