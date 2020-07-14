@@ -292,7 +292,7 @@ void ASoldierCharacter::Tick(float DeltaTime)
 		LineTraceItem();
 	}
 
-	
+	RagdollOnDeath();
 }
 
 // Called to bind functionality to input
@@ -354,8 +354,6 @@ void ASoldierCharacter::RagdollOnDeath()
 		this->GetMesh()->SetSimulatePhysics(true);
 		bDoRagdollOnce = true;
 	}
-
-	GetWorldTimerManager().SetTimer(RagdollTimer, this, &ASoldierCharacter::RagdollOnDeath, 1.25f, false);
 }
 void ASoldierCharacter::PutWeaponOnBack()
 {

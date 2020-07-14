@@ -266,9 +266,9 @@ protected:
 	void EndCrouch();
 
 	UFUNCTION(BlueprintCallable)
-	void StartFire();
+	virtual void StartFire();
 	UFUNCTION(BlueprintCallable)
-	void StopFire();
+	virtual void StopFire();
 
 	void SprintOn();
 	void SprintOff();
@@ -279,8 +279,8 @@ protected:
 	void Headbobbing();
 	void UpdateRifleStatus();
 	void FireMode();
-	void Reload();
-	void StopReload();
+	virtual void Reload();
+	virtual void StopReload();
 	void ZoomIn();
 	void ZoomOut();
 
@@ -290,7 +290,7 @@ protected:
 	void WeaponInspectionOn();
 	void WeaponInspectionOff();
 	void PutWeaponOnBack();
-	void RagdollOnDeath();
+	virtual void RagdollOnDeath();
 	void DrinkWater();
 	void EatFood();
 	void EndDrinkFromPond(APlayerController* PC);
