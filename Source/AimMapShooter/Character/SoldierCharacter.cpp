@@ -336,6 +336,8 @@ void ASoldierCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
 		PlayerInputComponent->BindAction("Grenade", IE_Pressed, this, &ASoldierCharacter::ThrowGrenade);
 
+		PlayerInputComponent->BindAction("StartDropGun", IE_Pressed, this, &ASoldierCharacter::StartDropGun);
+
 
 		PlayerInputComponent->BindAction("EatFood", IE_Pressed, this, &ASoldierCharacter::EatFood);
 		PlayerInputComponent->BindAction("DrinkWater", IE_Pressed, this, &ASoldierCharacter::DrinkWater);
@@ -1406,7 +1408,7 @@ void ASoldierCharacter::WeaponInspectionOn()
 	if (bIsInspecting != true)
 	{
 		bIsInspecting = true;
-		GetWorld()->GetTimerManager().SetTimer(InspectionTimer, this, &ASoldierCharacter::WeaponInspectionOff, 3.704f);
+		GetWorld()->GetTimerManager().SetTimer(InspectionTimer, this, &ASoldierCharacter::WeaponInspectionOff, 0.733f);
 	}
 }
 void ASoldierCharacter::WeaponInspectionOff()
@@ -1618,6 +1620,34 @@ void ASoldierCharacter::PlayHitSound(FName SurfaceHit)
 			UE_LOG(LogTemp, Warning, TEXT("No surface detected"));
 		}
 	}
+}
+void ASoldierCharacter::StartDropGun()
+{
+	if (CurrentWeapon)
+	{
+		bDropGun = true;
+
+		GetWorldTimerManager().SetTimer(DropTimer, this, &ASoldierCharacter::EndDropGun, 0.667f);
+
+		UE_LOG(LogTemp, Warning, TEXT("Start drop gun "));
+	}
+
+}
+void ASoldierCharacter::EndDropGun()
+{
+	bDropGun = false;
+
+	if (CurrentWeapon)
+	{
+		bIsWeaponAttached = false;
+		CurrentWeapon->Destroy();
+		HoldingWeaponState = EHoldingWeapon::None;
+
+		UE_LOG(LogTemp, Warning, TEXT("Destroying gun "));
+
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("End drop gun "));
 }
 bool ASoldierCharacter::GetbDied()
 {
