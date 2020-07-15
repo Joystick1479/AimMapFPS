@@ -5,6 +5,9 @@
 
 #include "TimerManager.h"
 #include "Weapons/BaseWeaponClass.h"
+#include "Kismet/GameplayStatics.h"
+#include "Sound/SoundCue.h" 
+
 
 void AAI_SoldierCharacter::StartFire()
 {
@@ -16,12 +19,13 @@ void AAI_SoldierCharacter::StartFire()
 			bFireAnimation = true;
 			CurrentWeapon->StartFire();
 		}
-		if (CurrentWeapon->GetCurrentAmmoInClip() == 0)
+		/*if (CurrentWeapon->GetCurrentAmmoInClip() == 0)
 		{
 			bReloading = true;
 			CurrentWeapon->StartReload();
+			UGameplayStatics::PlaySoundAtLocation(GetWorld(), ReloadSound, this->GetActorLocation());
 			GetWorldTimerManager().SetTimer(ReloadTimer, this, &AAI_SoldierCharacter::StopReload, 2.167f, false);
-		}
+		}*/
 	}
 	
 }

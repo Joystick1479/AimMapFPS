@@ -1147,7 +1147,25 @@ void ASoldierCharacter::StartFire()
 				if (CurrentWeapon->GetCurrentAmmoInClip() > 0 && CurrentWeapon->CurrentState != EWeaponState::Reloading )
 				{
 					bFireAnimation = true;
+
 					CurrentWeapon->StartFire();
+
+					APlayerController* PC = Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
+					if (PC && bZooming == true)
+					{
+						PC->ClientPlayCameraShake(CameShakeZoomClass);
+					}
+					else
+					{
+						PC->ClientPlayCameraShake(CameShakeHipClass);
+					}
+				}
+				else if (CurrentWeapon->GetCurrentAmmoInClip() == 0)
+				{
+					if (IsLocallyControlled())
+					{
+						UGameplayStatics::PlaySound2D(this, NoAmmoSound);
+					}
 				}
 			}
 		}
@@ -1158,8 +1176,25 @@ void ASoldierCharacter::StartFire()
 				if (CurrentWeapon->GetCurrentAmmoInClip() > 0 && CurrentWeapon->CurrentState != EWeaponState::Reloading)
 				{
 					bFireAnimation = true;
+					CurrentWeapon->Fire();
+					APlayerController* PC = Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
+					if (PC && bZooming == true)
+					{
+						PC->ClientPlayCameraShake(CameShakeZoomClass);
+					}
+					else
+					{
+						PC->ClientPlayCameraShake(CameShakeHipClass);
+					}
 				}
-				CurrentWeapon->Fire();
+				else if (CurrentWeapon->GetCurrentAmmoInClip() == 0)
+				{
+					if (IsLocallyControlled())
+					{
+						UGameplayStatics::PlaySound2D(this, NoAmmoSound);
+					}
+				}
+
 			}
 		}
 	}
@@ -1324,6 +1359,8 @@ void ASoldierCharacter::Reload()
 			CurrentWeapon->StartReload();
 			//ServerReloadingSound();
 			GetWorldTimerManager().SetTimer(ReloadTimer, this, &ASoldierCharacter::StopReload, 2.167f, false);
+
+			UGameplayStatics::PlaySoundAtLocation(GetWorld(), ReloadSound, this->GetActorLocation());
 		}
 	}
 }
@@ -1559,6 +1596,28 @@ void ASoldierCharacter::OnDrinkLow()
 	}
 
 	GetWorldTimerManager().SetTimer(UpdateSurvivalComponent, this, &ASoldierCharacter::OnDrinkLow, 8.0f, false);
+}
+void ASoldierCharacter::PlayHitSound(FName SurfaceHit)
+{
+	if (IsLocallyControlled())
+	{
+		if (SurfaceHit == "Normal")
+		{
+			UGameplayStatics::PlaySound2D(this, HitSound);
+		}
+		else if (SurfaceHit == "Head")
+		{
+			UGameplayStatics::PlaySound2D(this, HeadshotSound);
+		}
+		else if (SurfaceHit == "Helmet")
+		{
+			UGameplayStatics::PlaySound2D(this, HelmetSound);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("No surface detected"));
+		}
+	}
 }
 bool ASoldierCharacter::GetbDied()
 {

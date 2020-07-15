@@ -234,9 +234,6 @@ protected:
 	USoundCue* ReloadSound;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Effects")
-	USoundCue* NoAmmoSound;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Effects")
 	USoundCue* HeadshotSound;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Effects")

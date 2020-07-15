@@ -34,7 +34,7 @@
 // Sets default values
 ABaseWeaponClass::ABaseWeaponClass()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	CameraSocket = "CameraSocket";
@@ -104,7 +104,7 @@ void ABaseWeaponClass::BeginPlay()
 	FTimerDelegate DelegateFunc = FTimerDelegate::CreateUObject(this, &ABaseWeaponClass::SetbWeaponSway, bStartWeaponSway);
 	GetWorldTimerManager().SetTimer(TimerHandle_SwayTimer, DelegateFunc, 3.0f, false);
 
-	
+
 
 }
 
@@ -169,7 +169,7 @@ int32 ABaseWeaponClass::GetCurrentAmountOfClips()
 void ABaseWeaponClass::AddMagazine()
 {
 	CurrentAmountOfClips++;
-}	
+}
 
 void ABaseWeaponClass::Tick(float DeltaTime)
 {
@@ -268,7 +268,7 @@ void ABaseWeaponClass::SetWeaponSway(float SwayDirection)
 }
 void ABaseWeaponClass::StartFire()
 {
-	float FirstDelay = FMath::Max(LastFireTime + TimeBetweenShots - GetWorld()->TimeSeconds,0.0f);
+	float FirstDelay = FMath::Max(LastFireTime + TimeBetweenShots - GetWorld()->TimeSeconds, 0.0f);
 	GetWorldTimerManager().SetTimer(TimerHandle_TimeBetweenShots, this, &ABaseWeaponClass::Fire, TimeBetweenShots, true, FirstDelay);
 }
 
@@ -283,7 +283,7 @@ void ABaseWeaponClass::Fire()
 	{
 		ServerFire();
 	}
-	
+
 	if (CurrentAmmoInClip > 0 && CurrentState != EWeaponState::Reloading)
 	{
 		CurrentState = EWeaponState::Firing;
@@ -343,30 +343,41 @@ void ABaseWeaponClass::Fire()
 					if (SurfaceType == SURFACE_HEAD)
 					{
 						ActualDamage *= 4.0f;
-						UGameplayStatics::PlaySoundAtLocation(GetWorld(), HeadshotSound, GetActorLocation());
+
+						SoldierCharacter->PlayHitSound("Head");
+
+						//UGameplayStatics::PlaySoundAtLocation(GetWorld(), HeadshotSound, GetActorLocation());
 					}
 					if (SurfaceType == SURFACE_CHEST)
 					{
 						ActualDamage *= 2.0f;
 
-						UGameplayStatics::PlaySoundAtLocation(GetWorld(), HitSound, GetActorLocation());
+						SoldierCharacter->PlayHitSound("Normal");
+
+						//UGameplayStatics::PlaySoundAtLocation(GetWorld(), HitSound, GetActorLocation());
 					}
 					if (SurfaceType == SURFACE_LEG)
 					{
-						UGameplayStatics::PlaySoundAtLocation(GetWorld(), HitSound, GetActorLocation());
+						//UGameplayStatics::PlaySoundAtLocation(GetWorld(), HitSound, GetActorLocation());
 
 						ActualDamage *= 0.5f;
+
+						SoldierCharacter->PlayHitSound("Normal");
 					}
 					if (SurfaceType == SURFACE_ARM)
 					{
-						UGameplayStatics::PlaySoundAtLocation(GetWorld(), HitSound, GetActorLocation());
+						//UGameplayStatics::PlaySoundAtLocation(GetWorld(), HitSound, GetActorLocation());
 
 						ActualDamage *= 1.5f;
+
+						SoldierCharacter->PlayHitSound("Normal");
 					}
 					if (SurfaceType == SURFACE_HELMET)
 					{
+						SoldierCharacter->PlayHitSound("Helmet");
+
 						//NO DAMAGE, HELMET BLOCKED THE DAMAGED AND PLAYED OTHER SOUND
-						UGameplayStatics::PlaySoundAtLocation(GetWorld(), HelmetSound, GetActorLocation());
+						//UGameplayStatics::PlaySoundAtLocation(GetWorld(), HelmetSound, GetActorLocation());
 					}
 					UGameplayStatics::ApplyPointDamage(HitActor, ActualDamage, ShotDirection, Hit, MyOwner->GetInstigatorController(), MyOwner, DamageType);
 					UseAmmo();
@@ -384,7 +395,7 @@ void ABaseWeaponClass::Fire()
 				}
 			}
 		}
-		else if(SoldierCharacter->GetbZooming() == false || DistanceToObject > 0.35f)
+		else if (SoldierCharacter->GetbZooming() == false || DistanceToObject > 0.35f)
 		{
 			///RECOIL
 			float randomval = UKismetMathLibrary::RandomFloatInRange(-0.1, -0.5);
@@ -445,27 +456,36 @@ void ABaseWeaponClass::Fire()
 					if (SurfaceType == SURFACE_HEAD)
 					{
 						ActualDamage *= 4.0f;
-						UGameplayStatics::PlaySoundAtLocation(GetWorld(), HeadshotSound, GetActorLocation());
+
+						SoldierCharacter->PlayHitSound("Head");
+						//UGameplayStatics::PlaySoundAtLocation(GetWorld(), HeadshotSound, GetActorLocation());
 					}
 					if (SurfaceType == SURFACE_CHEST)
 					{
 						ActualDamage *= 2.0f;
 
-						UGameplayStatics::PlaySoundAtLocation(GetWorld(), HitSound, GetActorLocation());
+						SoldierCharacter->PlayHitSound("Normal");
+
+						//UGameplayStatics::PlaySoundAtLocation(GetWorld(), HitSound, GetActorLocation());
 					}
 					if (SurfaceType == SURFACE_LEG)
 					{
 						ActualDamage *= 0.5f;
-						UGameplayStatics::PlaySoundAtLocation(GetWorld(), HitSound, GetActorLocation());
+
+						SoldierCharacter->PlayHitSound("Normal");
+						//UGameplayStatics::PlaySoundAtLocation(GetWorld(), HitSound, GetActorLocation());
 					}
 					if (SurfaceType == SURFACE_ARM)
 					{
 						ActualDamage *= 1.5f;
-						UGameplayStatics::PlaySoundAtLocation(GetWorld(), HitSound, GetActorLocation());
+
+						SoldierCharacter->PlayHitSound("Normal");
+						//UGameplayStatics::PlaySoundAtLocation(GetWorld(), HitSound, GetActorLocation());
 					}
 					if (SurfaceType == SURFACE_HELMET)
 					{
-						UGameplayStatics::PlaySoundAtLocation(GetWorld(), HelmetSound, GetActorLocation());
+						SoldierCharacter->PlayHitSound("Helmet");
+						//UGameplayStatics::PlaySoundAtLocation(GetWorld(), HelmetSound, GetActorLocation());
 					}
 					UGameplayStatics::ApplyPointDamage(HitActor, ActualDamage, ShotDirection, Hit, MyOwner->GetInstigatorController(), MyOwner, DamageType);
 					UseAmmo();
@@ -486,20 +506,20 @@ void ABaseWeaponClass::Fire()
 	}
 
 
-		LastFireTime = GetWorld()->TimeSeconds;
+	LastFireTime = GetWorld()->TimeSeconds;
 
 	//*Sound when no ammo in clip*//
 
-	if (CurrentAmmoInClip == 0 && CurrentState!=EWeaponState::Reloading)
+	if (CurrentAmmoInClip == 0 && CurrentState != EWeaponState::Reloading)
 	{
 		ASoldierCharacter* SoldierCharacterAnimation = Cast<ASoldierCharacter>(GetOwner());
 		if (SoldierCharacterAnimation)
 		{
 			SoldierCharacterAnimation->bFireAnimation = false;
 		}
-		UGameplayStatics::PlaySoundAtLocation(GetWorld(), NoAmmoSound, GetActorLocation());
+		
 	}
-	
+
 }
 void ABaseWeaponClass::UseAmmo()
 {
@@ -544,7 +564,7 @@ void ABaseWeaponClass::PlayFireEffects(FVector EndLocation)
 	{
 		if (MyOwner->IsLocallyControlled())
 		{
-			APlayerController* PC = Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
+			/*APlayerController* PC = Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
 			ASoldierCharacter* SoldierCharacterOwner = Cast<ASoldierCharacter>(GetOwner());
 			if (PC && SoldierCharacterOwner->GetbZooming() == true)
 			{
@@ -553,11 +573,11 @@ void ABaseWeaponClass::PlayFireEffects(FVector EndLocation)
 			else
 			{
 				PC->ClientPlayCameraShake(CameShakeHipClass);
-			}
+			}*/
 		}
-		
+
 	}
-	
+
 }
 void ABaseWeaponClass::StartReload()
 {
@@ -567,7 +587,7 @@ void ABaseWeaponClass::StartReload()
 		//return;
 	}
 
-	if (ReloadingState == EReloadingState::None && CurrentAmountOfClips>0)
+	if (ReloadingState == EReloadingState::None && CurrentAmountOfClips > 0)
 	{
 		ReloadingState = EReloadingState::Reloading;
 		CurrentState = EWeaponState::Reloading;
@@ -587,13 +607,13 @@ void ABaseWeaponClass::StopReload()
 
 void ABaseWeaponClass::ReloadWeapon()
 {
-		CurrentAmmoInClip = 20;
-		CurrentAmountOfClips--;
+	CurrentAmmoInClip = 20;
+	CurrentAmountOfClips--;
 
-		CurrentState = EWeaponState::Idle;
-		ReloadingState = EReloadingState::None;
+	CurrentState = EWeaponState::Idle;
+	ReloadingState = EReloadingState::None;
 
-		UE_LOG(LogTemp, Warning, TEXT("Reloaded"));
+	UE_LOG(LogTemp, Warning, TEXT("Reloaded"));
 }
 void ABaseWeaponClass::ServerFire_Implementation()
 {
@@ -630,7 +650,7 @@ void ABaseWeaponClass::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	//This function tells us how we want to replicate things//
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME_CONDITION(ABaseWeaponClass, HitScanTrace,COND_SkipOwner);
+	DOREPLIFETIME_CONDITION(ABaseWeaponClass, HitScanTrace, COND_SkipOwner);
 	DOREPLIFETIME(ABaseWeaponClass, SkelMeshComp);
 
 

@@ -279,8 +279,12 @@ protected:
 	void Headbobbing();
 	void UpdateRifleStatus();
 	void FireMode();
+
+	UFUNCTION(BlueprintCallable)
 	virtual void Reload();
+	UFUNCTION(BlueprintCallable)
 	virtual void StopReload();
+
 	void ZoomIn();
 	void ZoomOut();
 
@@ -336,10 +340,30 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Sounds")
 	USoundCue* OutOfBreath;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Sounds")
+	USoundCue* ReloadSound;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Sounds")
+	USoundCue* NoAmmoSound;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Sounds")
+	USoundCue* HeadshotSound;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Sounds")
+	USoundCue* HelmetSound;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Sounds")
+	USoundCue* HitSound;
+
 	UPROPERTY(EditDefaultsOnly, Category = "FlashMaterial")
 	UMaterialParameterCollection* MaterialCollection;
 
 
+	UPROPERTY(EditDefaultsOnly, Category = "Player")
+	TSubclassOf<UCameraShake> CameShakeHipClass;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Player")
+	TSubclassOf<UCameraShake> CameShakeZoomClass;
 
 
 	///Multiplayer Replication
@@ -677,6 +701,8 @@ public:
 	bool bFireAnimation;
 	
 	void Flashbang(float ThrowDistance, FVector PlayerFacingAngle);
+
+	void PlayHitSound(FName SurfaceHit);
 
 
 	
