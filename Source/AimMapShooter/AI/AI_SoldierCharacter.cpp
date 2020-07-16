@@ -11,7 +11,6 @@
 
 void AAI_SoldierCharacter::StartFire()
 {
-	
 	if (CurrentWeapon)
 	{
 		if (CurrentWeapon->GetCurrentAmmoInClip() > 0 && CurrentWeapon->CurrentState != EWeaponState::Reloading)
@@ -19,15 +18,7 @@ void AAI_SoldierCharacter::StartFire()
 			bFireAnimation = true;
 			CurrentWeapon->StartFire();
 		}
-		/*if (CurrentWeapon->GetCurrentAmmoInClip() == 0)
-		{
-			bReloading = true;
-			CurrentWeapon->StartReload();
-			UGameplayStatics::PlaySoundAtLocation(GetWorld(), ReloadSound, this->GetActorLocation());
-			GetWorldTimerManager().SetTimer(ReloadTimer, this, &AAI_SoldierCharacter::StopReload, 2.167f, false);
-		}*/
 	}
-	
 }
 
 void AAI_SoldierCharacter::StopReload()

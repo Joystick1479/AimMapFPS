@@ -36,6 +36,7 @@
 
 #include "3rdPersonMeshes/Rifle_3rd.h"
 #include "3rdPersonMeshes/AK47_3rd.h"
+#include "3rdPersonMeshes/M4_3rd.h"
 
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -218,7 +219,7 @@ void ASoldierCharacter::BeginPlay()
 	if (CameraManager)
 	{
 		CameraManager->ViewPitchMax = 45.0f;
-		CameraManager->ViewPitchMin = -60.0f;
+		CameraManager->ViewPitchMin = -90.0f;
 	}
 
 
@@ -714,13 +715,15 @@ void ASoldierCharacter::PickUp(ABaseWeaponClass* Weapons, ABaseAttachmentClass* 
 					Scar->SetOwner(this);
 					Scar->AttachToComponent(FPPMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocket);
 					Scar->GetSkelMeshComp()->bOnlyOwnerSee = true;
-					//Scar->GetSkelMeshComp()->SetAnimInstanceClass(AnimBp);
 					Scar->GetSphereComp()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
 					CurrentWeapon = Scar;
 					bIsWeaponAttached = true;
+					Scar->SetupWeapon(ScarH->GetCurrentAmmoInClip(), ScarH->GetCurrentAmountOfClips());
+
 					ScarH->Destroy();
 				}
-
+				
 				AK_3rd = GetWorld()->SpawnActor<AAK47_3rd>(AKThirdWeaponClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
 				if (AK_3rd)
 				{
@@ -747,12 +750,25 @@ void ASoldierCharacter::PickUp(ABaseWeaponClass* Weapons, ABaseAttachmentClass* 
 					M4->SetOwner(this);
 					M4->AttachToComponent(FPPMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocket);
 					M4->GetSkelMeshComp()->bOnlyOwnerSee = true;
-					//Scar->GetSkelMeshComp()->SetAnimInstanceClass(AnimBp);
 					M4->GetSphereComp()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
 					CurrentWeapon = M4;
 					bIsWeaponAttached = true;
+
+					M4->SetupWeapon(M4Rifle->GetCurrentAmmoInClip(), M4Rifle->GetCurrentAmountOfClips());
+
 					M4Rifle->Destroy();
 				}
+				
+				M4_3rd = GetWorld()->SpawnActor<AM4_3rd>(M4ThirdWeaponClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
+				if (M4_3rd)
+				{
+					M4_3rd->SetOwner(this);
+					M4_3rd->AttachToComponent(this->GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocket);
+					M4_3rd->GetSkelMeshComp()->bOwnerNoSee = true;
+				}
+				
+				
 			}
 		}
 		AHoloScope * HoloAttachment = Cast<AHoloScope>(Attachments);
@@ -1049,7 +1065,7 @@ void ASoldierCharacter::CalcCamera(float DeltaTime, struct FMinimalViewInfo& Out
 
 		// Get the weapon sight transform
 		FTransform SightTransform;
-		if (HoloScope)
+		if (HoloScope && bIsHoloAttached)
 		{
 			SightTransform = HoloScope->GetMeshComponent()->GetSocketTransform(FName(TEXT("LineSocket")));
 		}
@@ -1078,7 +1094,7 @@ void ASoldierCharacter::CalcCamera(float DeltaTime, struct FMinimalViewInfo& Out
 		{
 			AimAlpha = UKismetMathLibrary::FInterpTo(AimAlpha, 1.0f, UGameplayStatics::GetWorldDeltaSeconds(GetWorld()), ZoomInterpSpeed);
 
-			if (HoloScope)
+			if (HoloScope && bIsHoloAttached)
 			{
 				
 				FieldOfView = UKismetMathLibrary::FInterpTo(FieldOfView, HoloScopeFieldOfView, UGameplayStatics::GetWorldDeltaSeconds(GetWorld()), ZoomInterpSpeed);
@@ -1401,6 +1417,12 @@ void ASoldierCharacter::UpdateRifleStatus()
 		SoldierCurrentAmmo = CurrentWeapon->GetAllAmmo();
 		SoldierCurrentClips = CurrentWeapon->GetCurrentAmountOfClips();
 	}
+	if(!bIsWeaponAttached)
+	{
+		SoldierCurrentAmmoInClip = 0;
+		SoldierCurrentAmmo = 0;
+		SoldierCurrentClips = 0;
+	}
 	GetWorldTimerManager().SetTimer(UpdateRifleTimer, this, &ASoldierCharacter::UpdateRifleStatus, 0.05f, false);
 }
 void ASoldierCharacter::WeaponInspectionOn()
@@ -1628,8 +1650,6 @@ void ASoldierCharacter::StartDropGun()
 		bDropGun = true;
 
 		GetWorldTimerManager().SetTimer(DropTimer, this, &ASoldierCharacter::EndDropGun, 0.667f);
-
-		UE_LOG(LogTemp, Warning, TEXT("Start drop gun "));
 	}
 
 }
@@ -1640,14 +1660,70 @@ void ASoldierCharacter::EndDropGun()
 	if (CurrentWeapon)
 	{
 		bIsWeaponAttached = false;
+		AScarH* ScarH = Cast<AScarH>(CurrentWeapon);
+		if (ScarH)
+		{
+			FActorSpawnParameters SpawnParams;
+			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+			Scar = GetWorld()->SpawnActor<AScarH>(ScarHRifleClass, this->GetActorLocation(), this->GetActorRotation(), SpawnParams);
+			if (Scar)
+			{
+				FVector LocationVector = CameraComp->GetComponentLocation();
+				FVector RotationVector = CameraComp->GetComponentRotation().Vector();
+				FVector DirectionVector = LocationVector + RotationVector;
+				Scar->GetSkelMeshComp()->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+				Scar->GetSkelMeshComp()->SetCollisionProfileName("Pawn");
+				Scar->GetSkelMeshComp()->SetSimulatePhysics(true);
+				Scar->GetSkelMeshComp()->AddImpulse(DirectionVector* SpawnImpulse, NAME_None, true);
+				Scar->SetupWeapon(SoldierCurrentAmmoInClip, SoldierCurrentClips);
+			}
+		}
+		AM4Rifle*  M4Rifle = Cast<AM4Rifle>(CurrentWeapon);
+		if (M4Rifle)
+		{
+			FActorSpawnParameters SpawnParams;
+			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+			M4 = GetWorld()->SpawnActor<AM4Rifle>(M4RifleClass, this->GetActorLocation(), this->GetActorRotation(), SpawnParams);
+			if (M4)
+			{
+				FVector LocationVector = CameraComp->GetComponentLocation();
+				FVector RotationVector = CameraComp->GetComponentRotation().Vector();
+				FVector DirectionVector = LocationVector + RotationVector;
+				M4->GetSkelMeshComp()->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+				M4->GetSkelMeshComp()->SetCollisionProfileName("Pawn");
+				M4->GetSkelMeshComp()->SetSimulatePhysics(true);
+				M4->GetSkelMeshComp()->AddImpulse(DirectionVector* SpawnImpulse, NAME_None, true);
+				M4->SetupWeapon(SoldierCurrentAmmoInClip, SoldierCurrentClips);
+			}
+		}
+		if (Grip)
+		{
+			bGripAttached = false;
+			GripEquipState = EGripAttachment::None;
+			Grip->Destroy();
+		}
+		if (HoloScope)
+		{
+			bIsHoloAttached = false;
+			HoloEquipState = EHoloAttachment::None;
+			HoloScope->Destroy();
+		}
+		
 		CurrentWeapon->Destroy();
+
 		HoldingWeaponState = EHoldingWeapon::None;
 
-		UE_LOG(LogTemp, Warning, TEXT("Destroying gun "));
-
+	}
+	if (AK_3rd)
+	{
+		AK_3rd->Destroy();
+	}
+	if(M4_3rd)
+	{
+		M4_3rd->Destroy();
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("End drop gun "));
+	GetWorldTimerManager().ClearTimer(DropTimer);
 }
 bool ASoldierCharacter::GetbDied()
 {

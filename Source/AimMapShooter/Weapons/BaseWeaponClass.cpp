@@ -56,13 +56,13 @@ ABaseWeaponClass::ABaseWeaponClass()
 
 	SphereComp = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
 	SphereComp->SetupAttachment(SkelMeshComp);
-
 	//
 	CurrentState = EWeaponState::Idle;
 	//
-	CurrentAmmo = 0;
-	CurrentAmmoInClip = 0;
-	CurrentAmountOfClips = 0;
+	CurrentAmmoInClip = WeaponConfig.AmmoPerClip;
+	CurrentAmmo = WeaponConfig.AmmoPerClip * WeaponConfig.InitialClips;
+	WeaponConfig.InitialClips--;
+	CurrentAmountOfClips = WeaponConfig.InitialClips;
 	//
 	SmoothSway1 = 5.0f;
 	SmoothSway2 = 3.0f;
@@ -81,22 +81,17 @@ ABaseWeaponClass::ABaseWeaponClass()
 	MinNetUpdateFrequency = 33.0f;
 
 }
-
+void ABaseWeaponClass::SetupWeapon(int32 LoadedAmmo, int32 NumberofClips)
+{
+	CurrentAmmoInClip = LoadedAmmo;
+	CurrentAmountOfClips = NumberofClips;
+}
 // Called when the game starts or when spawned
 void ABaseWeaponClass::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (WeaponConfig.InitialClips > 0)
-	{
-		CurrentAmmoInClip = WeaponConfig.AmmoPerClip;
-		CurrentAmmo = WeaponConfig.AmmoPerClip * WeaponConfig.InitialClips;
-		WeaponConfig.InitialClips--; ///* Minus one clip when we pick up the gun because it's already loaded *///
-		CurrentAmountOfClips = WeaponConfig.InitialClips;
-	}
-
 	TimeBetweenShots = 60 / RateOfFire;
-
 
 	//Setting up weapon sway with a small delay
 	FTimerHandle TimerHandle_SwayTimer;
@@ -165,6 +160,7 @@ int32 ABaseWeaponClass::GetCurrentAmountOfClips()
 {
 	return CurrentAmountOfClips;
 }
+
 
 void ABaseWeaponClass::AddMagazine()
 {
@@ -293,8 +289,6 @@ void ABaseWeaponClass::Fire()
 		ALaser* Laser = Cast<ALaser>(GetOwner());
 		if (SoldierCharacter->GetbZooming() && DistanceToObject < 0.35f)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Zooming"));
-
 			///RECOIL
 			float PitchRandomVal = UKismetMathLibrary::RandomFloatInRange(-0.1, -0.5);
 			SoldierCharacter->AddControllerPitchInput(PitchRandomVal);
@@ -345,29 +339,21 @@ void ABaseWeaponClass::Fire()
 						ActualDamage *= 4.0f;
 
 						SoldierCharacter->PlayHitSound("Head");
-
-						//UGameplayStatics::PlaySoundAtLocation(GetWorld(), HeadshotSound, GetActorLocation());
 					}
 					if (SurfaceType == SURFACE_CHEST)
 					{
 						ActualDamage *= 2.0f;
 
 						SoldierCharacter->PlayHitSound("Normal");
-
-						//UGameplayStatics::PlaySoundAtLocation(GetWorld(), HitSound, GetActorLocation());
 					}
 					if (SurfaceType == SURFACE_LEG)
 					{
-						//UGameplayStatics::PlaySoundAtLocation(GetWorld(), HitSound, GetActorLocation());
-
 						ActualDamage *= 0.5f;
 
 						SoldierCharacter->PlayHitSound("Normal");
 					}
 					if (SurfaceType == SURFACE_ARM)
 					{
-						//UGameplayStatics::PlaySoundAtLocation(GetWorld(), HitSound, GetActorLocation());
-
 						ActualDamage *= 1.5f;
 
 						SoldierCharacter->PlayHitSound("Normal");
@@ -376,8 +362,6 @@ void ABaseWeaponClass::Fire()
 					{
 						SoldierCharacter->PlayHitSound("Helmet");
 
-						//NO DAMAGE, HELMET BLOCKED THE DAMAGED AND PLAYED OTHER SOUND
-						//UGameplayStatics::PlaySoundAtLocation(GetWorld(), HelmetSound, GetActorLocation());
 					}
 					UGameplayStatics::ApplyPointDamage(HitActor, ActualDamage, ShotDirection, Hit, MyOwner->GetInstigatorController(), MyOwner, DamageType);
 					UseAmmo();
@@ -402,8 +386,6 @@ void ABaseWeaponClass::Fire()
 			SoldierCharacter->AddControllerPitchInput(randomval);
 			float YawRandomVal = UKismetMathLibrary::RandomFloatInRange(-0.2, 0.2);
 			SoldierCharacter->AddControllerYawInput(YawRandomVal);
-
-			UE_LOG(LogTemp, Warning, TEXT("NotZooming"));
 
 			AActor* MyOwner = GetOwner();
 			if (MyOwner)
@@ -458,34 +440,28 @@ void ABaseWeaponClass::Fire()
 						ActualDamage *= 4.0f;
 
 						SoldierCharacter->PlayHitSound("Head");
-						//UGameplayStatics::PlaySoundAtLocation(GetWorld(), HeadshotSound, GetActorLocation());
 					}
 					if (SurfaceType == SURFACE_CHEST)
 					{
 						ActualDamage *= 2.0f;
 
 						SoldierCharacter->PlayHitSound("Normal");
-
-						//UGameplayStatics::PlaySoundAtLocation(GetWorld(), HitSound, GetActorLocation());
 					}
 					if (SurfaceType == SURFACE_LEG)
 					{
 						ActualDamage *= 0.5f;
 
 						SoldierCharacter->PlayHitSound("Normal");
-						//UGameplayStatics::PlaySoundAtLocation(GetWorld(), HitSound, GetActorLocation());
 					}
 					if (SurfaceType == SURFACE_ARM)
 					{
 						ActualDamage *= 1.5f;
 
 						SoldierCharacter->PlayHitSound("Normal");
-						//UGameplayStatics::PlaySoundAtLocation(GetWorld(), HitSound, GetActorLocation());
 					}
 					if (SurfaceType == SURFACE_HELMET)
 					{
 						SoldierCharacter->PlayHitSound("Helmet");
-						//UGameplayStatics::PlaySoundAtLocation(GetWorld(), HelmetSound, GetActorLocation());
 					}
 					UGameplayStatics::ApplyPointDamage(HitActor, ActualDamage, ShotDirection, Hit, MyOwner->GetInstigatorController(), MyOwner, DamageType);
 					UseAmmo();

@@ -209,6 +209,9 @@ protected:
 	TSubclassOf<AAK47_3rd> AKThirdWeaponClass;
 
 	UPROPERTY(EditDefaultsOnly, Replicated, Category = "Player")
+	TSubclassOf<class AM4_3rd> M4ThirdWeaponClass;
+
+	UPROPERTY(EditDefaultsOnly, Replicated, Category = "Player")
 	TSubclassOf<AHoloScope> HoloClass;
 
 	UPROPERTY(EditDefaultsOnly, Replicated, Category = "Player")
@@ -235,6 +238,8 @@ protected:
 	ARifle_3rd* Rifle_3rd;
 
 	AAK47_3rd* AK_3rd;
+
+	AM4_3rd* M4_3rd;
 
 	UPROPERTY(EditDefaultsOnly, Replicated, Category = "Weapon")
 	float ZoomingTime;
@@ -306,6 +311,9 @@ protected:
 	UPROPERTY(BlueprintReadWrite)
 	bool bDropGun;
 	FTimerHandle DropTimer;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Force")
+	float SpawnImpulse;
 
 
 	UFUNCTION()

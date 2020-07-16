@@ -85,6 +85,7 @@ class AIMMAPSHOOTER_API ABaseWeaponClass : public AActor
 public:	
 	// Sets default values for this actor's properties
 	ABaseWeaponClass();
+	void SetupWeapon(int32 LoadedAmmo, int32 NumberofClips);
 
 	UCameraComponent* GetCamera();
 	USkeletalMeshComponent* GetSkelMeshComp();
@@ -99,6 +100,7 @@ public:
 	int32 GetCurrentAmmoInClip();
 	int32 GetAllAmmo();
 	int32 GetCurrentAmountOfClips();
+
 	virtual void AddMagazine();
 	virtual void Fire();
 
