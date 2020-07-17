@@ -75,15 +75,14 @@ ASoldierCharacter::ASoldierCharacter()
 
 	RootComponent = this->GetRootComponent();
 
-	FPPMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("FPPMesh"));
-	FPPMesh->SetupAttachment(RootComponent);
-
 	SpringArm = CreateDefaultSubobject <USpringArmComponent>(TEXT("SpringArm"));
-	SpringArm->SetupAttachment(FPPMesh);
-	
+	SpringArm->SetupAttachment(RootComponent);
 
 	CameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComp"));
 	CameraComp->SetupAttachment(SpringArm);
+
+	FPPMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("FPPMesh"));
+	FPPMesh->SetupAttachment(CameraComp);
 
 
 	HealthComp = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComp"));
