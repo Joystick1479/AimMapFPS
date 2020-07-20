@@ -538,7 +538,10 @@ protected:
 	void TurnOnLaser();
 
 	UPROPERTY(VisibleAnywhere, Category = "Camera")
-		USpringArmComponent* SpringArm;
+	USpringArmComponent* SpringArm;
+
+	UPROPERTY(VisibleAnywhere, Category = "Camera")
+	USpringArmComponent* WeaponSpringArm;
 
 	FName HeadSocket;
 	FName ArmSocket;

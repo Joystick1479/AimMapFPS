@@ -161,6 +161,9 @@ protected:
 
 	float DirectionSway;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Weapon sway")
+	float ClampSwayDegree;
+
 	//Weapon clipping
 	UPROPERTY(BlueprintReadWrite,EditDefaultsOnly, Category = "Weapon clipping")
 	float DistanceToObject;

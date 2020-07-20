@@ -66,6 +66,7 @@ ABaseWeaponClass::ABaseWeaponClass()
 	//
 	SmoothSway1 = 5.0f;
 	SmoothSway2 = 3.0f;
+	ClampSwayDegree = 5.0f;
 	//
 	SmoothClipping = 7.0f;
 	//
@@ -222,7 +223,7 @@ void ABaseWeaponClass::CalculateWeaponSway()
 	{
 		InitialWeaponRotation = SoldierCharOwner->GetActorRotation();
 
-		if (!InitialWeaponRotation.Equals(FinalWeaponRotation))
+		if (InitialWeaponRotation != FinalWeaponRotation)
 		{
 			if (InitialWeaponRotation.Yaw > FinalWeaponRotation.Yaw)
 			{
@@ -256,7 +257,7 @@ void ABaseWeaponClass::SetWeaponSway(float SwayDirection)
 	FRotator CurrentRotation = this->GetSkelMeshComp()->GetRelativeTransform().Rotator();
 	FRotator FinalRotation = FRotator(CurrentRotation.Pitch + SwayDirection, CurrentRotation.Yaw, CurrentRotation.Roll);
 
-	FinalRotation.Pitch = UKismetMathLibrary::Clamp(FinalRotation.Pitch, -5.f, 5.f);
+	FinalRotation.Pitch = UKismetMathLibrary::Clamp(FinalRotation.Pitch, -ClampSwayDegree, ClampSwayDegree);
 
 	FRotator SwayRotation = UKismetMathLibrary::RInterpTo(CurrentRotation, FinalRotation, UGameplayStatics::GetWorldDeltaSeconds(GetWorld()), SmoothSway2);
 

@@ -84,6 +84,9 @@ ASoldierCharacter::ASoldierCharacter()
 	FPPMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("FPPMesh"));
 	FPPMesh->SetupAttachment(CameraComp);
 
+	WeaponSpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("WeaponSpring"));
+	WeaponSpringArm->SetupAttachment(FPPMesh);
+
 
 	HealthComp = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComp"));
 
@@ -156,6 +159,8 @@ void ASoldierCharacter::BeginPlay()
 		UE_LOG(LogTemp, Warning, TEXT("Multiplayer game mode "));
 		bSinglePlayerMode = false;
 	}
+
+	WeaponSpringArm->AttachToComponent(FPPMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocket);
 
 	/// TIMELINE///
 	FOnTimelineFloat onTimelineCallback;
@@ -712,9 +717,11 @@ void ASoldierCharacter::PickUp(ABaseWeaponClass* Weapons, ABaseAttachmentClass* 
 				if (Scar)
 				{
 					Scar->SetOwner(this);
-					Scar->AttachToComponent(FPPMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocket);
+					Scar->AttachToComponent(WeaponSpringArm, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 					Scar->GetSkelMeshComp()->bOnlyOwnerSee = true;
 					Scar->GetSphereComp()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+					//Turn out postprocess outline
+					Scar->GetSkelMeshComp()->SetRenderCustomDepth(false);
 
 					CurrentWeapon = Scar;
 					bIsWeaponAttached = true;
@@ -747,9 +754,11 @@ void ASoldierCharacter::PickUp(ABaseWeaponClass* Weapons, ABaseAttachmentClass* 
 				if (M4)
 				{
 					M4->SetOwner(this);
-					M4->AttachToComponent(FPPMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocket);
+					M4->AttachToComponent(WeaponSpringArm, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 					M4->GetSkelMeshComp()->bOnlyOwnerSee = true;
 					M4->GetSphereComp()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+					//Turn out postprocess outline
+					M4->GetSkelMeshComp()->SetRenderCustomDepth(false);
 
 					CurrentWeapon = M4;
 					bIsWeaponAttached = true;
@@ -1138,6 +1147,10 @@ void ASoldierCharacter::ZoomIn()
 			bZooming = true;
 		}
 	}
+	if (WeaponSpringArm)
+	{
+		WeaponSpringArm->bEnableCameraRotationLag = false;
+	}
 }
 void ASoldierCharacter::ZoomOut()
 {
@@ -1147,6 +1160,10 @@ void ASoldierCharacter::ZoomOut()
 		MoveComp->MaxWalkSpeed = 300.0f;
 
 		bZooming = false;
+	}
+	if (WeaponSpringArm)
+	{
+		WeaponSpringArm->bEnableCameraRotationLag = true;
 	}
 }
 void ASoldierCharacter::StartFire()
