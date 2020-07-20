@@ -27,7 +27,10 @@ protected:
 	void OnRep_Health(float OldHealth);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated, Category = "HealthComponent")
-	float DefaultHealth;
+	float DefaultHealth = 0;
+
+	UPROPERTY(BlueprintReadOnly,EditDefaultsOnly, Category = "HealthComponent")
+	uint8 TeamNum = 0;
 
 	UFUNCTION()
 	void HandleTakeAnyDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
@@ -37,9 +40,12 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	UPROPERTY(ReplicatedUsing = OnRep_Health, EditAnywhere, BlueprintReadWrite, Category = "HealthComponent")
-	float Health;
+	float Health = 0;
 
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 	FOnHealthChangedSignature OnHealthChanged;
+
+	UFUNCTION(BlueprintCallable,BlueprintPure, Category = "HealthComponent")
+	static bool IsFriendly(AActor* ActorA, AActor* ActorB);
 		
 };

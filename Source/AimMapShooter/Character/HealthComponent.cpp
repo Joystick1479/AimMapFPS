@@ -13,6 +13,8 @@ UHealthComponent::UHealthComponent()
 
 	DefaultHealth = 100.f;
 
+	TeamNum = 255;
+
 	SetIsReplicated(true);
 }
 
@@ -43,6 +45,8 @@ void UHealthComponent::OnRep_Health(float OldHealth)
 
 void UHealthComponent::HandleTakeAnyDamage(AActor * DamagedActor, float Damage, const UDamageType * DamageType, AController * InstigatedBy, AActor * DamageCauser)
 {
+	if (IsFriendly(DamagedActor, DamageCauser)) return;
+
 	Health = FMath::Clamp(Health - Damage, 0.0f, DefaultHealth);
 
 	OnHealthChanged.Broadcast(this, Health, Damage, DamageType, InstigatedBy, DamageCauser);
@@ -57,6 +61,22 @@ void UHealthComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	// ...
+}
+
+bool UHealthComponent::IsFriendly(AActor * ActorA, AActor * ActorB)
+{
+	if (ActorA == nullptr || ActorB == nullptr)
+	{
+		return true;
+	}
+	UHealthComponent* HealthCompA = Cast<UHealthComponent>(ActorA->GetComponentByClass(UHealthComponent::StaticClass()));
+	UHealthComponent* HealthCompB = Cast<UHealthComponent>(ActorB->GetComponentByClass(UHealthComponent::StaticClass()));
+	if (HealthCompA == nullptr || HealthCompB == nullptr)
+	{
+		return true;
+	}
+
+	return HealthCompA->TeamNum == HealthCompB->TeamNum;
 }
 
 void UHealthComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
