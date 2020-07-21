@@ -17,6 +17,7 @@ class ALaser;
 class UAnimSequence;
 class AHelmet;
 class USceneComponent;
+class AHoloScope;
 
 //Contains information of a single hitscan weapon line trace//
 USTRUCT()
@@ -56,23 +57,22 @@ struct FWeaponData
 	GENERATED_USTRUCT_BODY()
 
 	UPROPERTY(EditDefaultsOnly, Category = "Ammo")
-	int32 MaxAmmo;
-
-
-	UPROPERTY(EditDefaultsOnly, Category = "Ammo")
-	int32 AmmoPerClip;
+	int32 MaxAmmo = 0;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Ammo")
-	int32 InitialClips;
+	int32 AmmoPerClip = 0;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Ammo")
+	int32 InitialClips = 0;
 
 	UPROPERTY(EditDefaultsOnly, Category = WeaponStat)
-	float TimeBetweenReload;
+	float TimeBetweenReload = 0;
 
 	FWeaponData()
 	{
 		MaxAmmo = 100;
 		AmmoPerClip = 20;
-		InitialClips = 2;
+		InitialClips = 5;
 		TimeBetweenReload = 2.0f;
 	}
 };
@@ -86,6 +86,7 @@ public:
 	// Sets default values for this actor's properties
 	ABaseWeaponClass();
 	void SetupWeapon(int32 LoadedAmmo, int32 NumberofClips);
+	void SetupHoloScope(AHoloScope* HolScope);
 
 	UCameraComponent* GetCamera();
 	USkeletalMeshComponent* GetSkelMeshComp();
@@ -281,6 +282,8 @@ protected:
 	FRotator WeaponInitialRotation;
 
 	AHelmet* Helmet;
+
+	AHoloScope* HoloScope;
 
 	
 };

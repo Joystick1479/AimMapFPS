@@ -20,6 +20,7 @@
 
 #include "WeaponAttachments/Laser.h"
 #include "WeaponAttachments/Helmet.h"
+#include "WeaponAttachments/HoloScope.h"
 
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/GameplayStatics.h"
@@ -86,6 +87,10 @@ void ABaseWeaponClass::SetupWeapon(int32 LoadedAmmo, int32 NumberofClips)
 {
 	CurrentAmmoInClip = LoadedAmmo;
 	CurrentAmountOfClips = NumberofClips;
+}
+void ABaseWeaponClass::SetupHoloScope(AHoloScope * HolScope)
+{
+	HoloScope = HolScope;
 }
 // Called when the game starts or when spawned
 void ABaseWeaponClass::BeginPlay()
@@ -305,28 +310,37 @@ void ABaseWeaponClass::Fire()
 	{
 		CurrentState = EWeaponState::Firing;
 
-
 		ASoldierCharacter* SoldierCharacter = Cast<ASoldierCharacter>(GetOwner());
 		ALaser* Laser = Cast<ALaser>(GetOwner());
 		if (SoldierCharacter->GetbZooming() && DistanceToObject < 0.35f)
 		{
+			UE_LOG(LogTemp, Warning, TEXT("Zooming"));
+
 			///RECOIL
 			float PitchRandomVal = UKismetMathLibrary::RandomFloatInRange(-0.1, -0.5);
 			SoldierCharacter->AddControllerPitchInput(PitchRandomVal);
 			float YawRandomVal = UKismetMathLibrary::RandomFloatInRange(-0.2, 0.2);
 			SoldierCharacter->AddControllerYawInput(YawRandomVal);
 
-
 			AActor* MyOwner = GetOwner();
 			if (MyOwner)
 			{
 				FHitResult Hit;
+				
 				FVector StartLocation = SkelMeshComp->GetSocketLocation(ScopeSocket);
 				FRotator Rotation = SkelMeshComp->GetSocketRotation(ScopeSocket);
+				if (HoloScope)
+				{
+					StartLocation = HoloScope->GetMeshComponent()->GetSocketLocation("LineSocket");
+					Rotation = HoloScope->GetMeshComponent()->GetSocketRotation("LineSocket");
+				}
 				FVector ShotDirection = Rotation.Vector();
+
 				float HalfRad = FMath::DegreesToRadians(BulletSpreadZooming);
 				ShotDirection = FMath::VRandCone(ShotDirection, HalfRad, HalfRad);
 				FVector EndLocation = StartLocation + (ShotDirection * 100000);
+
+				DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::Red, false, 1.0f, 0, 1.0f);
 
 				FCollisionQueryParams QueryParams;
 				QueryParams.AddIgnoredActor(MyOwner);
@@ -334,10 +348,9 @@ void ABaseWeaponClass::Fire()
 				QueryParams.bReturnPhysicalMaterial = true;
 				QueryParams.bTraceComplex = true;
 
-				if (GetWorld()->LineTraceSingleByChannel(Hit, StartLocation, EndLocation, ECollisionChannel::ECC_Visibility, QueryParams))
+				if (GetWorld()->LineTraceSingleByChannel(Hit, StartLocation, EndLocation, ECollisionChannel::ECC_Destructible, QueryParams))
 				{
 					//DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::Red, false, 1.0f, 0, 1.0f);
-
 
 					PlayImpactEffects(Hit.ImpactPoint);
 
@@ -382,7 +395,6 @@ void ABaseWeaponClass::Fire()
 					if (SurfaceType == SURFACE_HELMET)
 					{
 						SoldierCharacter->PlayHitSound("Helmet");
-
 					}
 					UGameplayStatics::ApplyPointDamage(HitActor, ActualDamage, ShotDirection, Hit, MyOwner->GetInstigatorController(), MyOwner, DamageType);
 					UseAmmo();
@@ -402,6 +414,7 @@ void ABaseWeaponClass::Fire()
 		}
 		else if (SoldierCharacter->GetbZooming() == false || DistanceToObject > 0.35f)
 		{
+			UE_LOG(LogTemp, Warning, TEXT("No zooming"));
 			///RECOIL
 			float randomval = UKismetMathLibrary::RandomFloatInRange(-0.1, -0.5);
 			SoldierCharacter->AddControllerPitchInput(randomval);
@@ -413,8 +426,6 @@ void ABaseWeaponClass::Fire()
 			{
 				FHitResult Hit;
 				FVector StartLocation = SkelMeshComp->GetSocketLocation(MuzzleSocket);
-				//FRotator temp;
-				//MyOwner->GetActorEyesViewPoint(StartLocation, temp);
 				FRotator temp = SkelMeshComp->GetSocketRotation(MuzzleSocket);
 
 				FVector RotationCamera = temp.Vector();
@@ -434,7 +445,6 @@ void ABaseWeaponClass::Fire()
 				QueryParams.bReturnPhysicalMaterial = true;
 				QueryParams.bTraceComplex = true;
 
-
 				if (GetWorld()->LineTraceSingleByChannel(Hit, StartLocation, EndLocation, ECollisionChannel::ECC_Destructible, QueryParams))
 				{
 					//DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::White, false, 1.0f, 0, 1.0f);
@@ -442,7 +452,6 @@ void ABaseWeaponClass::Fire()
 					PlayImpactEffects(Hit.ImpactPoint);
 
 					SkelMeshComp->PlayAnimation(AnimFire, false);
-
 
 					//*Applying damage*//
 					AActor* HitActor = Hit.GetActor();
@@ -502,7 +511,6 @@ void ABaseWeaponClass::Fire()
 		}
 	}
 
-
 	LastFireTime = GetWorld()->TimeSeconds;
 
 	//*Sound when no ammo in clip*//
@@ -514,7 +522,6 @@ void ABaseWeaponClass::Fire()
 		{
 			SoldierCharacterAnimation->bFireAnimation = false;
 		}
-		
 	}
 
 }
@@ -588,11 +595,12 @@ void ABaseWeaponClass::StartReload()
 	{
 		ReloadingState = EReloadingState::Reloading;
 		CurrentState = EWeaponState::Reloading;
-
-		SkelMeshComp->PlayAnimation(AnimSeqReload, false);
+		
+		this->SkelMeshComp->PlayAnimation(AnimSeqReload, false);
+		
 		//UGameplayStatics::PlaySoundAtLocation(GetWorld(), ReloadSound, GetActorLocation());
 
-		GetWorldTimerManager().SetTimer(TimerHandle_ReloadWeapon, this, &ABaseWeaponClass::ReloadWeapon, 2.5f, false);
+		GetWorldTimerManager().SetTimer(TimerHandle_ReloadWeapon, this, &ABaseWeaponClass::ReloadWeapon, 2.167f, false);
 	}
 
 }

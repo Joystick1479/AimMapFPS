@@ -803,6 +803,7 @@ void ASoldierCharacter::PickUp(ABaseWeaponClass* Weapons, ABaseAttachmentClass* 
 						{
 							FName Socket = CurrentWeapon->GetScopeSocketName();
 							HoloScope->AttachToComponent(CurrentWeapon->GetSkelMeshComp(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, Socket);
+							CurrentWeapon->SetupHoloScope(HoloScope);
 						}
 						HoloScope->GetSphereComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 						bIsHoloAttached = true;
@@ -1080,6 +1081,7 @@ void ASoldierCharacter::CalcCamera(float DeltaTime, struct FMinimalViewInfo& Out
 		else if(CurrentWeapon)
 		{
 			SightTransform = CurrentWeapon->GetSkelMeshComp()->GetSocketTransform(FName(TEXT("LineSocket")));
+
 		}
 		FVector SightLocation = SightTransform.GetLocation();
 		FRotator SightRotation = SightTransform.GetRotation().Rotator();
