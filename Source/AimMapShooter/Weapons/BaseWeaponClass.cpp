@@ -186,20 +186,40 @@ void ABaseWeaponClass::LineTraceWeaponClipping()
 	ASoldierCharacter* SoldierCharacter = Cast<ASoldierCharacter>(GetOwner());
 	if (SoldierCharacter)
 	{
-		FVector SoldierCharacterLocation = SoldierCharacter->GetActorLocation();
-		FVector SoldierCharacterRotation = UKismetMathLibrary::GetForwardVector(SoldierCharacter->GetActorRotation());
-		FVector SoldierCharacterLength = SoldierCharacterRotation * 100.0f;
-		FVector SoldierCharacterLineEnd = SoldierCharacterLocation + SoldierCharacterLength;
+		FVector SoldierLocation = SoldierCharacter->GetActorLocation() +FVector(0.0f,0.0f,55.f);
+		FVector WeaponRotation = UKismetMathLibrary::GetRightVector(SoldierCharacter->GetFPPMesh()->GetComponentRotation());
+
+		float LengthOfLineTrace = 0;
+
+		if (SoldierCharacter->GetbIsCrouching())
+		{
+			LengthOfLineTrace = 200.f;
+		}
+		else
+		{
+			LengthOfLineTrace = 100.f;
+		}
+
+		FVector WeaponRotationVector = WeaponRotation * LengthOfLineTrace;
+		FVector WeaponDirectionVector = SoldierLocation + WeaponRotationVector;
 
 		FHitResult Hit;
 		FCollisionQueryParams QueryParams;
 		QueryParams.AddIgnoredActor(SoldierCharacter);
 		QueryParams.AddIgnoredActor(this);
 
-		if (GetWorld()->LineTraceSingleByChannel(Hit, SoldierCharacterLocation, SoldierCharacterLineEnd, ECollisionChannel::ECC_Visibility, QueryParams))
+		if (GetWorld()->LineTraceSingleByChannel(Hit, SoldierLocation, WeaponDirectionVector, ECollisionChannel::ECC_Visibility, QueryParams))
 		{
-			float CloseToObstacle;
-			CloseToObstacle = 50.0f / Hit.Distance;
+			float CloseToObstacle = 0;
+
+			if (SoldierCharacter->GetbIsCrouching())
+			{
+				CloseToObstacle = 100.0f / Hit.Distance;
+			}
+			else
+			{
+				CloseToObstacle = 50.0f / Hit.Distance;
+			}
 			CloseToObstacle = UKismetMathLibrary::FClamp(CloseToObstacle, 0.0f, 1.0f);
 
 			DistanceToObject = UKismetMathLibrary::Lerp(DistanceToObject, CloseToObstacle, UGameplayStatics::GetWorldDeltaSeconds(GetWorld()) * SmoothClipping);

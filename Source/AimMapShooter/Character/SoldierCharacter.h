@@ -247,9 +247,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player")
 	float stamina;
 
-	bool bResetBreath;
+	bool bResetBreath = false;
 
-	bool bWeaponOnBack;
+	bool bWeaponOnBack = false;
 
 	UPROPERTY(BlueprintReadOnly)
 	bool bIsInspecting;
@@ -257,9 +257,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "LineTrace")
 	float MaxUseDistance;
 
-	bool bDoRagdollOnce;
+	bool bDoRagdollOnce = false;
 
-	bool bStopSound;
+	bool bStopSound = false;
 
 
 	//Character Movement//
@@ -294,7 +294,7 @@ protected:
 	void ZoomOut();
 
 	void PickUp(ABaseWeaponClass* Weapons,ABaseAttachmentClass* Attachments, ABaseSurvivalItemClass* SurvivalItem);
-	bool bWantToPickUp;
+	bool bWantToPickUp = false;
 
 	void WeaponInspectionOn();
 	void WeaponInspectionOff();
@@ -712,7 +712,9 @@ public:
 	bool GetbGripAttached();
 	bool GetbWantToRespawn();
 	bool GetbWantToPickUp();
+	bool GetbIsCrouching();
 	void SetbZooming(bool SetZoom);
+	USkeletalMeshComponent* GetFPPMesh();
 
 	UPROPERTY(BlueprintReadOnly)
 	bool bFireAnimation;

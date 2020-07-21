@@ -1761,9 +1761,17 @@ bool ASoldierCharacter::GetbWantToPickUp()
 {
 	return bWantToPickUp;
 }
+bool ASoldierCharacter::GetbIsCrouching()
+{
+	return bIsCrouching;
+}
 void ASoldierCharacter::SetbZooming(bool SetZoom)
 {
 	bZooming = SetZoom;
+}
+USkeletalMeshComponent* ASoldierCharacter::GetFPPMesh()
+{
+	return FPPMesh;
 }
 void ASoldierCharacter::ServerDrinkWater_Implementation()
 {
