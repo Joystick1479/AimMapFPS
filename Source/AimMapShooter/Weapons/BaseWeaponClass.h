@@ -97,10 +97,10 @@ public:
 	FName GetGripSocketName();
 	FName GetLaserSocketName();
 
-	float GetDistanceToObject();
-	int32 GetCurrentAmmoInClip();
-	int32 GetAllAmmo();
-	int32 GetCurrentAmountOfClips();
+	float GetDistanceToObject() const;
+	int32 GetCurrentAmmoInClip() const;
+	int32 GetAllAmmo() const;
+	int32 GetCurrentAmountOfClips() const;
 
 	virtual void AddMagazine();
 	virtual void Fire();

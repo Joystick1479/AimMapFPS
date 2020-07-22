@@ -148,21 +148,21 @@ FName ABaseWeaponClass::GetLaserSocketName()
 	return this->LaserSocket;
 }
 
-int32 ABaseWeaponClass::GetCurrentAmmoInClip()
+int32 ABaseWeaponClass::GetCurrentAmmoInClip() const
 {
 	return CurrentAmmoInClip;
 }
 
-float ABaseWeaponClass::GetDistanceToObject()
+float ABaseWeaponClass::GetDistanceToObject() const
 {
 	return DistanceToObject;
 }
-int32 ABaseWeaponClass::GetAllAmmo()
+int32 ABaseWeaponClass::GetAllAmmo() const
 {
 	return CurrentAmmo;
 }
 
-int32 ABaseWeaponClass::GetCurrentAmountOfClips()
+int32 ABaseWeaponClass::GetCurrentAmountOfClips() const
 {
 	return CurrentAmountOfClips;
 }
@@ -314,8 +314,6 @@ void ABaseWeaponClass::Fire()
 		ALaser* Laser = Cast<ALaser>(GetOwner());
 		if (SoldierCharacter->GetbZooming() && DistanceToObject < 0.35f)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Zooming"));
-
 			///RECOIL
 			float PitchRandomVal = UKismetMathLibrary::RandomFloatInRange(-0.1, -0.5);
 			SoldierCharacter->AddControllerPitchInput(PitchRandomVal);
@@ -339,8 +337,6 @@ void ABaseWeaponClass::Fire()
 				float HalfRad = FMath::DegreesToRadians(BulletSpreadZooming);
 				ShotDirection = FMath::VRandCone(ShotDirection, HalfRad, HalfRad);
 				FVector EndLocation = StartLocation + (ShotDirection * 100000);
-
-				DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::Red, false, 1.0f, 0, 1.0f);
 
 				FCollisionQueryParams QueryParams;
 				QueryParams.AddIgnoredActor(MyOwner);
@@ -562,24 +558,6 @@ void ABaseWeaponClass::PlayFireEffects(FVector EndLocation)
 	if (ShootSound)
 	{
 		UGameplayStatics::PlaySoundAtLocation(GetWorld(), ShootSound, GetActorLocation());
-	}
-	APawn* MyOwner = Cast<APawn>(GetOwner());
-	if (MyOwner)
-	{
-		if (MyOwner->IsLocallyControlled())
-		{
-			/*APlayerController* PC = Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
-			ASoldierCharacter* SoldierCharacterOwner = Cast<ASoldierCharacter>(GetOwner());
-			if (PC && SoldierCharacterOwner->GetbZooming() == true)
-			{
-				PC->ClientPlayCameraShake(CameShakeZoomClass);
-			}
-			else
-			{
-				PC->ClientPlayCameraShake(CameShakeHipClass);
-			}*/
-		}
-
 	}
 
 }

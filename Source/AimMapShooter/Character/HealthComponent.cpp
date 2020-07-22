@@ -63,6 +63,7 @@ void UHealthComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 	// ...
 }
 
+
 bool UHealthComponent::IsFriendly(AActor * ActorA, AActor * ActorB)
 {
 	if (ActorA == nullptr || ActorB == nullptr)

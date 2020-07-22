@@ -36,6 +36,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void RespawningPlayer();
 
+	virtual void Tick(float DeltaTime) override;
+
+
 private:
 
 	uint32 NumberOfPlayers = 0;
@@ -67,7 +70,6 @@ private:
 	virtual void RestartPlayer(AController* PC) override;
 
 
-	virtual void Tick(float DeltaTime) override;
 
 
 };
