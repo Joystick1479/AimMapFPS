@@ -11,6 +11,7 @@ class AHeadset;
 class AGrip;
 class AHoloScope;
 class ALaser;
+class AMagazine;
 class UParticleSystem;
 
 UCLASS()
@@ -34,19 +35,22 @@ protected:
 	TArray<AActor*> Actors;
 
 	UPROPERTY()
-	AHoloScope* Holo;
+	AHoloScope* Holo = nullptr;
 
 	UPROPERTY()
-	AHelmet* Helmet;
+	AHelmet* Helmet = nullptr;
 
 	UPROPERTY()
-	AHeadset* Headset;
+	AHeadset* Headset = nullptr;
 
 	UPROPERTY()
-	ALaser* Laser;
+	ALaser* Laser = nullptr;
 
 	UPROPERTY()
-	AGrip* Grip;
+	AGrip* Grip = nullptr;
+
+	UPROPERTY()
+	AMagazine* Magazine = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Player")
 	TSubclassOf<AHoloScope> HoloClass;
@@ -62,6 +66,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Player")
 	TSubclassOf<AGrip> GripClass;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Player")
+	TSubclassOf<AMagazine> MagazineClass;
 
 	UPROPERTY(EditDefaultsOnly, Replicated, Category = "ParticlesEffects")
 	UParticleSystem* ParticleSystem;

@@ -8,6 +8,7 @@
 #include "WeaponAttachments/Headset.h"
 #include "WeaponAttachments/Grip.h"
 #include "WeaponAttachments/Laser.h"
+#include "WeaponAttachments/Magazine.h"
 #include "Character/SoldierCharacter.h"
 
 #include "Particles/ParticleSystem.h"
@@ -82,7 +83,7 @@ void ASpawningAttach::SpawnRandom()
 
 		}
 	}
-	if (randomNumber == 4)
+	/*if (randomNumber == 4)
 	{
 		 UE_LOG(LogTemp, Warning, TEXT("Laser"));
 		Laser = GetWorld()->SpawnActor<ALaser>(LaserClass, GetActorLocation(), GetActorRotation(), SpawnParams);
@@ -92,8 +93,8 @@ void ASpawningAttach::SpawnRandom()
 			Laser->GetMeshComponent()->bOnlyOwnerSee = false;
 
 		}
-	}
-	if (randomNumber == 5)
+	}*/
+	if (randomNumber == 4)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Grip"));
 		Grip = GetWorld()->SpawnActor<AGrip>(GripClass, GetActorLocation(), GetActorRotation(), SpawnParams);
@@ -101,6 +102,16 @@ void ASpawningAttach::SpawnRandom()
 		{
 			Grip->SetOwner(this);
 			Grip->GetMeshComponent()->bOnlyOwnerSee = false;
+		}
+	}
+	if (randomNumber == 5)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Magazine"));
+		Magazine = GetWorld()->SpawnActor<AMagazine>(MagazineClass, GetActorLocation(), GetActorRotation(), SpawnParams);
+		if (Magazine)
+		{
+			Magazine->SetOwner(this);
+			Magazine->GetMeshComponent()->bOnlyOwnerSee = false;
 		}
 	}
 

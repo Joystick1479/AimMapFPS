@@ -38,7 +38,6 @@ public:
 
 	virtual void Tick(float DeltaTime) override;
 
-
 private:
 
 	uint32 NumberOfPlayers = 0;

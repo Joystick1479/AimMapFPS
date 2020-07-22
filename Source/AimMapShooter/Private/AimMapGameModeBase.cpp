@@ -7,6 +7,8 @@
 
 #include "Character/SoldierCharacter.h"
 
+#include "GameFramework/PlayerStart.h" 
+
 #include "Sound/SoundCue.h"
 
 #include "Kismet/GameplayStatics.h"
@@ -101,6 +103,17 @@ void AAimMapGameModeBase::SpawnAndPossPawn(AController* PC)
 	if (PC)
 	{
 		AActor* StartSpot = FindPlayerStart(PC);
+
+		/*UWorld* World = GetWorld();
+
+		for (TActorIterator<APlayerStart> It(World); It; ++It)
+		{
+			APlayerStart* Start = *It;
+
+		}*/
+		
+
+
 		FActorSpawnParameters SpawnParams;
 		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
