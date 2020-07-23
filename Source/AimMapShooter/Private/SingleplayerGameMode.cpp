@@ -6,6 +6,8 @@
 #include "Character/HealthComponent.h"
 
 
+
+
 ASingleplayerGameMode::ASingleplayerGameMode()
 {
 	TimeBetweenWaves = 2.0f;
@@ -92,3 +94,4 @@ void ASingleplayerGameMode::SpawnBotTimerElapsed()
 		EndWave();
 	}
 }
+

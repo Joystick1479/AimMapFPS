@@ -9,6 +9,7 @@
 class ASoldierCharacter;
 class UUserWidget;
 class USoundCue;
+class APlayerStartActor;
 
 /**
  * 
@@ -38,6 +39,8 @@ public:
 
 	virtual void Tick(float DeltaTime) override;
 
+	virtual void BeginPlay() override;
+
 private:
 
 	uint32 NumberOfPlayers = 0;
@@ -60,6 +63,12 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "GameOver")
 	TSubclassOf<UUserWidget> GameOverWidget;
+
+
+	UPROPERTY(EditDefaultsOnly, Category = "ScoreActors")
+	TSubclassOf<APlayerStartActor> PlayerStartClass;
+
+	TArray<AActor*> PlayerStarts;
 
 	UPROPERTY()
 	UUserWidget* wGameOverWidget;

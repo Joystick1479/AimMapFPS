@@ -6,6 +6,7 @@
 #include "AimMapGameModeBase.h"
 #include "SingleplayerGameMode.generated.h"
 
+
 /**
  * 
  */
@@ -37,14 +38,13 @@ protected:
 
 	void CheckWaveState();
 
-
 public:
 
 	ASingleplayerGameMode();
 
 	virtual void Tick(float DeltaSeconds) override;
 
-
 	virtual void StartPlay() override;
+
 	
 };

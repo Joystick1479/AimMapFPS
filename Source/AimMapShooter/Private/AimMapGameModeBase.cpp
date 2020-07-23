@@ -7,18 +7,27 @@
 
 #include "Character/SoldierCharacter.h"
 
-#include "GameFramework/PlayerStart.h" 
+#include "PlayerStartActor.h"
 
 #include "Sound/SoundCue.h"
 
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Kismet/KismetMathLibrary.h"
 
 #include "Engine/LatentActionManager.h" 
 
 #include "UObject/UObjectGlobals.h"
 
 #include "EngineUtils.h"
+
+void AAimMapGameModeBase::BeginPlay()
+{
+	Super::BeginPlay();
+
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), PlayerStartClass, PlayerStarts);
+
+}
 
 void AAimMapGameModeBase::PostLogin(APlayerController * NewPlayer)
 {
@@ -60,7 +69,7 @@ void AAimMapGameModeBase::StartGame()
 	if (!ensure(World != nullptr)) return;
 
 	bUseSeamlessTravel = true;
-	World->ServerTravel("/Game/FoliagePackV1/Maps/Demo_Landscape_A?listen");
+	World->ServerTravel("/Game/Maps/Blockout_P?listen");
 
 	
 }
@@ -71,8 +80,8 @@ void AAimMapGameModeBase::RestartGame()
 	UWorld* World = GetWorld();
 	if (!ensure(World != nullptr)) return;
 
-	bUseSeamlessTravel = true;
-	World->ServerTravel("/Game/FoliagePackV1/Maps/Demo_Landscape_A?listen");
+	bUseSeamlessTravel = false;
+	World->ServerTravel("/Game/Maps/Blockout_P?listen");
 }
 
 void AAimMapGameModeBase::RespawningPlayer()
@@ -102,17 +111,16 @@ void AAimMapGameModeBase::SpawnAndPossPawn(AController* PC)
 		///TODO random spawns
 	if (PC)
 	{
-		AActor* StartSpot = FindPlayerStart(PC);
+		int randomNumber = UKismetMathLibrary::RandomInteger(PlayerStarts.Num());
 
-		/*UWorld* World = GetWorld();
+		AActor* StartSpot = PlayerStarts[randomNumber];
 
-		for (TActorIterator<APlayerStart> It(World); It; ++It)
+		APlayerStartActor * PlayerStartActor = Cast<APlayerStartActor>(StartSpot);
+		if (PlayerStartActor->GetbIsOverlapping())
 		{
-			APlayerStart* Start = *It;
-
-		}*/
-		
-
+			SpawnAndPossPawn(PC);
+			return;
+		}
 
 		FActorSpawnParameters SpawnParams;
 		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
@@ -138,5 +146,7 @@ void AAimMapGameModeBase::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 	
 }
+
+
 
 

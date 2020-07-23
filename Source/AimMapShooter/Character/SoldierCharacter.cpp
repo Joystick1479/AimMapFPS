@@ -1732,7 +1732,7 @@ void ASoldierCharacter::EndDropGun()
 		HoldingWeaponState = EHoldingWeapon::None;
 
 	}
-	AAK47_3rd* AK_3rdMesh = Cast<AAK47_3rd>(GetOwner());
+	/*AAK47_3rd* AK_3rdMesh = Cast<AAK47_3rd>(GetOwner());
 	if (AK_3rdMesh)
 	{
 		AK_3rdMesh->Destroy();
@@ -1741,7 +1741,7 @@ void ASoldierCharacter::EndDropGun()
 	if (M4_3rdMesh)
 	{
 		M4_3rdMesh->Destroy();
-	}
+	}*/
 
 	GetWorldTimerManager().ClearTimer(DropTimer);
 }
