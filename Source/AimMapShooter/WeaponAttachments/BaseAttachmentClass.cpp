@@ -42,7 +42,7 @@ void ABaseAttachmentClass::BeginPlay()
 	Super::BeginPlay();
 	
 }
-void ABaseAttachmentClass::PickUpAttachment()
+void ABaseAttachmentClass::PickUpAttachment(ABaseWeaponClass* Weapon)
 {
 	if (PawnOwner)
 	{
@@ -51,7 +51,7 @@ void ABaseAttachmentClass::PickUpAttachment()
 			USkeletalMeshComponent* PawnMesh1P = PawnOwner->GetFPPMesh();
 			USkeletalMeshComponent* PawnMesh3P = PawnOwner->GetMesh();
 			FName AttachPoint = PawnOwner->GetWeaponAttachPoint();
-			Mesh1P->AttachToComponent(PawnOwner->GetCurrentWeapon()->GetMesh1P(), FAttachmentTransformRules::SnapToTargetNotIncludingScale,GetAttachPoint());
+			Mesh1P->AttachToComponent(PawnOwner->GetCurrentWeapon()->GetMesh1P(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, GetAttachPoint());
 			Mesh3P->AttachToComponent(PawnOwner->GetCurrentWeapon()->GetMesh3P(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, GetAttachPoint());
 
 			//Turn off collision after picking up object to stop line trace to pick it up
@@ -63,6 +63,8 @@ void ABaseAttachmentClass::PickUpAttachment()
 			bAttachmentAttached = true;
 		}
 	}
+	
+	
 }
 void ABaseAttachmentClass::SetOwningPawn(ASoldierCharacter* SoldierCharacter)
 {

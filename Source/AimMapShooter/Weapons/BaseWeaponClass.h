@@ -91,6 +91,7 @@ public:
 	USkeletalMeshComponent* GetMesh1P() const;
 	USkeletalMeshComponent* GetMesh3P() const;
 	USphereComponent * GetSphereComp()const;
+	AHoloScope* GetHoloScope() const;
 
 	FName GetMuzzleSocketName() const;
 	FName GetScopeSocketName()const;

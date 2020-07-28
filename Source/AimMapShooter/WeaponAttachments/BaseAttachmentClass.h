@@ -9,6 +9,7 @@
 class UStaticMeshComponent;
 class USphereComponent;
 class ASoldierCharacter;
+class ABaseWeaponClass;
 
 UCLASS()
 class AIMMAPSHOOTER_API ABaseAttachmentClass : public AActor
@@ -47,7 +48,7 @@ public:
 	virtual bool bIsAttachmentAttached()const;
 
 
-	virtual void PickUpAttachment();
+	virtual void PickUpAttachment(ABaseWeaponClass* Weapon);
 	bool GetIfPickeditem();
 	void SetOwningPawn(ASoldierCharacter* SoldierCharacter);
 	void SetIfPickedItem(bool PickedUp);

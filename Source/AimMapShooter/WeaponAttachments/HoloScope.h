@@ -18,4 +18,5 @@ public:
 
 	virtual FName GetAttachPoint() const override;
 
+	virtual void PickUpAttachment(ABaseWeaponClass* Weapon) override;
 };

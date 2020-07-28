@@ -717,6 +717,8 @@ public:
 	bool GetbWantToPickUp()const;
 	bool GetbIsCrouching()const;
 	void SetbZooming(bool SetZoom);
+	void SetHoloScope(AHoloScope* Holo);
+	AHoloScope* GetHoloScope() const;
 	USkeletalMeshComponent* GetFPPMesh()const;
 	USpringArmComponent* GetWeaponSpringArm() const;
 	ABaseWeaponClass* GetCurrentWeapon() const;

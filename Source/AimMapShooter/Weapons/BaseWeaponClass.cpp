@@ -52,6 +52,9 @@ ABaseWeaponClass::ABaseWeaponClass()
 
 	Mesh1P = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Mesh1P"));
 	Mesh1P->CastShadow = false;
+	Mesh1P->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	Mesh1P->SetCollisionProfileName("WorldStatic");
+	Mesh1P->SetSimulatePhysics(false);
 	Mesh1P->SetupAttachment(SceneComp);
 
 	Mesh3P = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Mesh3P"));
@@ -159,6 +162,17 @@ USkeletalMeshComponent* ABaseWeaponClass::GetMesh3P()const
 USphereComponent* ABaseWeaponClass::GetSphereComp()const
 {
 	return this->SphereComp;
+}
+AHoloScope* ABaseWeaponClass::GetHoloScope() const
+{
+	if (HoloScope!=nullptr)
+	{
+		return HoloScope;
+	}
+	else
+	{
+		return nullptr;
+	}
 }
 
 FName ABaseWeaponClass::GetMuzzleSocketName()const
