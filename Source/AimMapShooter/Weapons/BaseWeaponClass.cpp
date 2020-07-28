@@ -31,6 +31,7 @@
 #include "Math/Rotator.h"
 #include "Math/Vector.h"
 
+#define PrintLog(text) if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Green,text)
 
 // Sets default values
 ABaseWeaponClass::ABaseWeaponClass()
@@ -49,14 +50,16 @@ ABaseWeaponClass::ABaseWeaponClass()
 	SceneComp = CreateDefaultSubobject<USceneComponent>(TEXT("SceneComp"));
 	RootComponent = SceneComp;
 
-	SkelMeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkelMesh"));
-	SkelMeshComp->SetupAttachment(SceneComp);
+	Mesh1P = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Mesh1P"));
+	Mesh1P->CastShadow = false;
+	Mesh1P->SetupAttachment(SceneComp);
 
-	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
-	Camera->SetupAttachment(SkelMeshComp, CameraSocket);
+	Mesh3P = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Mesh3P"));
+	Mesh3P->CastShadow = true;
+	Mesh3P->SetupAttachment(Mesh1P);
 
 	SphereComp = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
-	SphereComp->SetupAttachment(SkelMeshComp);
+	SphereComp->SetupAttachment(Mesh1P);
 	//
 	CurrentState = EWeaponState::Idle;
 	//
@@ -108,42 +111,72 @@ void ABaseWeaponClass::BeginPlay()
 
 
 }
+void ABaseWeaponClass::PickUpWeapon()
+{
+	if (PawnOwner)
+	{
+		PrintLog("Have owner");
 
+		if (PawnOwner->IsLocallyControlled() == true)
+		{
+			USkeletalMeshComponent* PawnMesh1P = PawnOwner->GetFPPMesh();
+			USkeletalMeshComponent* PawnMesh3P = PawnOwner->GetMesh();
+			FName AttachPoint = PawnOwner->GetWeaponAttachPoint();
+			SceneComp->AttachToComponent(PawnMesh1P, FAttachmentTransformRules::SnapToTargetNotIncludingScale, AttachPoint);
+			Mesh1P->AttachToComponent(PawnOwner->GetWeaponSpringArm(), FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+			Mesh3P->AttachToComponent(PawnMesh3P, FAttachmentTransformRules::SnapToTargetNotIncludingScale, AttachPoint);
+
+			//Turn off collision after picking up object to stop line trace to pick it up
+			if (SphereComp)
+			{
+				SphereComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+			}
+		}
+	}
+	
+}
+void ABaseWeaponClass::SetOwningPawn(ASoldierCharacter* SoldierCharacter)
+{
+	if (PawnOwner != SoldierCharacter)
+	{
+		PawnOwner = SoldierCharacter;
+		SetOwner(SoldierCharacter);
+	}
+}
 void ABaseWeaponClass::SetbWeaponSway(bool bSway)
 {
 	bStartWeaponSway = bSway;
 }
-USkeletalMeshComponent* ABaseWeaponClass::GetSkelMeshComp()
+USkeletalMeshComponent* ABaseWeaponClass::GetMesh1P()const
 {
-	return this->SkelMeshComp;
+	return this->Mesh1P;
+}
+USkeletalMeshComponent* ABaseWeaponClass::GetMesh3P()const
+{
+	return this->Mesh3P;
 }
 
-USphereComponent* ABaseWeaponClass::GetSphereComp()
+USphereComponent* ABaseWeaponClass::GetSphereComp()const
 {
 	return this->SphereComp;
 }
 
-UCameraComponent* ABaseWeaponClass::GetCamera()
-{
-	return this->Camera;
-}
-
-FName ABaseWeaponClass::GetMuzzleSocketName()
+FName ABaseWeaponClass::GetMuzzleSocketName()const
 {
 	return this->MuzzleSocket;
 }
 
-FName ABaseWeaponClass::GetScopeSocketName()
+FName ABaseWeaponClass::GetScopeSocketName()const
 {
 	return this->ScopeSocket;
 }
 
-FName ABaseWeaponClass::GetGripSocketName()
+FName ABaseWeaponClass::GetGripSocketName()const
 {
 	return this->GripSocket;
 }
 
-FName ABaseWeaponClass::GetLaserSocketName()
+FName ABaseWeaponClass::GetLaserSocketName()const
 {
 	return this->LaserSocket;
 }
@@ -269,24 +302,24 @@ void ABaseWeaponClass::CalculateWeaponSway()
 		}
 		else
 		{
-			FRotator CurrentRotation = this->GetSkelMeshComp()->GetRelativeTransform().Rotator();
+			FRotator CurrentRotation = this->GetMesh1P()->GetRelativeTransform().Rotator();
 			FRotator TargetRotation = UKismetMathLibrary::RInterpTo(CurrentRotation, FRotator(0.0f, CurrentRotation.Yaw, CurrentRotation.Roll), UGameplayStatics::GetWorldDeltaSeconds(GetWorld()), SmoothSway1);
 
-			this->GetSkelMeshComp()->SetRelativeRotation(TargetRotation);
+			this->GetMesh1P()->SetRelativeRotation(TargetRotation);
 		}
 	}
 }
 
 void ABaseWeaponClass::SetWeaponSway(float SwayDirection)
 {
-	FRotator CurrentRotation = this->GetSkelMeshComp()->GetRelativeTransform().Rotator();
+	FRotator CurrentRotation = this->GetMesh1P()->GetRelativeTransform().Rotator();
 	FRotator FinalRotation = FRotator(CurrentRotation.Pitch + SwayDirection, CurrentRotation.Yaw, CurrentRotation.Roll);
 
 	FinalRotation.Pitch = UKismetMathLibrary::Clamp(FinalRotation.Pitch, -ClampSwayDegree, ClampSwayDegree);
 
 	FRotator SwayRotation = UKismetMathLibrary::RInterpTo(CurrentRotation, FinalRotation, UGameplayStatics::GetWorldDeltaSeconds(GetWorld()), SmoothSway2);
 
-	this->GetSkelMeshComp()->SetRelativeRotation(SwayRotation);
+	this->GetMesh1P()->SetRelativeRotation(SwayRotation);
 }
 void ABaseWeaponClass::StartFire()
 {
@@ -298,6 +331,8 @@ void ABaseWeaponClass::StopFire()
 {
 	GetWorldTimerManager().ClearTimer(TimerHandle_TimeBetweenShots);
 }
+
+
 
 void ABaseWeaponClass::Fire()
 {
@@ -325,12 +360,12 @@ void ABaseWeaponClass::Fire()
 			{
 				FHitResult Hit;
 				
-				FVector StartLocation = SkelMeshComp->GetSocketLocation(ScopeSocket);
-				FRotator Rotation = SkelMeshComp->GetSocketRotation(ScopeSocket);
+				FVector StartLocation = Mesh1P->GetSocketLocation(ScopeSocket);
+				FRotator Rotation = Mesh1P->GetSocketRotation(ScopeSocket);
 				if (HoloScope)
 				{
-					StartLocation = HoloScope->GetMeshComponent()->GetSocketLocation("LineSocket");
-					Rotation = HoloScope->GetMeshComponent()->GetSocketRotation("LineSocket");
+					StartLocation = HoloScope->GetMesh1P()->GetSocketLocation("LineSocket");
+					Rotation = HoloScope->GetMesh1P()->GetSocketRotation("LineSocket");
 				}
 				FVector ShotDirection = Rotation.Vector();
 
@@ -350,7 +385,7 @@ void ABaseWeaponClass::Fire()
 
 					PlayImpactEffects(Hit.ImpactPoint);
 
-					SkelMeshComp->PlayAnimation(AnimFire, false);
+					Mesh1P->PlayAnimation(AnimFire, false);
 
 					//*Applying damage*//
 					AActor* HitActor = Hit.GetActor();
@@ -421,8 +456,8 @@ void ABaseWeaponClass::Fire()
 			if (MyOwner)
 			{
 				FHitResult Hit;
-				FVector StartLocation = SkelMeshComp->GetSocketLocation(MuzzleSocket);
-				FRotator temp = SkelMeshComp->GetSocketRotation(MuzzleSocket);
+				FVector StartLocation = Mesh1P->GetSocketLocation(MuzzleSocket);
+				FRotator temp = Mesh1P->GetSocketRotation(MuzzleSocket);
 
 				FVector RotationCamera = temp.Vector();
 				FVector ShotDirection = RotationCamera;
@@ -447,7 +482,7 @@ void ABaseWeaponClass::Fire()
 
 					PlayImpactEffects(Hit.ImpactPoint);
 
-					SkelMeshComp->PlayAnimation(AnimFire, false);
+					Mesh1P->PlayAnimation(AnimFire, false);
 
 					//*Applying damage*//
 					AActor* HitActor = Hit.GetActor();
@@ -530,7 +565,7 @@ void ABaseWeaponClass::PlayImpactEffects(FVector ImpactPoint)
 {
 	if (ImpactEffect)
 	{
-		FVector MuzzleLocation = SkelMeshComp->GetSocketLocation(MuzzleSocket);
+		FVector MuzzleLocation = Mesh1P->GetSocketLocation(MuzzleSocket);
 		FVector ShotDirection = ImpactPoint - MuzzleLocation;
 		ShotDirection.Normalize();
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactEffect, ImpactPoint, ShotDirection.Rotation());
@@ -540,7 +575,7 @@ void ABaseWeaponClass::PlayImpactEffects(FVector ImpactPoint)
 
 void ABaseWeaponClass::PlayFireEffects(FVector EndLocation)
 {
-	FVector MuzzleLocation = SkelMeshComp->GetSocketLocation(MuzzleSocket);
+	FVector MuzzleLocation = Mesh1P->GetSocketLocation(MuzzleSocket);
 
 	if (TracerEffect)
 	{
@@ -574,7 +609,7 @@ void ABaseWeaponClass::StartReload()
 		ReloadingState = EReloadingState::Reloading;
 		CurrentState = EWeaponState::Reloading;
 		
-		this->SkelMeshComp->PlayAnimation(AnimSeqReload, false);
+		this->Mesh1P->PlayAnimation(AnimSeqReload, false);
 		
 		//UGameplayStatics::PlaySoundAtLocation(GetWorld(), ReloadSound, GetActorLocation());
 
@@ -634,7 +669,7 @@ void ABaseWeaponClass::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME_CONDITION(ABaseWeaponClass, HitScanTrace, COND_SkipOwner);
-	DOREPLIFETIME(ABaseWeaponClass, SkelMeshComp);
+	DOREPLIFETIME(ABaseWeaponClass, Mesh1P);
 
 
 }

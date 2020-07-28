@@ -9,6 +9,10 @@ AHoloScope::AHoloScope()
 	SetReplicates(true);
 }
 
+FName AHoloScope::GetAttachPoint() const
+{
+	return "ScopeSocket";
+}
 
 
 

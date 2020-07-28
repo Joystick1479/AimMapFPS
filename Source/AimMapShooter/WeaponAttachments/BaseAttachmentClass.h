@@ -8,6 +8,7 @@
 
 class UStaticMeshComponent;
 class USphereComponent;
+class ASoldierCharacter;
 
 UCLASS()
 class AIMMAPSHOOTER_API ABaseAttachmentClass : public AActor
@@ -17,6 +18,7 @@ class AIMMAPSHOOTER_API ABaseAttachmentClass : public AActor
 public:	
 	// Sets default values for this actor's properties
 	ABaseAttachmentClass();
+	~ABaseAttachmentClass();
 
 protected:
 	// Called when the game starts or when spawned
@@ -26,15 +28,31 @@ protected:
 	USphereComponent* SphereComp;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-	UStaticMeshComponent* MeshComp;
+	UStaticMeshComponent* Mesh1P;
 
-	bool bPickedUp;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	UStaticMeshComponent* Mesh3P;
+
+	ASoldierCharacter* PawnOwner = nullptr;
+
+	virtual FName GetAttachPoint() const;
+
+	bool bAttachmentAttached = false;
+
+	bool bPickedUp = false;
 
 public:	
 
+	UFUNCTION(BlueprintPure)
+	virtual bool bIsAttachmentAttached()const;
+
+
+	virtual void PickUpAttachment();
 	bool GetIfPickeditem();
+	void SetOwningPawn(ASoldierCharacter* SoldierCharacter);
 	void SetIfPickedItem(bool PickedUp);
-	UStaticMeshComponent* GetMeshComponent();
+	UStaticMeshComponent* GetMesh1P();
+	UStaticMeshComponent* GetMesh3P();
 	USphereComponent* GetSphereComponent();
 	
 

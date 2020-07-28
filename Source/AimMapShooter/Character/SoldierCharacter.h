@@ -226,6 +226,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Replicated, Category = "Player")
 	TSubclassOf<ALaser> LaserClass;
 
+	UPROPERTY(EditDefaultsOnly, Replicated, Category = "Player")
+	TSubclassOf<ABaseAttachmentClass> AttachmentsClass;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Player")
 	TSubclassOf<AMagazine> MagazineClass;
 
@@ -707,14 +710,19 @@ protected:
 public:	
 
 	
-	bool GetbDied();
-	bool GetbZooming();
-	bool GetbGripAttached();
-	bool GetbWantToRespawn();
-	bool GetbWantToPickUp();
-	bool GetbIsCrouching();
+	bool GetbDied()const;
+	bool GetbZooming()const;
+	bool GetbGripAttached()const;
+	bool GetbWantToRespawn()const;
+	bool GetbWantToPickUp()const;
+	bool GetbIsCrouching()const;
 	void SetbZooming(bool SetZoom);
-	USkeletalMeshComponent* GetFPPMesh();
+	USkeletalMeshComponent* GetFPPMesh()const;
+	USpringArmComponent* GetWeaponSpringArm() const;
+	ABaseWeaponClass* GetCurrentWeapon() const;
+
+	FName GetWeaponAttachPoint() const;
+
 
 	UPROPERTY(BlueprintReadOnly)
 	bool bFireAnimation;

@@ -253,8 +253,6 @@ void ASoldierCharacter::LineTraceItem()
 	{
 		//DrawDebugLine(GetWorld(), start_trace, end_trace, FColor::Red, false, 1.0f, 0, 1.0f);
 
-		PrintLog(Hit.GetActor()->GetName());
-
 		ABaseWeaponClass* WeaponClass = Cast<ABaseWeaponClass>(Hit.GetActor());
 		if (WeaponClass)
 		{
@@ -633,101 +631,26 @@ void ASoldierCharacter::TurnOnLaser()
 }
 void ASoldierCharacter::PickUp(ABaseWeaponClass* Weapons, ABaseAttachmentClass* Attachments, ABaseSurvivalItemClass* SurvivalItem)
 {
-
 	if (IsLocallyControlled())
 	{
 		if (Weapons)
 		{
-			if (HoldingWeaponState == EHoldingWeapon::None)
-			{
-				HoldingWeaponState = EHoldingWeapon::A4;
+			Weapons->SetOwningPawn(this);
 
-				FActorSpawnParameters SpawnParams;
-				SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+			Weapons->PickUpWeapon();
 
-				UClass* ClassToSpawn = nullptr;
+			CurrentWeapon = Weapons;
 
-				AScarH* Scar = Cast<AScarH>(Weapons);
-				if (Scar)
-				{
-					ClassToSpawn = Scar->GetClass();
-				}
-				AM4Rifle* Rifle = Cast<AM4Rifle>(Weapons);
-				if (Rifle)
-				{
-					ClassToSpawn = Rifle->GetClass();
-				}
-
-				Weapons = GetWorld()->SpawnActor<ABaseWeaponClass>(ClassToSpawn, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
-				if (Weapons)
-				{
-					Weapons->SetOwner(this);
-					Weapons->AttachToComponent(WeaponSpringArm, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-					Weapons->GetSkelMeshComp()->bOnlyOwnerSee = true;
-					Weapons->GetSphereComp()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-					//Turn out postprocess outline
-					Weapons->GetSkelMeshComp()->SetRenderCustomDepth(false);
-
-					CurrentWeapon = Weapons;
-					bIsWeaponAttached = true;
-
-					Weapons->SetupWeapon(Weapons->GetCurrentAmmoInClip(), Weapons->GetCurrentAmountOfClips());
-
-					//M4Rifle->Destroy();
-
-					UGameplayStatics::PlaySoundAtLocation(this, ItemsPickUp, GetActorLocation());
-
-				}
-			}
+			bIsWeaponAttached = true;
 		}
 		if (Attachments)
 		{
-			UClass* ClassToSpawn = nullptr;
-			FName Socket = "";
-			ABaseWeaponClass* AttachmentToSpawn = nullptr;
-
-			AHoloScope * HoloAttachment = Cast<AHoloScope>(Attachments);
-			if (HoloAttachment && CurrentWeapon && !bIsHoloAttached)
-			{
-				ClassToSpawn = HoloAttachment->GetClass();
-				bIsHoloAttached = true;
-				Socket = CurrentWeapon->GetScopeSocketName();
-
-				HoloScope = HoloAttachment;
-			}
-			AGrip * GripAttachment = Cast<AGrip>(Attachments);
-			if (GripAttachment && CurrentWeapon && !bGripAttached)
-			{
-				ClassToSpawn = GripAttachment->GetClass();
-				bGripAttached = true;
-				Socket = CurrentWeapon->GetGripSocketName();
-
-				Grip = GripAttachment;
-
-			}
-
-			//UGameplayStatics::PlaySoundAtLocation(this, ItemsPickUp, GetActorLocation());
-
-			FActorSpawnParameters SpawnParams;
-			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+			Attachments->SetOwningPawn(this);
 			
-			Attachments = GetWorld()->SpawnActor<ABaseAttachmentClass>(ClassToSpawn, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
-			if (Attachments)
-			{
-				Attachments->SetOwner(this);
-				Attachments->GetMeshComponent()->bOnlyOwnerSee = true;
-				Attachments->GetMeshComponent()->SetRenderCustomDepth(false);
-				Attachments->AttachToComponent(CurrentWeapon->GetSkelMeshComp(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, Socket);
-				//CurrentWeapon->SetupHoloScope(Attachments);
-
-				Attachments->GetSphereComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-
-				//	HoloAttachment->Destroy();
-			}
-			
-			
+			Attachments->PickUpAttachment();
 		}
 	}
+	
 	
 
 
@@ -1175,11 +1098,11 @@ void ASoldierCharacter::CalcCamera(float DeltaTime, struct FMinimalViewInfo& Out
 		FTransform SightTransform;
 		if (HoloScope && bIsHoloAttached)
 		{
-			SightTransform = HoloScope->GetMeshComponent()->GetSocketTransform(FName(TEXT("LineSocket")));
+			SightTransform = HoloScope->GetMesh1P()->GetSocketTransform(FName(TEXT("LineSocket")));
 		}
 		else if(CurrentWeapon)
 		{
-			SightTransform = CurrentWeapon->GetSkelMeshComp()->GetSocketTransform(FName(TEXT("LineSocket")));
+			SightTransform = CurrentWeapon->GetMesh1P()->GetSocketTransform(FName(TEXT("LineSocket")));
 
 		}
 		FVector SightLocation = SightTransform.GetLocation();
@@ -1788,10 +1711,10 @@ void ASoldierCharacter::EndDropGun()
 				FVector LocationVector = CameraComp->GetComponentLocation();
 				FVector RotationVector = CameraComp->GetComponentRotation().Vector();
 				FVector DirectionVector = LocationVector + RotationVector;
-				Scar->GetSkelMeshComp()->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
-				Scar->GetSkelMeshComp()->SetCollisionProfileName("Pawn");
-				Scar->GetSkelMeshComp()->SetSimulatePhysics(true);
-				Scar->GetSkelMeshComp()->AddImpulse(DirectionVector* SpawnImpulse, NAME_None, true);
+				Scar->GetMesh1P()->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+				Scar->GetMesh1P()->SetCollisionProfileName("Pawn");
+				Scar->GetMesh1P()->SetSimulatePhysics(true);
+				Scar->GetMesh1P()->AddImpulse(DirectionVector* SpawnImpulse, NAME_None, true);
 				Scar->SetupWeapon(SoldierCurrentAmmoInClip, SoldierCurrentClips);
 			}
 		}
@@ -1806,10 +1729,10 @@ void ASoldierCharacter::EndDropGun()
 				FVector LocationVector = CameraComp->GetComponentLocation();
 				FVector RotationVector = CameraComp->GetComponentRotation().Vector();
 				FVector DirectionVector = LocationVector + RotationVector;
-				M4->GetSkelMeshComp()->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
-				M4->GetSkelMeshComp()->SetCollisionProfileName("Pawn");
-				M4->GetSkelMeshComp()->SetSimulatePhysics(true);
-				M4->GetSkelMeshComp()->AddImpulse(DirectionVector* SpawnImpulse, NAME_None, true);
+				M4->GetMesh1P()->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+				M4->GetMesh1P()->SetCollisionProfileName("Pawn");
+				M4->GetMesh1P()->SetSimulatePhysics(true);
+				M4->GetMesh1P()->AddImpulse(DirectionVector* SpawnImpulse, NAME_None, true);
 				M4->SetupWeapon(SoldierCurrentAmmoInClip, SoldierCurrentClips);
 			}
 		}
@@ -1824,6 +1747,26 @@ void ASoldierCharacter::EndDropGun()
 			bIsHoloAttached = false;
 			HoloEquipState = EHoloAttachment::None;
 		//	HoloScope->Destroy();
+		}
+		TArray<AActor*> Attachments;
+		UGameplayStatics::GetAllActorsOfClass(GetWorld(), AttachmentsClass, Attachments);
+		for (int i = 0; i < Attachments.Num(); i++)
+		{
+			ABaseAttachmentClass* AttachmentIt = Cast<ABaseAttachmentClass>(Attachments[i]);
+			if (AttachmentIt)
+			{
+				if (AttachmentIt->GetOwner() == this)
+				{
+					AttachmentIt->Destroy();
+					PrintLog("Found attached to owner grip");
+				}
+			}
+		}
+		ABaseAttachmentClass* AttachmentClass = Cast<ABaseAttachmentClass>(GetOwner());
+		if (AttachmentClass)
+		{
+			PrintLog("I am ownder of attachment and destroying attachments");
+			AttachmentClass->Destroy();
 		}
 		
 		CurrentWeapon->Destroy();
@@ -1844,27 +1787,27 @@ void ASoldierCharacter::EndDropGun()
 
 	GetWorldTimerManager().ClearTimer(DropTimer);
 }
-bool ASoldierCharacter::GetbDied()
+bool ASoldierCharacter::GetbDied()const
 {
 	return bDied;
 }
-bool ASoldierCharacter::GetbZooming()
+bool ASoldierCharacter::GetbZooming()const
 {
 	return bZooming;
 }
-bool ASoldierCharacter::GetbGripAttached()
+bool ASoldierCharacter::GetbGripAttached()const
 {
 	return bGripAttached;
 }
-bool ASoldierCharacter::GetbWantToRespawn()
+bool ASoldierCharacter::GetbWantToRespawn()const
 {
 	return bWantsToRepawn;
 }
-bool ASoldierCharacter::GetbWantToPickUp()
+bool ASoldierCharacter::GetbWantToPickUp()const
 {
 	return bWantToPickUp;
 }
-bool ASoldierCharacter::GetbIsCrouching()
+bool ASoldierCharacter::GetbIsCrouching()const
 {
 	return bIsCrouching;
 }
@@ -1872,9 +1815,21 @@ void ASoldierCharacter::SetbZooming(bool SetZoom)
 {
 	bZooming = SetZoom;
 }
-USkeletalMeshComponent* ASoldierCharacter::GetFPPMesh()
+USkeletalMeshComponent* ASoldierCharacter::GetFPPMesh()const
 {
 	return FPPMesh;
+}
+USpringArmComponent* ASoldierCharacter::GetWeaponSpringArm() const
+{
+	return WeaponSpringArm;
+}
+ABaseWeaponClass* ASoldierCharacter::GetCurrentWeapon() const
+{
+	return CurrentWeapon;
+}
+FName ASoldierCharacter::GetWeaponAttachPoint() const
+{
+	return "WeaponSocket";
 }
 void ASoldierCharacter::ServerDrinkWater_Implementation()
 {
@@ -1932,8 +1887,8 @@ void ASoldierCharacter::ServerPickUpItem_Implementation(ABaseWeaponClass* Weapon
 			{
 				AutomaticRifle->SetOwner(this);
 				AutomaticRifle->AttachToComponent(FPPMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocket);
-				AutomaticRifle->GetSkelMeshComp()->bOnlyOwnerSee = true;
-				AutomaticRifle->GetSkelMeshComp()->SetAnimInstanceClass(AnimBp);
+				AutomaticRifle->GetMesh1P()->bOnlyOwnerSee = true;
+				AutomaticRifle->GetMesh1P()->SetAnimInstanceClass(AnimBp);
 				AutomaticRifle->GetSphereComp()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 				CurrentWeapon = AutomaticRifle;
 				bIsWeaponAttached = true;
@@ -1967,8 +1922,8 @@ void ASoldierCharacter::ServerPickUpItem_Implementation(ABaseWeaponClass* Weapon
 				{
 					SniperRifle->SetOwner(this);
 					SniperRifle->AttachToComponent(FPPMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocket);
-					SniperRifle->GetSkelMeshComp()->bOnlyOwnerSee = true;
-					SniperRifle->GetSkelMeshComp()->SetAnimInstanceClass(AnimBp);
+					SniperRifle->GetMesh1P()->bOnlyOwnerSee = true;
+					SniperRifle->GetMesh1P()->SetAnimInstanceClass(AnimBp);
 					SniperRifle->GetSphereComp()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 					CurrentWeapon = SniperRifle;
 					bIsWeaponAttached = true;
@@ -1996,7 +1951,7 @@ void ASoldierCharacter::ServerPickUpItem_Implementation(ABaseWeaponClass* Weapon
 			{
 				Scar->SetOwner(this);
 				Scar->AttachToComponent(FPPMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocket);
-				Scar->GetSkelMeshComp()->bOnlyOwnerSee = true;
+				Scar->GetMesh1P()->bOnlyOwnerSee = true;
 				//Scar->GetSkelMeshComp()->SetAnimInstanceClass(AnimBp);
 				Scar->GetSphereComp()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 				CurrentWeapon = Scar;
@@ -2029,7 +1984,7 @@ void ASoldierCharacter::ServerPickUpItem_Implementation(ABaseWeaponClass* Weapon
 			{
 				M4->SetOwner(this);
 				M4->AttachToComponent(FPPMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocket);
-				M4->GetSkelMeshComp()->bOnlyOwnerSee = true;
+				M4->GetMesh1P()->bOnlyOwnerSee = true;
 				//Scar->GetSkelMeshComp()->SetAnimInstanceClass(AnimBp);
 				M4->GetSphereComp()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 				CurrentWeapon = M4;
@@ -2056,12 +2011,12 @@ void ASoldierCharacter::ServerPickUpItem_Implementation(ABaseWeaponClass* Weapon
 				if (HoloScope)
 				{
 					HoloScope->SetOwner(this);
-					HoloScope->GetMeshComponent()->bOnlyOwnerSee = true;
-					HoloScope->GetMeshComponent()->SetRenderCustomDepth(false);
+					HoloScope->GetMesh1P()->bOnlyOwnerSee = true;
+					HoloScope->GetMesh1P()->SetRenderCustomDepth(false);
 					if (CurrentWeapon)
 					{
 						FName Socket = CurrentWeapon->GetScopeSocketName();
-						HoloScope->AttachToComponent(CurrentWeapon->GetSkelMeshComp(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, Socket);
+						HoloScope->AttachToComponent(CurrentWeapon->GetMesh1P(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, Socket);
 					}
 					HoloScope->GetSphereComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 					bIsHoloAttached = true;
@@ -2086,12 +2041,12 @@ void ASoldierCharacter::ServerPickUpItem_Implementation(ABaseWeaponClass* Weapon
 			if (Grip)
 			{
 				Grip->SetOwner(this);
-				Grip->GetMeshComponent()->bOnlyOwnerSee = true;
-				Grip->GetMeshComponent()->SetRenderCustomDepth(false);
+				Grip->GetMesh1P()->bOnlyOwnerSee = true;
+				Grip->GetMesh1P()->SetRenderCustomDepth(false);
 				if (CurrentWeapon)
 				{
 					FName GSocket = CurrentWeapon->GetGripSocketName();
-					Grip->AttachToComponent(CurrentWeapon->GetSkelMeshComp(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, GSocket);
+					Grip->AttachToComponent(CurrentWeapon->GetMesh1P(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, GSocket);
 				}
 				Grip->GetSphereComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 				bGripAttached = true;
@@ -2114,12 +2069,12 @@ void ASoldierCharacter::ServerPickUpItem_Implementation(ABaseWeaponClass* Weapon
 			if (Laser)
 			{
 				Laser->SetOwner(this);
-				Laser->GetMeshComponent()->bOnlyOwnerSee = true;
-				Laser->GetMeshComponent()->SetRenderCustomDepth(false);
+				Laser->GetMesh1P()->bOnlyOwnerSee = true;
+				Laser->GetMesh1P()->SetRenderCustomDepth(false);
 				if (CurrentWeapon)
 				{
 					FName LSocket = CurrentWeapon->GetLaserSocketName();
-					Laser->AttachToComponent(CurrentWeapon->GetSkelMeshComp(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, LSocket);
+					Laser->AttachToComponent(CurrentWeapon->GetMesh1P(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, LSocket);
 				}
 				Laser->GetSphereComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
@@ -2143,7 +2098,7 @@ void ASoldierCharacter::ServerPickUpItem_Implementation(ABaseWeaponClass* Weapon
 			if (Helmet)
 			{
 				Helmet->SetOwner(this);
-				Helmet->GetMeshComponent()->SetRenderCustomDepth(false);
+				Helmet->GetMesh1P()->SetRenderCustomDepth(false);
 				Helmet->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, HelmetSocket);
 				Helmet->GetSphereComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 				bIsHelmetAttached = true;
@@ -2167,9 +2122,9 @@ void ASoldierCharacter::ServerPickUpItem_Implementation(ABaseWeaponClass* Weapon
 			if (Headset)
 			{
 				Headset->SetOwner(this);
-				Headset->GetMeshComponent()->SetRenderCustomDepth(false);
+				Headset->GetMesh1P()->SetRenderCustomDepth(false);
 				Headset->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, HeadsetSocket);
-				Headset->GetMeshComponent()->ToggleActive();
+				Headset->GetMesh1P()->ToggleActive();
 				Headset->GetSphereComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 				bIsHeadsetAttached = true;
 				HeadsetAttachment->Destroy();

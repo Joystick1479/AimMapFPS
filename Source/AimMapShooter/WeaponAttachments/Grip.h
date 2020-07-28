@@ -13,5 +13,8 @@ UCLASS()
 class AIMMAPSHOOTER_API AGrip : public ABaseAttachmentClass
 {
 	GENERATED_BODY()
+
+public:
+	virtual FName GetAttachPoint() const override;
 	
 };

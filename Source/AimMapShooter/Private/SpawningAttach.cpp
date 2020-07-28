@@ -58,7 +58,7 @@ void ASpawningAttach::SpawnRandom()
 		if (Holo)
 		{
 			Holo->SetOwner(this);
-			Holo->GetMeshComponent()->bOnlyOwnerSee = false;
+			Holo->GetMesh3P()->bOnlyOwnerSee = false;
 
 		}
 	}
@@ -69,7 +69,7 @@ void ASpawningAttach::SpawnRandom()
 		if (Helmet)
 		{
 			Helmet->SetOwner(this);
-			Helmet->GetMeshComponent()->bOnlyOwnerSee = false;
+			Helmet->GetMesh3P()->bOnlyOwnerSee = false;
 		}
 	}
 	if (randomNumber == 3)
@@ -79,7 +79,7 @@ void ASpawningAttach::SpawnRandom()
 		if (Headset)
 		{
 			Headset->SetOwner(this);
-			Headset->GetMeshComponent()->bOnlyOwnerSee = false;
+			Headset->GetMesh3P()->bOnlyOwnerSee = false;
 
 		}
 	}
@@ -101,7 +101,7 @@ void ASpawningAttach::SpawnRandom()
 		if (Grip)
 		{
 			Grip->SetOwner(this);
-			Grip->GetMeshComponent()->bOnlyOwnerSee = false;
+			Grip->GetMesh3P()->bOnlyOwnerSee = false;
 		}
 	}
 	if (randomNumber == 5)
@@ -111,7 +111,7 @@ void ASpawningAttach::SpawnRandom()
 		if (Magazine)
 		{
 			Magazine->SetOwner(this);
-			Magazine->GetMeshComponent()->bOnlyOwnerSee = false;
+			Magazine->GetMesh3P()->bOnlyOwnerSee = false;
 		}
 	}
 

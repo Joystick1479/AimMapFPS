@@ -17,10 +17,10 @@ ALaser::ALaser()
 	PrimaryActorTick.bCanEverTick = true;
 
 	MeshComp2 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComp2"));
-	MeshComp2->SetupAttachment(MeshComp);
+	MeshComp2->SetupAttachment(Mesh1P);
 
 	PointLight = CreateDefaultSubobject<UPointLightComponent>(TEXT("PointLightComp"));
-	PointLight->SetupAttachment(MeshComp);
+	PointLight->SetupAttachment(Mesh1P);
 
 	LaserSocket = "LaserSocket";
 
@@ -38,7 +38,7 @@ void ALaser::StartLaser(ABaseWeaponClass* WeaponClass)
 		
 		FName Socket = WeaponClass->GetMuzzleSocketName();
 		FHitResult Hit;
-		FVector StartSocketLocation = MeshComp->GetSocketLocation(LaserSocket);
+		FVector StartSocketLocation = Mesh1P->GetSocketLocation(LaserSocket);
 		FRotator ActorEyes;
 		ASoldierCharacter* SoldierChar = Cast<ASoldierCharacter>(GetOwner());
 		if (SoldierChar)

@@ -16,6 +16,6 @@ public:
 	// Sets default values for this actor's properties
 	AHoloScope();
 
-
+	virtual FName GetAttachPoint() const override;
 
 };

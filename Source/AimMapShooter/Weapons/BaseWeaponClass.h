@@ -88,20 +88,21 @@ public:
 	void SetupWeapon(int32 LoadedAmmo, int32 NumberofClips);
 	void SetupHoloScope(AHoloScope* HolScope);
 
-	UCameraComponent* GetCamera();
-	USkeletalMeshComponent* GetSkelMeshComp();
-	USphereComponent * GetSphereComp();
+	USkeletalMeshComponent* GetMesh1P() const;
+	USkeletalMeshComponent* GetMesh3P() const;
+	USphereComponent * GetSphereComp()const;
 
-	FName GetMuzzleSocketName();
-	FName GetScopeSocketName();
-	FName GetGripSocketName();
-	FName GetLaserSocketName();
+	FName GetMuzzleSocketName() const;
+	FName GetScopeSocketName()const;
+	FName GetGripSocketName()const;
+	FName GetLaserSocketName()const;
 
 	float GetDistanceToObject() const;
 	int32 GetCurrentAmmoInClip() const;
 	int32 GetAllAmmo() const;
 	int32 GetCurrentAmountOfClips() const;
 
+	virtual void PickUpWeapon();
 	virtual void AddMagazine();
 	virtual void Fire();
 
@@ -110,11 +111,15 @@ public:
 	virtual void StartFire();
 	virtual void StopFire();
 
+	void SetOwningPawn(ASoldierCharacter* SoldierCharacter);
+
 	EWeaponState::Type CurrentState;
 
 
 
 protected:
+
+	ASoldierCharacter* PawnOwner = nullptr;
 
 	/** weapon data */
 	UPROPERTY(EditDefaultsOnly, Category = Config)
@@ -130,22 +135,21 @@ protected:
 	FName LaserSocketEnd = "LaserSocketEnd";
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components", Replicated)
-	USkeletalMeshComponent* SkelMeshComp;
+	USkeletalMeshComponent* Mesh1P;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
-	UCameraComponent* Camera;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components", Replicated)
+	USkeletalMeshComponent* Mesh3P;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
 	USphereComponent* SphereComp;
 
-	USceneComponent* SceneComp;
+	USceneComponent* SceneComp = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Player")
 	TSubclassOf<UCameraShake> CameShakeHipClass;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Player")
 	TSubclassOf<UCameraShake> CameShakeZoomClass;
-
 
 	UPROPERTY(EditDefaultsOnly, Category = "ActorHit")
 	TSubclassOf<ASoldierCharacter> SoldierHit;
@@ -160,7 +164,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon sway")
 	float SmoothSway2;
 
-	float DirectionSway;
+	float DirectionSway = 0;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon sway")
 	float ClampSwayDegree;
@@ -207,8 +211,8 @@ protected:
 	//* Bullets per minute fired*//
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
 	float RateOfFire;
-	float LastFireTime;
-	float LastReloadTime;
+	float LastFireTime = 0;
+	float LastReloadTime = 0;
 
 	virtual void BeginPlay() override;
 	virtual void UseAmmo();
@@ -277,13 +281,13 @@ protected:
 	UPROPERTY(BlueprintReadOnly, Replicated)
 	bool bFireAnimation;
 
-	bool bStartWeaponSway;
+	bool bStartWeaponSway = false;
 
 	FRotator WeaponInitialRotation;
 
-	AHelmet* Helmet;
+	AHelmet* Helmet = nullptr;
 
-	AHoloScope* HoloScope;
+	AHoloScope* HoloScope = nullptr;
 
 	
 };
