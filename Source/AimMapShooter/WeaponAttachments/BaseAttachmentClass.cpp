@@ -64,7 +64,6 @@ void ABaseAttachmentClass::PickUpAttachment(ABaseWeaponClass* Weapon)
 		}
 	}
 	
-	
 }
 void ABaseAttachmentClass::SetOwningPawn(ASoldierCharacter* SoldierCharacter)
 {
@@ -74,7 +73,7 @@ void ABaseAttachmentClass::SetOwningPawn(ASoldierCharacter* SoldierCharacter)
 		SetOwner(SoldierCharacter);
 	}
 }
-bool ABaseAttachmentClass::GetIfPickeditem()
+bool ABaseAttachmentClass::GetIfPickeditem() const
 {
 	return bPickedUp;
 }
@@ -83,15 +82,15 @@ void ABaseAttachmentClass::SetIfPickedItem(bool PickedUp)
 	bPickedUp = PickedUp;
 }
 
-UStaticMeshComponent* ABaseAttachmentClass::GetMesh1P()
+UStaticMeshComponent* ABaseAttachmentClass::GetMesh1P() const
 {
 	return Mesh1P;
 }
-UStaticMeshComponent* ABaseAttachmentClass::GetMesh3P()
+UStaticMeshComponent* ABaseAttachmentClass::GetMesh3P() const
 {
 	return Mesh3P;
 }
-USphereComponent* ABaseAttachmentClass::GetSphereComponent()
+USphereComponent* ABaseAttachmentClass::GetSphereComponent() const
 {
 	return SphereComp;
 }

@@ -36,7 +36,6 @@ class ABaseWeaponClass;
 class ABaseAttachmentClass;
 class ABaseSurvivalItemClass;
 
-
 namespace ECharacterState
 {
 	enum Type

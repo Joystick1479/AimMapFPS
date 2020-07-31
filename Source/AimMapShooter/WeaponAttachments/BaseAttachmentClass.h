@@ -49,12 +49,12 @@ public:
 
 
 	virtual void PickUpAttachment(ABaseWeaponClass* Weapon);
-	bool GetIfPickeditem();
+	bool GetIfPickeditem() const;
 	void SetOwningPawn(ASoldierCharacter* SoldierCharacter);
 	void SetIfPickedItem(bool PickedUp);
-	UStaticMeshComponent* GetMesh1P();
-	UStaticMeshComponent* GetMesh3P();
-	USphereComponent* GetSphereComponent();
+	UStaticMeshComponent* GetMesh1P() const;
+	UStaticMeshComponent* GetMesh3P() const;
+	USphereComponent* GetSphereComponent()const;
 	
 
 };
