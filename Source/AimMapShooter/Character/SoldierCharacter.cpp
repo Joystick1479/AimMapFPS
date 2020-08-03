@@ -76,6 +76,7 @@ ASoldierCharacter::ASoldierCharacter()
 	WeaponBackSocket = "WeaponBackSocket";
 
 	RootComponent = this->GetRootComponent();
+	GetMesh()->CastShadow = true;
 
 	SpringArm = CreateDefaultSubobject <USpringArmComponent>(TEXT("SpringArm"));
 	SpringArm->SetupAttachment(RootComponent);
@@ -84,6 +85,7 @@ ASoldierCharacter::ASoldierCharacter()
 	CameraComp->SetupAttachment(SpringArm);
 
 	FPPMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("FPPMesh"));
+	FPPMesh->CastShadow = false;
 	FPPMesh->SetupAttachment(CameraComp);
 
 	WeaponSpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("WeaponSpring"));

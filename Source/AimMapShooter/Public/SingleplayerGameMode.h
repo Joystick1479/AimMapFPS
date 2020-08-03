@@ -22,6 +22,9 @@ protected:
 	int32 NrOfBotsToSpawn = 0;
 	int32 WaveCount = 0;
 
+	UPROPERTY(EditDefaultsOnly, Category = "GameMode")
+	int32 MultiplyNumberOfBots = 0;
+
 	UPROPERTY(EditDefaultsOnly, Category =  "GameMode")
 	float TimeBetweenWaves = 0;
 

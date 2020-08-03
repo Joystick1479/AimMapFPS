@@ -20,7 +20,7 @@ void ASingleplayerGameMode::StartWave()
 {
 	WaveCount++;
 
-	NrOfBotsToSpawn = 2 * WaveCount;
+	NrOfBotsToSpawn = MultiplyNumberOfBots * WaveCount;
 
 	GetWorldTimerManager().SetTimer(TimerHandle_BotSpawner, this, &ASingleplayerGameMode::SpawnBotTimerElapsed, 1.0f, true, 0.0f);
 }
