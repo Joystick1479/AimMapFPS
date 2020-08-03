@@ -94,7 +94,10 @@ void ABaseWeaponClass::SetupWeapon(int32 LoadedAmmo, int32 NumberofClips)
 	CurrentAmmoInClip = LoadedAmmo;
 	CurrentAmountOfClips = NumberofClips;
 }
-
+void ABaseWeaponClass::SetupHoloScope(AHoloScope * HolScope)
+{
+	HoloScope = HolScope;
+}
 // Called when the game starts or when spawned
 void ABaseWeaponClass::BeginPlay()
 {

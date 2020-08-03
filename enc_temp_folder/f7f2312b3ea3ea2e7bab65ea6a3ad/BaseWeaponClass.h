@@ -86,6 +86,7 @@ public:
 	// Sets default values for this actor's properties
 	ABaseWeaponClass();
 	void SetupWeapon(int32 LoadedAmmo, int32 NumberofClips);
+	void SetupHoloScope(AHoloScope* HolScope);
 
 	USkeletalMeshComponent* GetMesh1P() const;
 	USkeletalMeshComponent* GetMesh3P() const;

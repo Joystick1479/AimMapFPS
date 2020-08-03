@@ -718,6 +718,7 @@ void ASoldierCharacter::AddToInventory(ABaseAttachmentClass* Attachment)
 		NumberOfHoloScopes++;
 		if (HoloScope == nullptr)
 		{
+			PrintLog("Nullptr");
 			HoloScope = HoloAttachment;
 
 			bDuplicateItem = false;
@@ -740,13 +741,7 @@ void ASoldierCharacter::AddToInventory(ABaseAttachmentClass* Attachment)
 	{
 		InventoryAttachmentArray.Add(GripAttachment);
 		NumberOfGrip++;
-		if (Grip == nullptr)
-		{
-			Grip = GripAttachment;
-
-			bDuplicateItem = false;
-		}
-		else if (NumberOfGrip > 1)
+		if (NumberOfGrip > 1)
 		{
 			bDuplicateItem = true;
 			GripAttachment->Destroy();
@@ -1475,9 +1470,7 @@ void ASoldierCharacter::EndDropGun()
 				if (AttachmentIt->GetOwner() == this)
 				{
 					AttachmentIt->Destroy();
-
 					HoloScope = nullptr;
-					Grip = nullptr;
 				}
 			}
 		}
@@ -1518,7 +1511,14 @@ void ASoldierCharacter::SetbZooming(bool SetZoom)
 {
 	bZooming = SetZoom;
 }
-
+void ASoldierCharacter::SetHoloScope(AHoloScope* Holo)
+{
+	HoloScope = Holo;
+}
+AHoloScope* ASoldierCharacter::GetHoloScope() const
+{
+	return HoloScope;
+}
 USkeletalMeshComponent* ASoldierCharacter::GetFPPMesh()const
 {
 	return FPPMesh;

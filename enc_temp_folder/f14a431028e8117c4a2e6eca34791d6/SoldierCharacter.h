@@ -710,7 +710,6 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated, Category = "Zoom")
 	bool bZooming;
 
-	//Inventory
 	virtual void AddToInventory(ABaseAttachmentClass* Attachment);
 	TArray<ABaseAttachmentClass*> InventoryAttachmentArray;
 	uint8 NumberOfHoloScopes = 0;
@@ -727,6 +726,8 @@ public:
 	bool GetbWantToPickUp()const;
 	bool GetbIsCrouching()const;
 	void SetbZooming(bool SetZoom);
+	void SetHoloScope(AHoloScope* Holo);
+	AHoloScope* GetHoloScope() const;
 	USkeletalMeshComponent* GetFPPMesh()const;
 	USpringArmComponent* GetWeaponSpringArm() const;
 	ABaseWeaponClass* GetCurrentWeapon() const;
