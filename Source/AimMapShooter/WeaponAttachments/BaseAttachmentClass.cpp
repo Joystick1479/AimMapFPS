@@ -9,6 +9,8 @@
 #include "Character/SoldierCharacter.h"
 #include "Weapons/BaseWeaponClass.h"
 
+#define PrintLog(text) if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Green,text)
+
 // Sets default values
 ABaseAttachmentClass::ABaseAttachmentClass()
 {

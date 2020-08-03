@@ -6,6 +6,10 @@
 #include "GameFramework/Character.h"
 #include "Components/TimelineComponent.h"
 #include "Templates/UniquePtr.h" 
+
+#include "Containers/Array.h" 
+#include "Containers/Map.h"
+
 #include "SoldierCharacter.generated.h"
 
 class UCameraComponent;
@@ -705,6 +709,12 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated, Category = "Zoom")
 	bool bZooming;
+
+	virtual void AddToInventory(ABaseAttachmentClass* Attachment);
+	TArray<ABaseAttachmentClass*> InventoryAttachmentArray;
+	uint8 NumberOfHoloScopes = 0;
+	uint8 NumberOfGrip = 0;
+	bool bDuplicateItem = false;
 
 public:	
 

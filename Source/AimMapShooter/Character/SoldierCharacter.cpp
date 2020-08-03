@@ -638,7 +638,6 @@ void ASoldierCharacter::PickUp(ABaseWeaponClass* Weapons, ABaseAttachmentClass* 
 	{
 		if (Weapons)
 		{
-			Weapons->SetOwningPawn(this);
 
 			//Dropped gun can be droppped from another player before so they have collision and physics on - we do not want that here
 			Weapons->GetMesh1P()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -650,19 +649,25 @@ void ASoldierCharacter::PickUp(ABaseWeaponClass* Weapons, ABaseAttachmentClass* 
 
 			Weapons->PickUpWeapon();
 
+			Weapons->SetOwningPawn(this);
+
 			CurrentWeapon = Weapons;
 
 			bIsWeaponAttached = true;
+
 		}
 		if (Attachments)
 		{
-			
-			Attachments->SetOwningPawn(this);
-			if (CurrentWeapon)
+
+			AddToInventory(Attachments);
+
+			if (CurrentWeapon && !bDuplicateItem)
 			{
+				Attachments->SetOwningPawn(this);
+
 				Attachments->PickUpAttachment(CurrentWeapon);
 			}
-			
+
 		}
 	}
 
@@ -702,6 +707,42 @@ void ASoldierCharacter::PickUp(ABaseWeaponClass* Weapons, ABaseAttachmentClass* 
 
 	}
 	
+}
+void ASoldierCharacter::AddToInventory(ABaseAttachmentClass* Attachment)
+{
+	
+	AHoloScope* HoloAttachment = Cast<AHoloScope>(Attachment);
+	if (HoloAttachment)
+	{
+		HoloScope = HoloAttachment;
+		InventoryAttachmentArray.Add(HoloAttachment);
+		NumberOfHoloScopes++;
+		if (NumberOfHoloScopes > 1)
+		{
+			bDuplicateItem = true;
+		}
+		else
+		{
+			bDuplicateItem = false;
+		}
+	}
+
+	AGrip* GripAttachment = Cast<AGrip>(Attachment);
+	if (GripAttachment)
+	{
+		Grip = GripAttachment;
+		InventoryAttachmentArray.Add(GripAttachment);
+		NumberOfGrip++;
+		if (NumberOfGrip > 1)
+		{
+			bDuplicateItem = true;
+		}
+		else
+		{
+			bDuplicateItem = false;
+		}
+	}
+
 }
 void ASoldierCharacter::EndDrinkFromPond(APlayerController* PC)
 {
@@ -1406,42 +1447,6 @@ void ASoldierCharacter::EndDropGun()
 			Weapon->GetMesh1P()->AddImpulse(DirectionVector* SpawnImpulse, NAME_None, true);
 			Weapon->SetupWeapon(SoldierCurrentAmmoInClip, SoldierCurrentClips);
 		}
-		/*AScarH* ScarH = Cast<AScarH>(CurrentWeapon);
-		if (ScarH)
-		{
-			FActorSpawnParameters SpawnParams;
-			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-			Scar = GetWorld()->SpawnActor<AScarH>(ScarHRifleClass, this->GetActorLocation(), this->GetActorRotation(), SpawnParams);
-			if (Scar)
-			{
-				FVector LocationVector = CameraComp->GetComponentLocation();
-				FVector RotationVector = CameraComp->GetComponentRotation().Vector();
-				FVector DirectionVector = LocationVector + RotationVector;
-				Scar->GetMesh1P()->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
-				Scar->GetMesh1P()->SetCollisionProfileName("Pawn");
-				Scar->GetMesh1P()->SetSimulatePhysics(true);
-				Scar->GetMesh1P()->AddImpulse(DirectionVector* SpawnImpulse, NAME_None, true);
-				Scar->SetupWeapon(SoldierCurrentAmmoInClip, SoldierCurrentClips);
-			}
-		}
-		AM4Rifle*  M4Rifle = Cast<AM4Rifle>(CurrentWeapon);
-		if (M4Rifle)
-		{
-			FActorSpawnParameters SpawnParams;
-			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-			M4 = GetWorld()->SpawnActor<AM4Rifle>(M4RifleClass, this->GetActorLocation(), this->GetActorRotation(), SpawnParams);
-			if (M4)
-			{
-				FVector LocationVector = CameraComp->GetComponentLocation();
-				FVector RotationVector = CameraComp->GetComponentRotation().Vector();
-				FVector DirectionVector = LocationVector + RotationVector;
-				M4->GetMesh1P()->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
-				M4->GetMesh1P()->SetCollisionProfileName("Pawn");
-				M4->GetMesh1P()->SetSimulatePhysics(true);
-				M4->GetMesh1P()->AddImpulse(DirectionVector* SpawnImpulse, NAME_None, true);
-				M4->SetupWeapon(SoldierCurrentAmmoInClip, SoldierCurrentClips);
-			}
-		}*/
 
 		///Destroy all attachments attached to gun
 		TArray<AActor*> Attachments;
